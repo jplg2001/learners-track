@@ -293,6 +293,44 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .bulk-cert-progress { margin-top:12px; }
 .bulk-cert-bar { height:10px; background:var(--bg-card); border-radius:999px; overflow:hidden; margin-top:6px; }
 .bulk-cert-bar span { display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--success)); width:0%; transition:width 0.2s; }
+/* --- Planeaciones (lesson plans) --- */
+.lesson-plan-content { max-width:720px; width:96vw; max-height:92vh; }
+.lp-tabs { display:flex; gap:8px; margin-bottom:14px; border-bottom:2px solid var(--badge-border); }
+.lp-tab { background:none; border:none; border-bottom:3px solid transparent; padding:9px 14px; font-weight:700; font-size:0.98em; color:var(--fg); opacity:0.6; cursor:pointer; transition:var(--transition); }
+.lp-tab.active { opacity:1; color:var(--accent-strong); border-bottom-color:var(--accent-strong); }
+.lp-panel { animation:fadeIn 0.25s ease; }
+.lp-dropzone { border:2px dashed var(--accent); border-radius:12px; padding:22px 14px; text-align:center; cursor:pointer; background:var(--bg-card); transition:var(--transition); }
+.lp-dropzone:hover,.lp-dropzone.dragging { background:var(--badge-bg); border-color:var(--accent-strong); transform:translateY(-2px); }
+.lp-dropzone p { margin:0; font-weight:600; }
+.lp-formats { font-size:0.8em; opacity:0.7; margin-top:6px !important; font-weight:400 !important; }
+.lp-paste { margin-top:10px; font-size:0.9em; }
+.lp-paste summary { cursor:pointer; font-weight:600; color:var(--accent); padding:6px 0; }
+.lp-paste input,.lp-paste textarea { border-radius:8px; border:1px solid #c9d8f6; padding:8px; font-family:inherit; font-size:0.95em; }
+.lp-list { margin-top:12px; display:flex; flex-direction:column; gap:7px; max-height:190px; overflow-y:auto; }
+.lp-item { display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--badge-border); border-radius:9px; padding:8px 11px; }
+.lp-item-name { font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.92em; }
+.lp-item-meta { font-size:0.78em; opacity:0.65; white-space:nowrap; }
+.lp-item button { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.05em; padding:2px 6px; border-radius:5px; }
+.lp-item button:hover { background:rgba(255,107,107,0.15); }
+.lp-empty { text-align:center; padding:14px; opacity:0.6; font-size:0.9em; }
+.lp-style-box { margin-top:14px; background:var(--bg-card); border:1px solid var(--badge-border); border-radius:12px; padding:12px 14px; }
+.lp-style-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-weight:700; color:var(--accent-strong); }
+.lp-style-body { margin-top:9px; font-size:0.89em; line-height:1.5; }
+.lp-style-body ul { margin:5px 0; padding-left:19px; }
+.lp-style-body li { margin:3px 0; }
+.lp-style-badge { font-size:0.85em; padding:8px 12px; border-radius:9px; margin-bottom:12px; }
+.lp-style-badge.ok { background:rgba(32,209,132,0.13); border-left:3px solid var(--success); }
+.lp-style-badge.warn { background:rgba(243,156,18,0.13); border-left:3px solid var(--warning); }
+.lp-form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:0 14px; }
+.lp-gen-status { text-align:center; padding:16px; font-weight:600; }
+.lp-result { margin-top:12px; background:var(--bg); border:1px solid var(--badge-border); border-radius:12px; padding:14px 16px; max-height:300px; overflow-y:auto; font-size:0.9em; }
+.lp-result h4 { color:var(--accent-strong); margin:12px 0 5px; }
+.lp-result h4:first-child { margin-top:0; }
+.lp-result ul { margin:5px 0; padding-left:19px; }
+.lp-result table { width:100%; border-collapse:collapse; margin:9px 0; font-size:0.88em; }
+.lp-result th,.lp-result td { border:1px solid var(--badge-border); padding:6px 8px; text-align:left; vertical-align:top; }
+.lp-result th { background:var(--accent); color:#fff; }
+@media (max-width:600px){ .lp-tab { padding:8px 9px; font-size:0.86em; } .lesson-plan-content { padding:26px 16px 18px; } }
 /* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
 .badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
 .badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
@@ -431,6 +469,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <button class="ai-analysis-btn" onclick="openAIAnalysisModal()">🤖 AI Classroom Analysis</button>
             <button class="ai-analysis-btn" onclick="weeklySummaryAI()" style="margin-top:10px;background:linear-gradient(135deg,#20d184 0%,#4facfe 100%);">📅 <span id="weeklySummaryBtnText">Weekly summary (AI)</span></button>
             <button class="ai-analysis-btn" onclick="openAiChatModal()" style="margin-top:10px;background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);">💬 Hablar con el Asistente IA</button>
+            <button class="ai-analysis-btn" onclick="openLessonPlanModal()" style="margin-top:10px;background:linear-gradient(135deg,#f39c12 0%,#e8617d 100%);">📝 <span id="lessonPlanBtnText">Planeaciones (IA)</span></button>
             <button class="ai-analysis-btn" onclick="openApiKeySettingsModal()" style="margin-top:10px;background:linear-gradient(135deg,#232946 0%,#667eea 100%);">🔐 Configurar IA</button>
             <div class="stats">
                 <h4 id="statsTitle">📊 Statistics</h4>
@@ -644,6 +683,68 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
     </div>
 </div>
 
+<!-- Lesson Plans (AI) Modal -->
+<div class="modal" id="lessonPlanModal" style="display:none;" aria-hidden="true">
+    <div class="modal-content lesson-plan-content">
+        <button class="modal-close-btn" onclick="closeLessonPlanModal()">&times;</button>
+        <h3 id="lpTitle" style="color:var(--accent-strong);margin-bottom:4px;">📝 Planeaciones con IA</h3>
+        <p id="lpIntro" style="font-size:0.9em;opacity:0.85;margin-bottom:14px;">Sube tus planeaciones para que la IA aprenda tu estilo, y genera la de la próxima clase en Word.</p>
+
+        <div class="lp-tabs" role="tablist">
+            <button type="button" class="lp-tab active" id="lpTabMine" role="tab" onclick="switchLessonPlanTab('mine')">📚 <span id="lpTabMineText">Mis planeaciones</span></button>
+            <button type="button" class="lp-tab" id="lpTabNew" role="tab" onclick="switchLessonPlanTab('new')">✨ <span id="lpTabNewText">Generar la siguiente</span></button>
+        </div>
+
+        <!-- Panel: mis planeaciones -->
+        <div id="lpPanelMine" class="lp-panel">
+            <div class="lp-dropzone" id="lpDropzone">
+                <p id="lpDropText">Arrastra aquí tus planeaciones o pulsa para elegirlas</p>
+                <p class="lp-formats" id="lpFormats">Word (.docx), PDF, texto (.txt, .md)</p>
+                <input type="file" id="lpFileInput" accept=".docx,.pdf,.txt,.md,text/plain" multiple style="display:none;">
+            </div>
+            <details class="lp-paste">
+                <summary id="lpPasteSummary">…o pegar el texto directamente</summary>
+                <input type="text" id="lpPasteName" placeholder="Nombre de la planeación" style="width:100%;box-sizing:border-box;margin-bottom:6px;">
+                <textarea id="lpPasteText" rows="5" placeholder="Pega aquí el contenido de tu planeación..." style="width:100%;box-sizing:border-box;"></textarea>
+                <button type="button" class="btn-secondary" style="margin-top:6px;" onclick="addPastedLessonPlan()" id="lpPasteAddBtn">Añadir</button>
+            </details>
+            <div id="lpList" class="lp-list"></div>
+            <div class="lp-style-box">
+                <div class="lp-style-head">
+                    <span id="lpStyleTitle">🎯 Tu estilo de enseñanza</span>
+                    <button type="button" class="btn-ai" id="lpAnalyzeBtn" onclick="analyzeTeachingStyle()">Analizar mi estilo</button>
+                </div>
+                <div id="lpStyleBody" class="lp-style-body"></div>
+            </div>
+        </div>
+
+        <!-- Panel: generar -->
+        <div id="lpPanelNew" class="lp-panel" style="display:none;">
+            <div id="lpStyleBadge" class="lp-style-badge"></div>
+            <div class="lp-form-grid">
+                <div class="form-group"><label for="lpTopic" id="lpTopicLabel">Tema de la clase: *</label><input type="text" id="lpTopic" placeholder="Ej: Fracciones equivalentes"></div>
+                <div class="form-group"><label for="lpSubject" id="lpSubjectLabel">Asignatura:</label><input type="text" id="lpSubject" placeholder="Ej: Matemáticas"></div>
+                <div class="form-group"><label for="lpGrade" id="lpGradeLabel">Grado/Nivel:</label><input type="text" id="lpGrade"></div>
+                <div class="form-group"><label for="lpDuration" id="lpDurationLabel">Duración:</label><input type="text" id="lpDuration" placeholder="Ej: 50 minutos"></div>
+            </div>
+            <div class="form-group"><label for="lpObjective" id="lpObjectiveLabel">¿Qué quieres que aprendan?</label><textarea id="lpObjective" rows="2" placeholder="Ej: Que identifiquen fracciones equivalentes usando material concreto"></textarea></div>
+            <div class="form-group"><label for="lpResources" id="lpResourcesLabel">Materiales disponibles:</label><input type="text" id="lpResources" placeholder="Ej: tablero, fichas, sin proyector"></div>
+            <div class="form-group"><label for="lpNotes" id="lpNotesLabel">Notas o consideraciones (opcional):</label><textarea id="lpNotes" rows="2" placeholder="Ej: grupo muy participativo, hay 3 estudiantes que necesitan apoyo"></textarea></div>
+            <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+                <input type="checkbox" id="lpUseClassData" style="width:auto;transform:scale(1.1);">
+                <label for="lpUseClassData" id="lpUseClassDataLabel" style="margin:0;cursor:pointer;">Tener en cuenta el rendimiento actual de mi salón</label>
+            </div>
+            <div id="lpGenStatus" class="lp-gen-status" style="display:none;"></div>
+            <div id="lpResult" class="lp-result" style="display:none;"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;">
+                <button type="button" class="btn-secondary" onclick="closeLessonPlanModal()" id="lpCloseBtn">Cerrar</button>
+                <button type="button" class="btn-ai" id="lpGenerateBtn" onclick="generateLessonPlan()">✨ Generar planeación</button>
+                <button type="button" class="btn-primary" id="lpDownloadBtn" onclick="downloadLessonPlanDocx()" style="display:none;">📄 Descargar Word</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bulk Certificates Modal -->
 <div class="modal" id="bulkCertModal" style="display:none;" aria-hidden="true">
     <div class="modal-content" style="max-width:620px;">
@@ -734,6 +835,13 @@ let noteColumns = ["Evaluation 1","Evaluation 2"];
 let badgePointsEnabled = false;
 let badgePointValue = 0.2;
 const MAX_NOTE = 5;
+// === PLANEACIONES (LESSON PLANS) ===
+// Planes que sube el docente, de los que la IA extrae su estilo de enseñanza
+// para que las planeaciones nuevas se parezcan a las suyas.
+let lessonPlans = [];            // [{id,name,text,chars,date}]
+let teachingStyleProfile = null; // perfil de estilo devuelto por la IA
+const LESSON_PLAN_MAX_CHARS = 30000;   // por plan
+const LESSON_PLANS_MAX_TOTAL = 240000; // en total, para no reventar el limite de Firestore
 
 // === HELPER FUNCTIONS ===
 function addInstitutionLogoToPDF(pdf,logoData,config) {
@@ -1226,6 +1334,7 @@ function logout() {
     classrooms=[]; activeClassroomIndex=0; gridWeeks=1; weekTitles=["Week 1"]; noteColumns=["Evaluation 1","Evaluation 2"];
     // Se limpia tambien el perfil y el aula en memoria para no filtrar datos al siguiente usuario.
     currentBadges=[]; currentStudents=[]; disarmBadge();
+    lessonPlans=[]; teachingStyleProfile=null;
     userProfile={ name:'Teacher', avatar:'https://i.pravatar.cc/150?u=teacher', email:'', school:'', grade:'', institutionLogo:null };
     const _hl=document.getElementById('institutionLogoSmall'); if(_hl){_hl.src='';_hl.style.display='none';}
     const _ha=document.getElementById('headerAvatar'); if(_ha){_ha.src='';_ha.style.display='none';}
@@ -1245,6 +1354,7 @@ function saveUserProfile() {
     currentUser.classrooms=classrooms; currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles;
     currentUser.noteColumns=noteColumns; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
+    currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
     saveUsers(); updateUIWithProfile();
     if(window.FIREBASE_ON) scheduleCloudPush();
 }
@@ -1272,6 +1382,7 @@ function saveData() {
     currentUser.classrooms=classrooms; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles; currentUser.noteColumns=noteColumns;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
+    currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
     saveUsers();
     if(window.FIREBASE_ON) scheduleCloudPush();
 }
@@ -2200,6 +2311,8 @@ async function handleLogin(event){
             noteColumns=user.noteColumns||["Evaluation 1","Evaluation 2"];
             badgePointsEnabled=!!user.badgePointsEnabled;
             badgePointValue=(typeof user.badgePointValue==='number')?user.badgePointValue:0.2;
+            lessonPlans=Array.isArray(user.lessonPlans)?user.lessonPlans:[];
+            teachingStyleProfile=user.teachingStyleProfile||null;
             updateUIWithProfile(); hideProfileSetup(); loadActiveClassroom();
         } else {
             updateUIWithProfile(); showProfileSetup();
@@ -2646,6 +2759,39 @@ function updateNewFeaturesText(){
     setTxt('bulkCertGenerateBtn','📦 Generar y descargar ZIP','📦 Generate and download ZIP');
     const bcc=document.getElementById('bulkCertComment'); if(bcc)bcc.placeholder=es?'Comentario adicional...':'Additional comment...';
     if(document.getElementById('bulkCertPreview')&&document.getElementById('bulkCertModal')?.style.display==='flex') renderBulkCertPreview();
+    // --- Planeaciones ---
+    const lpb=document.getElementById('lessonPlanBtnText'); if(lpb)lpb.textContent=es?'Planeaciones (IA)':'Lesson plans (AI)';
+    setTxt('lpTitle','📝 Planeaciones con IA','📝 AI Lesson Plans');
+    setTxt('lpIntro','Sube tus planeaciones para que la IA aprenda tu estilo, y genera la de la próxima clase en Word.','Upload your lesson plans so the AI learns your style, then generate the next class as a Word file.');
+    setTxt('lpTabMineText','Mis planeaciones','My lesson plans');
+    setTxt('lpTabNewText','Generar la siguiente','Generate the next one');
+    setTxt('lpDropText','Arrastra aquí tus planeaciones o pulsa para elegirlas','Drag your lesson plans here or click to choose them');
+    setTxt('lpFormats','Word (.docx), PDF, texto (.txt, .md)','Word (.docx), PDF, text (.txt, .md)');
+    setTxt('lpPasteSummary','…o pegar el texto directamente','…or paste the text directly');
+    setTxt('lpPasteAddBtn','Añadir','Add');
+    setTxt('lpStyleTitle','🎯 Tu estilo de enseñanza','🎯 Your teaching style');
+    setTxt('lpAnalyzeBtn','Analizar mi estilo','Analyze my style');
+    setTxt('lpTopicLabel','Tema de la clase: *','Class topic: *');
+    setTxt('lpSubjectLabel','Asignatura:','Subject:');
+    setTxt('lpGradeLabel','Grado/Nivel:','Grade/Level:');
+    setTxt('lpDurationLabel','Duración:','Duration:');
+    setTxt('lpObjectiveLabel','¿Qué quieres que aprendan?','What do you want them to learn?');
+    setTxt('lpResourcesLabel','Materiales disponibles:','Available materials:');
+    setTxt('lpNotesLabel','Notas o consideraciones (opcional):','Notes or considerations (optional):');
+    setTxt('lpUseClassDataLabel','Tener en cuenta el rendimiento actual de mi salón','Take my classroom’s current performance into account');
+    setTxt('lpCloseBtn','Cerrar','Close');
+    setTxt('lpGenerateBtn','✨ Generar planeación','✨ Generate lesson plan');
+    setTxt('lpDownloadBtn','📄 Descargar Word','📄 Download Word');
+    const ph=(id,e,i)=>{const el=document.getElementById(id); if(el)el.placeholder=es?e:i;};
+    ph('lpPasteName','Nombre de la planeación','Lesson plan name');
+    ph('lpPasteText','Pega aquí el contenido de tu planeación...','Paste your lesson plan content here...');
+    ph('lpTopic','Ej: Fracciones equivalentes','E.g.: Equivalent fractions');
+    ph('lpSubject','Ej: Matemáticas','E.g.: Mathematics');
+    ph('lpDuration','Ej: 50 minutos','E.g.: 50 minutes');
+    ph('lpObjective','Ej: Que identifiquen fracciones equivalentes usando material concreto','E.g.: That they identify equivalent fractions using manipulatives');
+    ph('lpResources','Ej: tablero, fichas, sin proyector','E.g.: board, counters, no projector');
+    ph('lpNotes','Ej: grupo muy participativo, hay 3 estudiantes que necesitan apoyo','E.g.: very participative group, 3 students need support');
+    if(document.getElementById('lpList')&&document.getElementById('lessonPlanModal')?.style.display==='flex'){ renderLessonPlanList(); renderStyleBadge(); }
     syncBadgePointsControls();
     const anl=document.getElementById('aiAnonymizeLabel');
     if(anl)anl.textContent=es
@@ -2964,6 +3110,147 @@ function updateChatMessageSafe(id,text){
   if(wrap)wrap.scrollTop=wrap.scrollHeight;
 }
 
+// ===================== LECTURA DE PLANEACIONES SUBIDAS =====================
+// mammoth (.docx) y pdf.js (.pdf) se cargan SOLO cuando el docente sube ese tipo de
+// archivo: son pesadas y no deben ralentizar el arranque de la app para todos.
+const LP_MAMMOTH_URL='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+const LP_PDFJS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const LP_PDFJS_WORKER='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+function loadScriptOnce(url,globalName){
+    return new Promise((resolve,reject)=>{
+        if(globalName&&window[globalName]) return resolve(window[globalName]);
+        let s=document.querySelector(`script[data-lazy="${url}"]`);
+        if(s){
+            s.addEventListener('load',()=>resolve(window[globalName]));
+            s.addEventListener('error',()=>reject(new Error('No se pudo cargar '+url)));
+            return;
+        }
+        s=document.createElement('script');
+        s.src=url; s.async=true; s.dataset.lazy=url;
+        s.onload=()=>resolve(window[globalName]);
+        s.onerror=()=>reject(new Error('No se pudo cargar la librería necesaria'));
+        document.head.appendChild(s);
+    });
+}
+async function extractTextFromFile(file){
+    const es=currentLanguage==='es';
+    const nombre=(file.name||'').toLowerCase();
+    if(nombre.endsWith('.txt')||nombre.endsWith('.md')||(file.type||'').startsWith('text/')){
+        return await file.text();
+    }
+    if(nombre.endsWith('.docx')){
+        const mammoth=await loadScriptOnce(LP_MAMMOTH_URL,'mammoth');
+        const r=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});
+        return (r&&r.value)||'';
+    }
+    if(nombre.endsWith('.pdf')){
+        const pdfjs=await loadScriptOnce(LP_PDFJS_URL,'pdfjsLib');
+        pdfjs.GlobalWorkerOptions.workerSrc=LP_PDFJS_WORKER;
+        const doc=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+        let texto='';
+        for(let i=1;i<=doc.numPages;i++){
+            const page=await doc.getPage(i);
+            const tc=await page.getTextContent();
+            texto+=tc.items.map(it=>it.str).join(' ')+'\n\n';
+        }
+        return texto;
+    }
+    if(nombre.endsWith('.doc')) throw new Error(es
+        ? 'El formato .doc antiguo no se puede leer. Ábrelo en Word y guárdalo como .docx.'
+        : 'Old .doc format is not readable. Open it in Word and save as .docx.');
+    throw new Error(es?'Formato no admitido':'Unsupported format');
+}
+
+// ===================== GENERADOR DE DOCUMENTOS WORD (.docx) =====================
+// Un .docx es un ZIP con XML dentro. Como JSZip ya esta cargado para los certificados,
+// se construye aqui un documento Word real (no un HTML renombrado, que Word abre con
+// avisos y no permite editar bien).
+function xmlEsc(s){
+    return String(s==null?'':s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&apos;')
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,''); // Word rechaza los caracteres de control
+}
+function docxP(text,o){
+    o=o||{};
+    const pPr=[];
+    if(o.style) pPr.push(`<w:pStyle w:val="${o.style}"/>`);
+    if(o.align) pPr.push(`<w:jc w:val="${o.align}"/>`);
+    if(o.spaceAfter!==undefined||o.spaceBefore!==undefined)
+        pPr.push(`<w:spacing${o.spaceBefore!==undefined?` w:before="${o.spaceBefore}"`:''}${o.spaceAfter!==undefined?` w:after="${o.spaceAfter}"`:''}/>`);
+    if(o.indent) pPr.push(`<w:ind w:left="${o.indent}"/>`);
+    const rPr=[];
+    if(o.bold) rPr.push('<w:b/>');
+    if(o.italic) rPr.push('<w:i/>');
+    if(o.size) rPr.push(`<w:sz w:val="${o.size}"/>`);
+    if(o.color) rPr.push(`<w:color w:val="${o.color}"/>`);
+    const runs=String(text==null?'':text).split('\n')
+        .map((line,i)=>(i>0?'<w:br/>':'')+`<w:t xml:space="preserve">${xmlEsc(line)}</w:t>`).join('');
+    return `<w:p>${pPr.length?`<w:pPr>${pPr.join('')}</w:pPr>`:''}`
+         + `<w:r>${rPr.length?`<w:rPr>${rPr.join('')}</w:rPr>`:''}${runs}</w:r></w:p>`;
+}
+function docxBullet(text){ return docxP('• '+text,{style:'ListParagraph'}); }
+function docxTable(headers,rows,widths){
+    const bordes='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV']
+        .map(s=>`<w:${s} w:val="single" w:sz="6" w:space="0" w:color="B7C4E2"/>`).join('')+'</w:tblBorders>';
+    const celda=(txt,w,head)=>`<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>`
+        + (head?'<w:shd w:val="clear" w:color="auto" w:fill="667EEA"/>':'')
+        + `</w:tcPr>${docxP(txt,{bold:!!head,size:18,color:head?'FFFFFF':'222222',spaceAfter:0})}</w:tc>`;
+    const filaHead=`<w:tr><w:trPr><w:tblHeader/></w:trPr>${headers.map((h,i)=>celda(h,widths[i],true)).join('')}</w:tr>`;
+    const cuerpo=rows.map(r=>`<w:tr>${r.map((c,i)=>celda(c,widths[i],false)).join('')}</w:tr>`).join('');
+    // Word exige un parrafo despues de una tabla; si no, el documento sale corrupto.
+    return `<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/>${bordes}</w:tblPr>`
+         + `<w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
+         + filaHead+cuerpo+'</w:tbl>'+docxP('',{spaceAfter:0});
+}
+const DOCX_STYLES=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr></w:rPrDefault></w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="60"/><w:jc w:val="center"/></w:pPr><w:rPr><w:b/><w:sz w:val="40"/><w:color w:val="667EEA"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="240"/><w:jc w:val="center"/></w:pPr><w:rPr><w:i/><w:sz w:val="20"/><w:color w:val="666666"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="280" w:after="100"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="667EEA"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="180" w:after="80"/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:sz w:val="24"/><w:color w:val="4A5578"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="ListParagraph"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:left="360"/><w:spacing w:after="60"/></w:pPr></w:style>
+</w:styles>`;
+async function buildDocxBlob(bodyXml){
+    if(typeof window.JSZip!=='function') throw new Error('JSZip no disponible');
+    const zip=new window.JSZip();
+    zip.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`);
+    zip.folder('_rels').file('.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`);
+    const word=zip.folder('word');
+    word.folder('_rels').file('document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`);
+    word.file('styles.xml',DOCX_STYLES);
+    word.file('document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${bodyXml}`
+        + `<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>`
+        + `</w:body></w:document>`);
+    return await zip.generateAsync({
+        type:'blob',
+        mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        compression:'DEFLATE'
+    });
+}
+function downloadBlob(blob,filename){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
 // --- Helper reutilizable para llamar a Gemini ---
 async function callGeminiAI(prompt){
   const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(GEMINI_API_KEY),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
@@ -3017,6 +3304,350 @@ async function weeklySummaryAI(){
     if(body) body.innerHTML='<h3 style="color:var(--accent-strong);">📅 '+(es?'Resumen semanal del salón':'Weekly classroom summary')+'</h3><div class="ai-result-section">'+sanitizeAiHtml(deanonymizeAiText(text))+'</div>';
   }catch(err){ console.error(err); if(body) body.innerHTML='<div class="ai-result-section ai-student-alert"><h4>⚠️ '+(es?'Error de IA':'AI Error')+'</h4><p>'+escapeHtml(err.message||'')+'</p></div>'; }
 }
+
+// ===================== PLANEACIONES CON IA =====================
+let lastGeneratedPlan = null; // ultimo plan generado, en JSON, listo para exportar
+
+function lessonPlansTotalChars(){ return lessonPlans.reduce((a,p)=>a+(p.chars||0),0); }
+
+function renderLessonPlanList(){
+    const box=document.getElementById('lpList'); if(!box) return;
+    const es=currentLanguage==='es';
+    if(lessonPlans.length===0){
+        box.innerHTML=`<div class="lp-empty">${es?'Todavía no has subido ninguna planeación.':'You have not uploaded any lesson plans yet.'}</div>`;
+    } else {
+        box.innerHTML=lessonPlans.map(p=>
+            `<div class="lp-item">`
+            + `<span class="lp-item-name" title="${escapeHtml(p.name)}">📄 ${escapeHtml(p.name)}</span>`
+            + `<span class="lp-item-meta">${Math.round((p.chars||0)/1000)} k · ${escapeHtml(p.date||'')}</span>`
+            + `<button type="button" title="${es?'Eliminar':'Delete'}" aria-label="${es?'Eliminar ':'Delete '}${escapeHtml(p.name)}" onclick="removeLessonPlan('${p.id}')">🗑️</button>`
+            + `</div>`).join('');
+    }
+    const btn=document.getElementById('lpAnalyzeBtn');
+    if(btn) btn.disabled=lessonPlans.length===0;
+    renderTeachingStyle();
+}
+function renderTeachingStyle(){
+    const box=document.getElementById('lpStyleBody'); if(!box) return;
+    const es=currentLanguage==='es';
+    if(!teachingStyleProfile){
+        box.innerHTML=`<span style="opacity:.7;">${es
+            ? 'Sube al menos una planeación y pulsa «Analizar mi estilo». La IA describirá cómo estructuras tus clases y usará ese estilo al generar planeaciones nuevas.'
+            : 'Upload at least one lesson plan and click "Analyze my style". The AI will describe how you structure your classes and reuse that style for new plans.'}</span>`;
+        return;
+    }
+    const p=teachingStyleProfile;
+    const lista=(titulo,arr)=>(Array.isArray(arr)&&arr.length)
+        ? `<b>${titulo}:</b><ul>${arr.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul>` : '';
+    box.innerHTML=
+        (p.resumen?`<p>${escapeHtml(p.resumen)}</p>`:'')
+        + lista(es?'Estructura habitual':'Typical structure',p.estructuraTipica)
+        + lista(es?'Metodologías':'Methodologies',p.metodologias)
+        + lista(es?'Elementos recurrentes':'Recurring elements',p.elementosRecurrentes)
+        + (p.tono?`<p><b>${es?'Tono':'Tone'}:</b> ${escapeHtml(p.tono)}</p>`:'')
+        + (p.duracionHabitual?`<p><b>${es?'Duración habitual':'Usual duration'}:</b> ${escapeHtml(p.duracionHabitual)}</p>`:'')
+        + `<p style="opacity:.65;font-size:.92em;margin-top:8px;">${es?'Analizado el':'Analyzed on'} ${escapeHtml(p.fecha||'')} · ${p.planesAnalizados||0} ${es?'planeación(es)':'plan(s)'}</p>`;
+}
+function renderStyleBadge(){
+    const box=document.getElementById('lpStyleBadge'); if(!box) return;
+    const es=currentLanguage==='es';
+    if(teachingStyleProfile){
+        box.className='lp-style-badge ok';
+        box.innerHTML=`✅ ${es?'La planeación se generará imitando <b>tu estilo</b>, analizado de tus':'The plan will be generated imitating <b>your style</b>, analyzed from your'} ${teachingStyleProfile.planesAnalizados||0} ${es?'planeación(es).':'plan(s).'}`;
+    } else {
+        box.className='lp-style-badge warn';
+        box.innerHTML=`⚠️ ${es?'Aún no has analizado tu estilo. La planeación se generará con un formato estándar. Sube tus planeaciones en la otra pestaña para que se parezca a las tuyas.':'You have not analyzed your style yet. A standard format will be used. Upload your plans in the other tab so it matches yours.'}`;
+    }
+}
+window.switchLessonPlanTab=function(tab){
+    const mine=tab==='mine';
+    document.getElementById('lpTabMine').classList.toggle('active',mine);
+    document.getElementById('lpTabNew').classList.toggle('active',!mine);
+    document.getElementById('lpPanelMine').style.display=mine?'':'none';
+    document.getElementById('lpPanelNew').style.display=mine?'none':'';
+    if(!mine) renderStyleBadge();
+};
+window.openLessonPlanModal=function(){
+    const setV=(id,v)=>{const el=document.getElementById(id); if(el&&!el.value)el.value=v;};
+    setV('lpGrade', document.getElementById('className')?.value || userProfile.grade || '');
+    setV('lpDuration', currentLanguage==='es'?'50 minutos':'50 minutes');
+    renderLessonPlanList();
+    switchLessonPlanTab('mine');
+    const res=document.getElementById('lpResult'); if(res){res.style.display='none';res.innerHTML='';}
+    const dl=document.getElementById('lpDownloadBtn'); if(dl)dl.style.display='none';
+    showModal('lessonPlanModal');
+};
+window.closeLessonPlanModal=function(){ hideModal('lessonPlanModal'); };
+
+function addLessonPlanRecord(name,texto){
+    const es=currentLanguage==='es';
+    let limpio=String(texto||'').replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim();
+    if(!limpio){ showNotification(es?`"${name}" no contiene texto legible`:`"${name}" has no readable text`,'error'); return false; }
+    let recortado=false;
+    if(limpio.length>LESSON_PLAN_MAX_CHARS){ limpio=limpio.slice(0,LESSON_PLAN_MAX_CHARS); recortado=true; }
+    if(lessonPlansTotalChars()+limpio.length>LESSON_PLANS_MAX_TOTAL){
+        showNotification(es
+            ? 'Se alcanzó el límite de planeaciones guardadas. Elimina alguna para añadir más.'
+            : 'Storage limit for lesson plans reached. Delete one to add more.','error');
+        return false;
+    }
+    lessonPlans.push({
+        id:'lp'+Date.now()+Math.random().toString(36).slice(2,6),
+        name:String(name||'Planeación').slice(0,120),
+        text:limpio, chars:limpio.length,
+        date:new Date().toISOString().split('T')[0]
+    });
+    if(recortado) showNotification(es?`"${name}" era muy largo y se guardó recortado`:`"${name}" was too long and was truncated`,'info');
+    return true;
+}
+async function handleLessonPlanFiles(files){
+    const es=currentLanguage==='es';
+    const lista=[...files]; if(lista.length===0) return;
+    const drop=document.getElementById('lpDropzone');
+    const textoOriginal=drop?drop.innerHTML:'';
+    let ok=0;
+    for(let i=0;i<lista.length;i++){
+        const f=lista[i];
+        if(drop) drop.innerHTML=`<p>⏳ ${es?'Leyendo':'Reading'} ${escapeHtml(f.name)} (${i+1}/${lista.length})…</p>`;
+        try{
+            const texto=await extractTextFromFile(f);
+            if(addLessonPlanRecord(f.name.replace(/\.[^.]+$/,''),texto)) ok++;
+        }catch(err){
+            console.error(err);
+            showNotification(`${f.name}: ${err.message||(es?'no se pudo leer':'could not be read')}`,'error');
+        }
+    }
+    if(drop) drop.innerHTML=textoOriginal;
+    if(ok>0){
+        saveData(); renderLessonPlanList();
+        showNotification(es?`${ok} planeación(es) añadida(s)`:`${ok} lesson plan(s) added`,'success');
+    }
+}
+window.addPastedLessonPlan=function(){
+    const es=currentLanguage==='es';
+    const n=document.getElementById('lpPasteName'), t=document.getElementById('lpPasteText');
+    if(!t||!t.value.trim()){ showNotification(es?'Pega el texto de la planeación':'Paste the lesson plan text','error'); return; }
+    const nombre=(n&&n.value.trim())||(es?'Planeación pegada':'Pasted plan');
+    if(addLessonPlanRecord(nombre,t.value)){
+        saveData(); renderLessonPlanList();
+        if(n)n.value=''; t.value='';
+        showNotification(es?'Planeación añadida':'Lesson plan added','success');
+    }
+};
+window.removeLessonPlan=function(id){
+    lessonPlans=lessonPlans.filter(p=>p.id!==id);
+    saveData(); renderLessonPlanList();
+};
+
+// Extrae el JSON aunque el modelo lo envuelva en ```json ... ```
+function parseAiJson(texto){
+    let s=String(texto||'').trim();
+    const fence=s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if(fence) s=fence[1].trim();
+    const ini=s.indexOf('{'), fin=s.lastIndexOf('}');
+    if(ini>0||fin<s.length-1){ if(ini!==-1&&fin!==-1) s=s.slice(ini,fin+1); }
+    return JSON.parse(s);
+}
+async function callGeminiJson(prompt){
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(GEMINI_API_KEY),{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{ responseMimeType:'application/json', temperature:0.7 } })
+    });
+    const data=await res.json();
+    const texto=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!res.ok||data?.error||!texto) throw new Error(data?.error?.message||'La IA no devolvió respuesta');
+    return parseAiJson(texto);
+}
+
+window.analyzeTeachingStyle=async function(){
+    const es=currentLanguage==='es';
+    if(!hasApiKey()){ ensureAiKey(); return; }
+    if(lessonPlans.length===0){ showNotification(es?'Sube al menos una planeación':'Upload at least one lesson plan','error'); return; }
+    const btn=document.getElementById('lpAnalyzeBtn');
+    const body=document.getElementById('lpStyleBody');
+    if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'+(es?'Analizando...':'Analyzing...'); }
+    if(body) body.innerHTML=`<div class="ai-loading"><div class="ai-loading-spinner"></div><p>${es?'Leyendo tus planeaciones...':'Reading your lesson plans...'}</p></div>`;
+    try{
+        // Se recorta cada plan para no enviar un prompt gigantesco.
+        const muestras=lessonPlans.map((p,i)=>`--- PLANEACIÓN ${i+1}: ${p.name} ---\n${p.text.slice(0,8000)}`).join('\n\n');
+        const prompt=(es
+            ? 'Eres un asesor pedagógico. Analiza las planeaciones de clase de este docente e identifica su estilo propio de enseñanza y de redacción. Responde SOLO con un objeto JSON con estas claves exactas: "resumen" (string, 2-3 frases describiendo su estilo), "estructuraTipica" (array de strings con las secciones que suele usar, en su orden), "tono" (string), "metodologias" (array de strings), "duracionHabitual" (string), "elementosRecurrentes" (array de strings), "idioma" (string, "es" o "en"), "recomendaciones" (array de strings con 2-3 sugerencias de mejora respetuosas).'
+            : 'You are a pedagogical advisor. Analyze this teacher\'s lesson plans and identify their own teaching and writing style. Respond ONLY with a JSON object with these exact keys: "resumen" (string, 2-3 sentences), "estructuraTipica" (array of strings, sections they use in order), "tono" (string), "metodologias" (array of strings), "duracionHabitual" (string), "elementosRecurrentes" (array of strings), "idioma" (string), "recomendaciones" (array of 2-3 respectful improvement suggestions).')
+            + '\n\n' + muestras;
+        const perfil=await callGeminiJson(prompt);
+        perfil.fecha=new Date().toISOString().split('T')[0];
+        perfil.planesAnalizados=lessonPlans.length;
+        teachingStyleProfile=perfil;
+        saveData(); renderTeachingStyle();
+        showNotification(es?'Estilo analizado':'Style analyzed','success');
+    }catch(err){
+        console.error(err);
+        if(body) body.innerHTML='';
+        renderTeachingStyle();
+        showNotification((es?'Error al analizar: ':'Analysis error: ')+(err.message||''),'error');
+    }finally{
+        if(btn){ btn.disabled=lessonPlans.length===0; btn.textContent=es?'Analizar mi estilo':'Analyze my style'; }
+    }
+};
+
+function renderLessonPlanPreview(plan){
+    const es=currentLanguage==='es';
+    const box=document.getElementById('lpResult'); if(!box) return;
+    const lista=(t,a)=>(Array.isArray(a)&&a.length)?`<h4>${t}</h4><ul>${a.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul>`:'';
+    const sec=Array.isArray(plan.secuencia)?plan.secuencia:[];
+    box.innerHTML=
+        `<h4>${escapeHtml(plan.titulo||'')}</h4>`
+        + `<p>${escapeHtml([plan.asignatura,plan.grado,plan.duracion].filter(Boolean).join(' · '))}</p>`
+        + (plan.objetivoGeneral?`<h4>${es?'Objetivo general':'General objective'}</h4><p>${escapeHtml(plan.objetivoGeneral)}</p>`:'')
+        + lista(es?'Objetivos específicos':'Specific objectives',plan.objetivosEspecificos)
+        + lista(es?'Materiales':'Materials',plan.materiales)
+        + (sec.length?`<h4>${es?'Secuencia':'Sequence'}</h4><table><thead><tr>`
+            + `<th>${es?'Momento':'Stage'}</th><th>${es?'Tiempo':'Time'}</th><th>${es?'Docente':'Teacher'}</th><th>${es?'Estudiantes':'Students'}</th>`
+            + `</tr></thead><tbody>`
+            + sec.map(s=>`<tr><td>${escapeHtml(s.momento||'')}</td><td>${escapeHtml(s.tiempo||'')}</td><td>${escapeHtml(s.actividadDocente||'')}</td><td>${escapeHtml(s.actividadEstudiante||'')}</td></tr>`).join('')
+            + `</tbody></table>`:'')
+        + (plan.evaluacion?`<h4>${es?'Evaluación':'Assessment'}</h4><p>${escapeHtml(plan.evaluacion.formativa||'')}</p>`
+            + (Array.isArray(plan.evaluacion.criterios)&&plan.evaluacion.criterios.length?`<ul>${plan.evaluacion.criterios.map(c=>`<li>${escapeHtml(c)}</li>`).join('')}</ul>`:''):'')
+        + (plan.tarea?`<h4>${es?'Tarea':'Homework'}</h4><p>${escapeHtml(plan.tarea)}</p>`:'');
+    box.style.display='block';
+}
+
+window.generateLessonPlan=async function(){
+    const es=currentLanguage==='es';
+    if(!hasApiKey()){ ensureAiKey(); return; }
+    const v=id=>{const el=document.getElementById(id); return el?el.value.trim():'';};
+    const tema=v('lpTopic');
+    if(!tema){ showNotification(es?'Escribe el tema de la clase':'Enter the class topic','error'); document.getElementById('lpTopic')?.focus(); return; }
+    const btn=document.getElementById('lpGenerateBtn');
+    const status=document.getElementById('lpGenStatus');
+    const res=document.getElementById('lpResult');
+    const dl=document.getElementById('lpDownloadBtn');
+    if(btn) btn.disabled=true;
+    if(dl) dl.style.display='none';
+    if(res){ res.style.display='none'; res.innerHTML=''; }
+    if(status){ status.style.display='block'; status.innerHTML=`<div class="ai-loading-spinner"></div><p>${es?'Creando tu planeación...':'Creating your lesson plan...'}</p>`; }
+    try{
+        const datos={
+            tema, asignatura:v('lpSubject'), grado:v('lpGrade'), duracion:v('lpDuration'),
+            objetivo:v('lpObjective'), materiales:v('lpResources'), notas:v('lpNotes'),
+            fecha:new Date().toISOString().split('T')[0]
+        };
+        let contextoSalon='';
+        if(document.getElementById('lpUseClassData')?.checked && (currentStudents||[]).length>0){
+            // Reutiliza la anonimizacion del resto de la app: no salen nombres reales.
+            contextoSalon='\n\nDATOS REALES DEL SALÓN (para adaptar la clase):\n'+buildClassroomContext();
+        }
+        const estilo=teachingStyleProfile
+            ? `\n\nESTILO DEL DOCENTE (imítalo en estructura, tono y nivel de detalle):\n${JSON.stringify(teachingStyleProfile)}`
+            : '';
+        const esquema='{"titulo":string,"asignatura":string,"grado":string,"duracion":string,"fecha":string,'
+            + '"objetivoGeneral":string,"objetivosEspecificos":[string],"estandares":[string],"materiales":[string],'
+            + '"vocabularioClave":[string],'
+            + '"secuencia":[{"momento":string,"tiempo":string,"actividadDocente":string,"actividadEstudiante":string,"recursos":string}],'
+            + '"diferenciacion":{"apoyo":string,"extension":string},'
+            + '"evaluacion":{"formativa":string,"sumativa":string,"criterios":[string]},'
+            + '"tarea":string,"notasDocente":string}';
+        const prompt=(es
+            ? 'Eres un docente experto creando la planeación de la próxima clase. Devuelve SOLO un objeto JSON válido que siga EXACTAMENTE este esquema (sin texto adicional):\n'
+              + esquema
+              + '\n\nLa secuencia debe tener entre 3 y 6 momentos (inicio, desarrollo, cierre como mínimo) cuyos tiempos sumen la duración indicada. Sé concreto y accionable: nada de generalidades. Escribe en español.'
+            : 'You are an expert teacher creating the next class lesson plan. Return ONLY a valid JSON object following EXACTLY this schema (no extra text):\n'
+              + esquema
+              + '\n\nThe sequence must have 3 to 6 stages (at least opening, development, closing) whose times add up to the given duration. Be concrete and actionable. Write in English.')
+            + '\n\nDATOS DE LA CLASE:\n'+JSON.stringify(datos)
+            + estilo + contextoSalon;
+        const plan=await callGeminiJson(prompt);
+        plan.fecha=plan.fecha||datos.fecha;
+        plan.titulo=plan.titulo||tema;
+        lastGeneratedPlan=plan;
+        renderLessonPlanPreview(plan);
+        if(dl) dl.style.display='';
+        showNotification(es?'Planeación lista. Revísala y descárgala en Word.':'Lesson plan ready. Review it and download as Word.','success');
+    }catch(err){
+        console.error(err);
+        showNotification((es?'Error al generar: ':'Generation error: ')+(err.message||''),'error');
+    }finally{
+        if(btn) btn.disabled=false;
+        if(status){ status.style.display='none'; status.innerHTML=''; }
+    }
+};
+
+window.downloadLessonPlanDocx=async function(){
+    const es=currentLanguage==='es';
+    const plan=lastGeneratedPlan;
+    if(!plan){ showNotification(es?'Primero genera una planeación':'Generate a lesson plan first','error'); return; }
+    try{
+        const T=(k,e)=>es?k:e;
+        let xml='';
+        xml+=docxP(plan.titulo||T('Planeación de clase','Lesson plan'),{style:'Title'});
+        const sub=[plan.asignatura,plan.grado,plan.duracion,plan.fecha].filter(Boolean).join('  ·  ');
+        if(sub) xml+=docxP(sub,{style:'Subtitle'});
+        const ficha=[
+            [T('Docente','Teacher'), userProfile.name||''],
+            [T('Institución','Institution'), document.getElementById('schoolName')?.value||userProfile.school||''],
+            [T('Asignatura','Subject'), plan.asignatura||''],
+            [T('Grado','Grade'), plan.grado||''],
+            [T('Duración','Duration'), plan.duracion||''],
+            [T('Fecha','Date'), plan.fecha||'']
+        ].filter(r=>r[1]);
+        if(ficha.length) xml+=docxTable([T('Campo','Field'),T('Detalle','Detail')],ficha,[2800,6560]);
+        const seccionLista=(titulo,arr)=>{
+            if(!Array.isArray(arr)||!arr.length) return '';
+            return docxP(titulo,{style:'Heading1'})+arr.map(x=>docxBullet(String(x))).join('');
+        };
+        if(plan.objetivoGeneral) xml+=docxP(T('Objetivo general','General objective'),{style:'Heading1'})+docxP(plan.objetivoGeneral);
+        xml+=seccionLista(T('Objetivos específicos','Specific objectives'),plan.objetivosEspecificos);
+        xml+=seccionLista(T('Estándares / competencias','Standards / competencies'),plan.estandares);
+        xml+=seccionLista(T('Materiales','Materials'),plan.materiales);
+        xml+=seccionLista(T('Vocabulario clave','Key vocabulary'),plan.vocabularioClave);
+        if(Array.isArray(plan.secuencia)&&plan.secuencia.length){
+            xml+=docxP(T('Secuencia didáctica','Lesson sequence'),{style:'Heading1'});
+            xml+=docxTable(
+                [T('Momento','Stage'),T('Tiempo','Time'),T('Actividad del docente','Teacher activity'),T('Actividad del estudiante','Student activity'),T('Recursos','Resources')],
+                plan.secuencia.map(s=>[s.momento||'',s.tiempo||'',s.actividadDocente||'',s.actividadEstudiante||'',s.recursos||'']),
+                [1300,900,2900,2900,1360]
+            );
+        }
+        if(plan.diferenciacion&&(plan.diferenciacion.apoyo||plan.diferenciacion.extension)){
+            xml+=docxP(T('Atención a la diversidad','Differentiation'),{style:'Heading1'});
+            if(plan.diferenciacion.apoyo) xml+=docxP(T('Apoyo','Support'),{style:'Heading2'})+docxP(plan.diferenciacion.apoyo);
+            if(plan.diferenciacion.extension) xml+=docxP(T('Extensión','Extension'),{style:'Heading2'})+docxP(plan.diferenciacion.extension);
+        }
+        if(plan.evaluacion){
+            xml+=docxP(T('Evaluación','Assessment'),{style:'Heading1'});
+            if(plan.evaluacion.formativa) xml+=docxP(T('Formativa','Formative'),{style:'Heading2'})+docxP(plan.evaluacion.formativa);
+            if(plan.evaluacion.sumativa) xml+=docxP(T('Sumativa','Summative'),{style:'Heading2'})+docxP(plan.evaluacion.sumativa);
+            if(Array.isArray(plan.evaluacion.criterios)&&plan.evaluacion.criterios.length){
+                xml+=docxP(T('Criterios','Criteria'),{style:'Heading2'})+plan.evaluacion.criterios.map(c=>docxBullet(String(c))).join('');
+            }
+        }
+        if(plan.tarea) xml+=docxP(T('Tarea','Homework'),{style:'Heading1'})+docxP(plan.tarea);
+        if(plan.notasDocente) xml+=docxP(T('Notas del docente','Teacher notes'),{style:'Heading1'})+docxP(plan.notasDocente,{italic:true});
+        xml+=docxP('',{spaceAfter:0});
+        xml+=docxP(T('Generado con Learners Track','Generated with Learners Track')+' · '+(plan.fecha||''),{size:16,color:'888888',align:'center'});
+
+        const blob=await buildDocxBlob(xml);
+        const nombre=String(plan.titulo||'Planeacion').normalize('NFD').replace(/[̀-ͯ]/g,'')
+            .replace(/[^A-Za-z0-9 _-]/g,'').trim().replace(/\s+/g,'_').slice(0,60)||'Planeacion';
+        downloadBlob(blob,`${nombre}_${plan.fecha||''}.docx`);
+        showNotification(es?'Documento Word descargado':'Word document downloaded','success');
+    }catch(err){
+        console.error(err);
+        showNotification((es?'No se pudo crear el Word: ':'Could not create the Word file: ')+(err.message||''),'error');
+    }
+};
+
+// Zona de arrastre y selector de archivos
+(function(){
+    const drop=document.getElementById('lpDropzone');
+    const input=document.getElementById('lpFileInput');
+    if(!drop||!input) return;
+    drop.addEventListener('click',()=>input.click());
+    input.addEventListener('change',e=>{ handleLessonPlanFiles(e.target.files); input.value=''; });
+    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('dragging'); }));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('dragging'); }));
+    drop.addEventListener('drop',e=>{ if(e.dataTransfer&&e.dataTransfer.files) handleLessonPlanFiles(e.dataTransfer.files); });
+})();
 
 // Enviar el chat con Enter (Shift+Enter = salto de línea)
 (function(){ const ci=document.getElementById('chatInput'); if(ci) ci.addEventListener('keydown',function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChatMessage(); } }); })();
@@ -3166,6 +3797,8 @@ function loadUserFromCloud(uid,email){
     };
     badgePointsEnabled=currentUser.badgePointsEnabled;
     badgePointValue=currentUser.badgePointValue;
+    lessonPlans=Array.isArray(d.lessonPlans)?d.lessonPlans:[];
+    teachingStyleProfile=d.teachingStyleProfile||null;
     userProfile.name=currentUser.name||'Teacher'; userProfile.email=currentUser.email; userProfile.avatar=currentUser.avatar;
     userProfile.school=currentUser.school; userProfile.grade=currentUser.grade; userProfile.institutionLogo=currentUser.institutionLogo;
     // Los grados tambien viajan a la nube: antes solo vivian en el dispositivo,
@@ -3188,7 +3821,7 @@ function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_clou
 function pushToCloud(){
   try{
     const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue };
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
     // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
