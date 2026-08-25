@@ -259,6 +259,17 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .slide-in { animation:slideIn 0.5s ease; }
 @keyframes slideIn { from { transform:translateX(-20px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 .fade-enter { animation:fadeIn 0.35s ease; }
+/* --- Puntos por insignia --- */
+.badge-points-box { display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--bg-card); border:1px solid var(--badge-border); border-radius:12px; padding:9px 14px; }
+.badge-points-toggle,.badge-points-value { display:flex; align-items:center; gap:7px; font-weight:600; cursor:pointer; margin:0; }
+.badge-points-toggle input { width:auto; transform:scale(1.15); cursor:pointer; }
+.badge-points-value input { width:78px; padding:5px 7px; border-radius:7px; border:1px solid #c9d8f6; font-family:inherit; font-size:1em; box-sizing:border-box; }
+.badge-points-value.is-off { opacity:0.45; pointer-events:none; }
+.badge-points-help { font-size:0.82em; opacity:0.75; flex-basis:100%; }
+.bonus-chip { display:block; font-size:0.72em; font-weight:700; color:var(--success); margin-top:3px; letter-spacing:0.02em; }
+.bonus-cell { background:rgba(32,209,132,0.12); font-weight:700; color:var(--success); border-left:2px solid var(--success); }
+.bonus-leftover { display:block; font-size:0.7em; font-weight:600; opacity:0.7; color:var(--fg); }
+.original-note { font-size:0.72em; opacity:0.65; display:block; margin-top:2px; }
 /* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
 .badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
 .badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
@@ -291,6 +302,10 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-top:-4px;">
                 <input type="checkbox" id="rememberEmailOptIn" checked style="width:auto;transform:scale(1.1);">
                 <label for="rememberEmailOptIn" id="rememberEmailLabel" style="margin:0;cursor:pointer;">Remember my email on this device</label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-top:-4px;">
+                <input type="checkbox" id="keepSessionOptIn" style="width:auto;transform:scale(1.1);">
+                <label for="keepSessionOptIn" id="keepSessionLabel" style="margin:0;cursor:pointer;">Keep me signed in on this device</label>
             </div>
             <button type="submit" class="auth-button" id="loginBtn">Sign In</button>
             <div style="text-align:center;margin-top:12px;"><a href="#" id="forgotPasswordLink" role="button" onclick="firebasePasswordReset();return false;" style="color:var(--accent);font-weight:600;font-size:0.9rem;text-decoration:none;">Forgot your password?</a></div>
@@ -410,6 +425,17 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div id="scoresControls" class="notes-controls" style="display:none;">
                 <button class="add-note-col-btn" id="addNoteColBtn">+ Add Score Column</button>
                 <button class="remove-note-col-btn" id="removeNoteColBtn">- Remove Score Column</button>
+                <div class="badge-points-box">
+                    <label class="badge-points-toggle">
+                        <input type="checkbox" id="badgePointsEnabledInput">
+                        <span id="badgePointsToggleLabel">🏅 Sumar puntos de insignias a las notas</span>
+                    </label>
+                    <label class="badge-points-value">
+                        <span id="badgePointsValueLabel">Valor por insignia:</span>
+                        <input type="number" id="badgePointValueInput" min="0" max="5" step="0.05" value="0.2" inputmode="decimal">
+                    </label>
+                    <span class="badge-points-help" id="badgePointsHelp">Los puntos se suman a la nota más baja; si llega a 5.0, pasan a la siguiente.</span>
+                </div>
             </div>
             <div style="margin:6px 0 12px;"><input type="search" id="studentSearchInput" name="lt-student-search" autocomplete="off" autocapitalize="off" placeholder="🔎 Search student..." style="width:100%;max-width:340px;padding:8px 12px;border-radius:8px;border:1px solid #c9d8f6;box-sizing:border-box;font-family:inherit;"></div>
             <div id="classroomRowsView" class="table-scroll"></div>
@@ -626,6 +652,14 @@ let gridWeeks = 1;
 let weekTitles = ["Week 1"];
 const STUDENTS_PER_ROW = 7;
 let noteColumns = ["Evaluation 1","Evaluation 2"];
+// === PUNTOS POR INSIGNIA ===
+// Todas las insignias valen lo mismo, se agreguen las que se agreguen. Los puntos
+// acumulados se suman a la nota MAS BAJA del estudiante; si esa nota llega a 5.0 y
+// sobran puntos, el resto pasa a la siguiente mas baja, y asi sucesivamente.
+// La nota escrita por el docente NUNCA se modifica: la bonificacion se calcula al vuelo.
+let badgePointsEnabled = false;
+let badgePointValue = 0.2;
+const MAX_NOTE = 5;
 
 // === HELPER FUNCTIONS ===
 function addInstitutionLogoToPDF(pdf,logoData,config) {
@@ -1108,6 +1142,7 @@ function saveUserProfile() {
     currentUser.grade=userProfile.grade; currentUser.institutionLogo=userProfile.institutionLogo;
     currentUser.classrooms=classrooms; currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles;
     currentUser.noteColumns=noteColumns; currentUser.activeClassroomIndex=activeClassroomIndex;
+    currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
     saveUsers(); updateUIWithProfile();
     if(window.FIREBASE_ON) scheduleCloudPush();
 }
@@ -1134,6 +1169,7 @@ function saveData() {
     if(!currentUser)return;
     currentUser.classrooms=classrooms; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles; currentUser.noteColumns=noteColumns;
+    currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
     saveUsers();
     if(window.FIREBASE_ON) scheduleCloudPush();
 }
@@ -1237,7 +1273,34 @@ window.deleteStudent=function(sid) {
     const c=classrooms[activeClassroomIndex]; const i=c.students.findIndex(s=>s.id===sid);
     if(i!==-1){c.students.splice(i,1);c.students.forEach((s,j)=>s.id=j+1);saveData();loadActiveClassroom();}
 };
-function updateNoteButtons() { const a=document.getElementById('addNoteColBtn'),r=document.getElementById('removeNoteColBtn'); if(a)a.disabled=noteColumns.length>=10; if(r)r.disabled=noteColumns.length<=1; }
+function updateNoteButtons() { const a=document.getElementById('addNoteColBtn'),r=document.getElementById('removeNoteColBtn'); if(a)a.disabled=noteColumns.length>=10; if(r)r.disabled=noteColumns.length<=1; syncBadgePointsControls(); }
+// Refleja el estado actual en los controles de puntos por insignia.
+function syncBadgePointsControls(){
+    const chk=document.getElementById('badgePointsEnabledInput');
+    const val=document.getElementById('badgePointValueInput');
+    if(chk) chk.checked=badgePointsEnabled;
+    if(val) val.value=badgePointValue;
+    const wrap=document.querySelector('.badge-points-value');
+    if(wrap) wrap.classList.toggle('is-off',!badgePointsEnabled);
+}
+window.setBadgePointsEnabled=function(on){
+    badgePointsEnabled=!!on;
+    saveData(); syncBadgePointsControls(); renderCurrentView(); updateStats();
+    const es=currentLanguage==='es';
+    showNotification(badgePointsEnabled
+        ? (es?`Puntos de insignias activados (${badgePointValue} por insignia)`:`Badge points enabled (${badgePointValue} per badge)`)
+        : (es?'Puntos de insignias desactivados. Las notas vuelven a su valor original.':'Badge points disabled. Scores return to their original value.'),'info');
+};
+window.setBadgePointValue=function(raw){
+    const v=parseFloat(String(raw).replace(',','.'));
+    const es=currentLanguage==='es';
+    if(isNaN(v)||v<0||v>5){
+        showNotification(es?'El valor por insignia debe estar entre 0 y 5':'Value per badge must be between 0 and 5','error');
+        syncBadgePointsControls(); return;
+    }
+    badgePointValue=Math.round(v*100)/100;
+    saveData(); syncBadgePointsControls(); renderCurrentView(); updateStats();
+};
 window.addNoteColumn=function() { if(noteColumns.length>=10)return; const n=currentLanguage==='es'?prompt('Nombre de la nueva columna:','Evaluación '+(noteColumns.length+1)):prompt('Name of new column:','Evaluation '+(noteColumns.length+1)); if(!n)return; noteColumns.push(n); currentStudents.forEach(s=>s.notes.push("")); saveData(); renderCurrentView(); updateNoteButtons(); };
 window.removeNoteColumn=function() { if(noteColumns.length<=1)return; noteColumns.pop(); currentStudents.forEach(s=>s.notes.pop()); saveData(); renderCurrentView(); updateNoteButtons(); };
 window.editNoteColumnTitle=function(i,el){el.readOnly=false;el.focus();el.select();};
@@ -1258,12 +1321,54 @@ function isInvalidNote(raw){
     const v=parseNote(raw);
     return v===null || v<0 || v>5;
 }
+// Total de insignias otorgadas a un estudiante en toda la cuadricula.
+function countStudentBadges(student){
+    return (student.gridBadges||[]).reduce((a,c)=>a+((c||[]).length),0);
+}
+const _round2 = n => Math.round(n*100)/100;
+// Formatea puntos sin ceros sobrantes: 0.6 -> "0.6", 0.25 -> "0.25", 1 -> "1"
+const fmtPoints = n => String(_round2(n));
+// Reparte los puntos de las insignias empezando por la nota mas baja.
+// Devuelve el detalle sin tocar student.notes.
+function computeBadgeBonus(student){
+    const totalBadges = countStudentBadges(student);
+    const pointsEarned = badgePointsEnabled ? _round2(totalBadges*badgePointValue) : 0;
+    const detail = (student.notes||[]).map(n=>{
+        const v = parseNote(n);
+        // Solo se bonifica lo que sea una nota valida entre 0 y 5.
+        const usable = (v!==null && v>=0 && v<=MAX_NOTE);
+        return { original:v, usable, bonus:0, final:v };
+    });
+    let left = pointsEarned;
+    if(left>0){
+        // De la mas baja a la mas alta; en caso de empate, la que aparece antes.
+        const orden = detail
+            .map((d,i)=>({i, v:d.original, usable:d.usable}))
+            .filter(d=>d.usable)
+            .sort((a,b)=> a.v-b.v || a.i-b.i);
+        for(const {i} of orden){
+            if(left<=0) break;
+            const espacio = _round2(MAX_NOTE - detail[i].final);
+            if(espacio<=0) continue;
+            const dar = Math.min(espacio,left);
+            detail[i].bonus = _round2(detail[i].bonus+dar);
+            detail[i].final = _round2(detail[i].final+dar);
+            left = _round2(left-dar);
+        }
+    }
+    return { totalBadges, pointsEarned, applied:_round2(pointsEarned-left), leftover:left, detail };
+}
+// Promedio. Con los puntos activados usa las notas ya bonificadas.
 function calculateStudentAverage(student) {
-    let sum=0,count=0;
     if(!student.notes||!Array.isArray(student.notes))return "-";
-    student.notes.forEach(n=>{ const v=parseNote(n); if(v!==null){ sum+=v; count++; } });
+    let sum=0,count=0;
+    if(badgePointsEnabled){
+        computeBadgeBonus(student).detail.forEach(d=>{ if(d.original!==null){ sum+=(d.usable?d.final:d.original); count++; } });
+    } else {
+        student.notes.forEach(n=>{ const v=parseNote(n); if(v!==null){ sum+=v; count++; } });
+    }
     if(count===0)return "-";
-    return Math.max(0,Math.min(5,sum/count)).toFixed(1);
+    return Math.max(0,Math.min(MAX_NOTE,sum/count)).toFixed(1);
 }
 // Actualiza solo la fila afectada: antes se redibujaba toda la tabla en cada cambio,
 // lo que hacia perder el foco y el orden de tabulacion al capturar notas seguidas.
@@ -1271,6 +1376,22 @@ window.updateStudentNote=function(sid,ci,val,inputEl){
     const s=currentStudents.find(x=>x.id===sid); if(!s)return;
     s.notes[ci]=val; saveData();
     if(inputEl) inputEl.classList.toggle('note-invalid', isInvalidNote(val));
+    // Con los puntos activos, cambiar una nota puede redistribuir la bonificacion
+    // entre todas las notas de la fila, asi que hay que redibujar la tabla.
+    if(badgePointsEnabled && viewMode==='scores'){
+        const activo=document.activeElement;
+        const col=activo&&activo.closest('td')?[...activo.closest('tr').children].indexOf(activo.closest('td')):-1;
+        const fila=activo&&activo.closest('tr')?[...activo.closest('tbody').children].indexOf(activo.closest('tr')):-1;
+        renderClassroomScores();
+        // Se devuelve el foco a la misma casilla para no interrumpir la captura de notas.
+        if(fila>=0&&col>=0){
+            const tb=document.querySelector('#classroomScoresView tbody');
+            const celda=tb&&tb.children[fila]?tb.children[fila].children[col]:null;
+            const inp=celda?celda.querySelector('input'):null;
+            if(inp){ inp.focus(); inp.select&&inp.select(); }
+        }
+        return;
+    }
     const row=inputEl?inputEl.closest('tr'):null;
     const cell=row?row.querySelector('.average-cell'):null;
     if(cell){
@@ -1447,17 +1568,32 @@ function renderClassroomScores() {
     const table=document.createElement('table'); table.className='notes-table';
     let thHTML=`<tr><th>${es?'Estudiante':'Student'}</th>`;
     noteColumns.forEach((t,i)=>{thHTML+=`<th><input class="note-col-title" value="${escapeHtml(t)}" readonly aria-label="${es?'Nombre de la columna':'Column name'}" ondblclick="editNoteColumnTitle(${i},this)" onblur="setNoteColumnTitle(${i},this)"></th>`;});
+    if(badgePointsEnabled) thHTML+=`<th title="${es?'Insignias × valor por insignia':'Badges × value per badge'}">${es?'🏅 Puntos':'🏅 Points'}</th>`;
     thHTML+=`<th>${escapeHtml(translations[currentLanguage].averageLabel||"Average (0-5)")}</th></tr>`;
     table.innerHTML=`<thead>${thHTML}</thead>`;
     const tbody=document.createElement('tbody');
     currentStudents.forEach(s=>{
         const tr=document.createElement('tr');
         tr.innerHTML=studentNameCellHtml(s,{cert:false});
+        const bono = badgePointsEnabled ? computeBadgeBonus(s) : null;
         noteColumns.forEach((nc,i)=>{
             const raw=s.notes[i]||'';
             const invalid=isInvalidNote(raw)?' note-invalid':'';
-            tr.innerHTML+=`<td><input type="text" inputmode="decimal" class="note-input${invalid}" value="${escapeHtml(raw)}" placeholder="0-5" title="${es?'Nota de 0 a 5':'Score from 0 to 5'}" aria-label="${escapeHtml(nc)} — ${escapeHtml(s.name||'')}" onchange="updateStudentNote(${s.id},${i},this.value,this)"></td>`;
+            // La casilla sigue mostrando SIEMPRE la nota que escribio el docente.
+            // La bonificacion aparece debajo, como informacion.
+            let chip='';
+            if(bono){
+                const d=bono.detail[i];
+                if(d&&d.bonus>0) chip=`<span class="bonus-chip" title="${es?'Nota con puntos de insignias':'Score with badge points'}">+${fmtPoints(d.bonus)} → ${d.final.toFixed(1)}</span>`;
+            }
+            tr.innerHTML+=`<td><input type="text" inputmode="decimal" class="note-input${invalid}" value="${escapeHtml(raw)}" placeholder="0-5" title="${es?'Nota de 0 a 5':'Score from 0 to 5'}" aria-label="${escapeHtml(nc)} — ${escapeHtml(s.name||'')}" onchange="updateStudentNote(${s.id},${i},this.value,this)">${chip}</td>`;
         });
+        if(bono){
+            const sobra = bono.leftover>0
+                ? `<span class="bonus-leftover">${es?'sin usar':'unused'}: ${fmtPoints(bono.leftover)}</span>` : '';
+            const textoPuntos = bono.pointsEarned>0 ? `+${fmtPoints(bono.pointsEarned)}${sobra}` : '—';
+            tr.innerHTML+=`<td class="bonus-cell" title="${bono.totalBadges} ${es?'insignias':'badges'} × ${badgePointValue}">${textoPuntos}</td>`;
+        }
         const avg=calculateStudentAverage(s);
         let cc='score-mid'; if(avg!=="-"){const v=parseFloat(avg);if(v>=3.5)cc='score-high';else if(v<3)cc='score-low';}
         tr.innerHTML+=`<td class="average-cell ${cc}">${avg}</td>`;
@@ -1727,6 +1863,8 @@ function hydrateRememberedEmail(){
             if(rememberLogin) rememberLogin.checked=true;
             if(rememberRegister) rememberRegister.checked=true;
         }
+        const keepBox=document.getElementById('keepSessionOptIn');
+        if(keepBox) keepBox.checked=(localStorage.getItem('learnersTrackKeepSession')==='1');
     }catch(e){}
 }
 async function handleLogin(event){
@@ -1747,6 +1885,8 @@ async function handleLogin(event){
             classrooms=user.classrooms;activeClassroomIndex=user.activeClassroomIndex||0;
             gridWeeks=user.gridWeeks||1;weekTitles=user.weekTitles||["Week 1"];
             noteColumns=user.noteColumns||["Evaluation 1","Evaluation 2"];
+            badgePointsEnabled=!!user.badgePointsEnabled;
+            badgePointValue=(typeof user.badgePointValue==='number')?user.badgePointValue:0.2;
             updateUIWithProfile(); hideProfileSetup(); loadActiveClassroom();
         } else {
             updateUIWithProfile(); showProfileSetup();
@@ -1943,14 +2083,34 @@ function getInstitutionalInfo(){return{institution:document.getElementById('scho
 // Devuelve las tablas de la vista ACTIVA (notas, o una tabla por semana).
 // Antes "Vista actual" exportaba siempre la semana 1 en formato de dias, incluso
 // estando en la vista de SCORES o teniendo varias semanas cargadas.
+// Tabla de notas. Con puntos activos incluye la nota original, la bonificada y los
+// puntos ganados, para que el boletin sea auditable.
+function buildScoresTable(){
+    const es=currentLanguage==='es', t=translations[currentLanguage];
+    const head=[es?'Estudiante':'Student', ...noteColumns];
+    if(badgePointsEnabled){
+        head.push(...noteColumns.map(n=>`${n} ${es?'(con puntos)':'(with points)'}`), es?'Puntos insignias':'Badge points');
+    }
+    head.push(t.averageLabel);
+    return {
+        title: t.scores,
+        head,
+        body: currentStudents.map(s=>{
+            const fila=[s.name, ...noteColumns.map((_,i)=>s.notes[i]||'')];
+            if(badgePointsEnabled){
+                const b=computeBadgeBonus(s);
+                fila.push(...b.detail.map(d=>d.original===null?'':(d.usable?d.final.toFixed(1):String(d.original))));
+                fila.push(b.pointsEarned.toFixed(2));
+            }
+            fila.push(calculateStudentAverage(s));
+            return fila;
+        })
+    };
+}
 function buildCurrentViewTables(){
     const es=currentLanguage==='es', t=translations[currentLanguage], tables=[];
     if(viewMode==='scores'){
-        tables.push({
-            title: t.scores,
-            head: [es?'Estudiante':'Student', ...noteColumns, t.averageLabel],
-            body: currentStudents.map(s=>[s.name, ...noteColumns.map((_,i)=>s.notes[i]||''), calculateStudentAverage(s)])
-        });
+        tables.push(buildScoresTable());
     } else {
         for(let w=1;w<=gridWeeks;w++){
             tables.push({
@@ -1973,8 +2133,8 @@ function safeSheetName(name,fallback){
 }
 function exportCurrentViewPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);const vt=viewMode==='rows'?t.weeklyRows:viewMode==='grid'?t.weeklyGrid:t.scores;pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${vt} - ${new Date().toLocaleString()}`,105,60,{align:'center'});buildCurrentViewTables().forEach((tb,idx)=>{let sy=65;if(idx>0){pdf.addPage();sy=20;}pdf.setTextColor(102,126,234);pdf.setFontSize(12);pdf.text(tb.title,105,sy,{align:'center'});pdf.autoTable({head:[tb.head],body:tb.body,startY:sy+5,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});});pdf.save(`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportCurrentViewExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();buildCurrentViewTables().forEach((tb,idx)=>{const data=[[t.institutionHeader,info.institution],[t.teacherHeader,info.teacher],[t.classroomHeader,info.classroom],[t.dateHeader,info.date],[],[tb.title],tb.head,...tb.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(tb.title,(currentLanguage==='es'?'Vista ':'View ')+(idx+1)));});window.XLSX.writeFile(wb,`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportScoresPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.scores} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'Estudiante':'Student',...noteColumns,t.averageLabel]];const data=currentStudents.map(s=>[s.name,...s.notes,calculateStudentAverage(s)]);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const headers=[currentLanguage==='es'?'Estudiante':'Student',...noteColumns,t.averageLabel];const data=[headers,...currentStudents.map(s=>[s.name,...s.notes,calculateStudentAverage(s)])];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(t.scores,'Scores'));window.XLSX.writeFile(wb,`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportScoresPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.scores} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const _st=buildScoresTable();const headers=[_st.head];const data=_st.body;pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const _st=buildScoresTable();const data=[_st.head,..._st.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(t.scores,'Scores'));window.XLSX.writeFile(wb,`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportBadgesPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.availableBadges} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon']];const data=currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️']);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3}});let y=pdf.lastAutoTable.finalY+15;pdf.setFontSize(12);pdf.text(currentLanguage==='es'?'Insignias por Estudiante:':'Badges per Student:',10,y);y+=10;const bd=currentStudents.map(s=>[s.name,s.gridBadges.flat().length]);pdf.autoTable({head:[[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges']],body:bd,startY:y,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportBadgesExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const bh=[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon'];const bd=[bh,...currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️'])];const bw=window.XLSX.utils.aoa_to_sheet(bd);window.XLSX.utils.book_append_sheet(wb,bw,currentLanguage==='es'?'Insignias':'Badges');const sh=[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges'];const sd=[sh,...currentStudents.map(s=>[s.name,s.gridBadges.flat().length])];const sw=window.XLSX.utils.aoa_to_sheet(sd);window.XLSX.utils.book_append_sheet(wb,sw,currentLanguage==='es'?'Por Estudiante':'Per Student');window.XLSX.writeFile(wb,`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportStatisticsPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.statisticsTitle} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const ne=currentStudents.length,ni=currentStudents.reduce((a,s)=>a+s.gridBadges.reduce((x,y)=>x+y.length,0),0),ai=ne>0?(ni/ne).toFixed(2):0,nc=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;const sd=[[t.studentsLabel,ne],[t.badgesAwardedLabel,ni],[t.avgBadgesLabel,ai],[t.commentsLabel,nc]];pdf.autoTable({body:sd,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3},columnStyles:{0:{fontStyle:'bold'}}});pdf.save(`Statistics_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
@@ -2058,13 +2218,27 @@ function openStudentReport(sid){
         if(wLines){ const wt=weekTitles[w-1]||(es?'Semana ':'Week ')+w; badgesHtml+=`<div style="margin-bottom:6px;"><b style="color:var(--accent-strong);">${escapeHtml(wt)}</b><ul style="margin:4px 0;">${wLines}</ul></div>`; }
     }
     if(!badgesHtml) badgesHtml=`<p style="opacity:.7;">${es?'Sin insignias aún.':'No badges yet.'}</p>`;
-    const scoresHtml=noteColumns.map((nc,i)=>`<li><b>${escapeHtml(nc)}:</b> ${escapeHtml(s.notes[i]||'—')}</li>`).join('');
+    const bono = badgePointsEnabled ? computeBadgeBonus(s) : null;
+    const scoresHtml=noteColumns.map((nc,i)=>{
+        const base=escapeHtml(s.notes[i]||'—');
+        const d=bono?bono.detail[i]:null;
+        const extra=(d&&d.bonus>0)
+            ? ` <span style="color:var(--success);font-weight:700;">+${fmtPoints(d.bonus)} → ${d.final.toFixed(1)}</span>`
+            : '';
+        return `<li><b>${escapeHtml(nc)}:</b> ${base}${extra}</li>`;
+    }).join('');
+    const puntosHtml = bono
+        ? `<div><b>${es?'Puntos por insignias:':'Badge points:'}</b> <span style="color:var(--success);font-weight:700;">+${fmtPoints(bono.pointsEarned)}</span>`
+          + (bono.leftover>0?` <span style="opacity:.7;font-size:.9em;">(${es?'sin usar':'unused'}: ${fmtPoints(bono.leftover)})</span>`:'')
+          + `</div>`
+        : '';
     let ac='score-mid'; if(avg!=="-"){const v=parseFloat(avg);if(v>=3.5)ac='score-high';else if(v<3)ac='score-low';}
     document.getElementById('studentReportBody').innerHTML=
       `<h3 style="color:var(--accent-strong);margin-bottom:4px;">📋 ${escapeHtml(s.name||('Student '+s.id))}</h3>
        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;">
          <div><b>${es?'Promedio:':'Average:'}</b> <span class="${ac}" style="font-weight:700;">${avg}</span></div>
          <div><b>${es?'Insignias:':'Badges:'}</b> ${totalBadges}</div>
+         ${puntosHtml}
        </div>
        <h4 style="color:var(--accent-strong);">${es?'Notas':'Scores'}</h4><ul style="margin:4px 0 12px;">${scoresHtml}</ul>
        <h4 style="color:var(--accent-strong);">${es?'Insignias':'Badges'}</h4>${badgesHtml}
@@ -2099,7 +2273,17 @@ function generateStudentReportPDF(sid){
         const totalBadges=(s.gridBadges||[]).reduce((a,yy)=>a+(yy||[]).length,0);
         pdf.text(`${es?'Promedio:':'Average:'} ${avg}    ${es?'Insignias:':'Badges:'} ${totalBadges}`,10,y);y+=10;
         pdf.setFont('helvetica','bold');pdf.text(es?'Notas:':'Scores:',10,y);pdf.setFont('helvetica','normal');y+=6;
-        s.notes.forEach((n,i)=>{if(y>280){pdf.addPage();y=20;}pdf.text(`- ${noteColumns[i]}: ${n||'—'}`,14,y);y+=6;});
+        const _bono = badgePointsEnabled ? computeBadgeBonus(s) : null;
+        s.notes.forEach((n,i)=>{
+            if(y>280){pdf.addPage();y=20;}
+            const d=_bono?_bono.detail[i]:null;
+            const extra=(d&&d.bonus>0)?`  (+${fmtPoints(d.bonus)} ${es?'insignias':'badges'} = ${d.final.toFixed(1)})`:'';
+            pdf.text(`- ${noteColumns[i]}: ${n||'—'}${extra}`,14,y);y+=6;
+        });
+        if(_bono){
+            if(y>280){pdf.addPage();y=20;}
+            pdf.text(`- ${es?'Puntos por insignias':'Badge points'}: +${fmtPoints(_bono.pointsEarned)}${_bono.leftover>0?` (${es?'sin usar':'unused'}: ${fmtPoints(_bono.leftover)})`:''}`,14,y);y+=6;
+        }
         y+=4;if(y>280){pdf.addPage();y=20;}pdf.setFont('helvetica','bold');pdf.text(es?'Insignias:':'Badges:',10,y);pdf.setFont('helvetica','normal');y+=6;
         for(let w=1;w<=gridWeeks;w++){const wt=weekTitles[w-1]||(es?'Semana ':'Week ')+w;let wh=false;for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;const b=s.gridBadges[ci]||[];if(b.length>0){if(!wh){if(y>270){pdf.addPage();y=20;}pdf.text(`${wt}:`,14,y);y+=6;wh=true;}if(y>270){pdf.addPage();y=20;}pdf.text(`   ${weekDays[d]}: ${b.map(x=>x.name).join(', ')}`,16,y);y+=6;}}}
         if(s.comment&&s.comment.trim()){y+=4;if(y>260){pdf.addPage();y=20;}pdf.setFont('helvetica','bold');pdf.text(es?'Comentario:':'Comment:',10,y);pdf.setFont('helvetica','normal');y+=6;pdf.text(s.comment,14,y,{maxWidth:180});}
@@ -2118,6 +2302,15 @@ function updateNewFeaturesText(){
     const fp=document.getElementById('forgotPasswordLink'); if(fp)fp.textContent=es?'¿Olvidaste tu contraseña?':'Forgot your password?';
     const ss=document.getElementById('studentSearchInput'); if(ss)ss.placeholder=es?'🔎 Buscar estudiante...':'🔎 Search student...';
     const cch=document.getElementById('clearChatBtn'); if(cch)cch.textContent=es?'🧹 Nueva conversación':'🧹 New conversation';
+    const rml=document.getElementById('rememberEmailLabel'); if(rml)rml.textContent=es?'Recordar mi correo en este dispositivo':'Remember my email on this device';
+    const rrl=document.getElementById('rememberRegisterEmailLabel'); if(rrl)rrl.textContent=es?'Recordar este correo en este dispositivo':'Remember this email on this device';
+    const ksl=document.getElementById('keepSessionLabel'); if(ksl)ksl.textContent=es?'Mantener la sesión iniciada en este dispositivo':'Keep me signed in on this device';
+    const bpt=document.getElementById('badgePointsToggleLabel'); if(bpt)bpt.textContent=es?'🏅 Sumar puntos de insignias a las notas':'🏅 Add badge points to scores';
+    const bpv=document.getElementById('badgePointsValueLabel'); if(bpv)bpv.textContent=es?'Valor por insignia:':'Value per badge:';
+    const bph=document.getElementById('badgePointsHelp'); if(bph)bph.textContent=es
+        ? 'Los puntos se suman a la nota más baja; si llega a 5.0, pasan a la siguiente. La nota que escribes no se modifica.'
+        : 'Points go to the lowest score; once it reaches 5.0 they move to the next lowest. Your typed score is never modified.';
+    syncBadgePointsControls();
     const anl=document.getElementById('aiAnonymizeLabel');
     if(anl)anl.textContent=es
         ? 'Anonimizar los nombres de los estudiantes antes de enviarlos a la IA (recomendado)'
@@ -2211,6 +2404,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     const removeWeekBtn=document.getElementById('removeWeekBtn'); if(removeWeekBtn) removeWeekBtn.addEventListener('click',window.removeWeek);
     const addNoteColBtn=document.getElementById('addNoteColBtn'); if(addNoteColBtn) addNoteColBtn.addEventListener('click',window.addNoteColumn);
     const removeNoteColBtn=document.getElementById('removeNoteColBtn'); if(removeNoteColBtn) removeNoteColBtn.addEventListener('click',window.removeNoteColumn);
+    const bpEnabled=document.getElementById('badgePointsEnabledInput');
+    if(bpEnabled) bpEnabled.addEventListener('change',function(){ setBadgePointsEnabled(this.checked); });
+    const bpValue=document.getElementById('badgePointValueInput');
+    if(bpValue) bpValue.addEventListener('change',function(){ setBadgePointValue(this.value); });
     document.addEventListener('keydown',e=>{
         if(e.key!=='Escape')return;
         // Primero se cancela la insignia activa; si no hay ninguna, se cierran los modales.
@@ -2523,6 +2720,11 @@ let db = null;
 // login: habia que reescribir la contrasena en cada recarga. Ahora se restaura sola.
 let _manualAuthInFlight = false;
 let _authRestoreDone = false;
+// La sesion SOLO se recuerda si el docente lo pide expresamente. Por defecto se
+// pide la contrasena en cada visita: en un movil compartido o extraviado, entrar
+// solo al abrir el enlace expondria los datos de todo el salon.
+function keepSessionEnabled(){ return localStorage.getItem('learnersTrackKeepSession')==='1'; }
+function setKeepSession(on){ try{ localStorage.setItem('learnersTrackKeepSession', on?'1':'0'); }catch(e){} }
 function initAuthPersistence(){
   if(!window.FIREBASE_ON) return;
   try{
@@ -2531,6 +2733,11 @@ function initAuthPersistence(){
       // Si el usuario acaba de pulsar "Iniciar sesion"/"Registrarse", esa ruta ya carga los datos.
       if(_manualAuthInFlight || _authRestoreDone || currentUser) return;
       _authRestoreDone = true;
+      if(!keepSessionEnabled()){
+        // Habia sesion guardada pero no se pidio mantenerla: se cierra y se pide la contrasena.
+        firebase.auth().signOut().catch(()=>{});
+        return;
+      }
       loadUserFromCloud(user.uid, user.email);
     });
   }catch(e){ console.error('auth persistence',e); }
@@ -2575,6 +2782,7 @@ function firebaseLogin(){
   if(!email||!pw){ showNotification(translations[currentLanguage].loginError,'error'); return; }
   _manualAuthInFlight = true;
   persistRememberedEmails();
+  setKeepSession(!!document.getElementById('keepSessionOptIn')?.checked);
   firebase.auth().signInWithEmailAndPassword(email,pw)
     .then(cred=>loadUserFromCloud(cred.user.uid,email))
     .catch(err=>{ console.error(err); showNotification((currentLanguage==='es'?'No se pudo iniciar sesión: ':'Sign-in failed: ')+fbErr(err),'error'); })
@@ -2613,8 +2821,12 @@ function loadUserFromCloud(uid,email){
       classrooms:Array.isArray(d.classrooms)?d.classrooms:[], gridWeeks:d.gridWeeks||1,
       weekTitles:Array.isArray(d.weekTitles)?d.weekTitles:["Week 1"],
       noteColumns:Array.isArray(d.noteColumns)?d.noteColumns:["Evaluation 1","Evaluation 2"],
-      activeClassroomIndex:d.activeClassroomIndex||0
+      activeClassroomIndex:d.activeClassroomIndex||0,
+      badgePointsEnabled:!!d.badgePointsEnabled,
+      badgePointValue:(typeof d.badgePointValue==='number')?d.badgePointValue:0.2
     };
+    badgePointsEnabled=currentUser.badgePointsEnabled;
+    badgePointValue=currentUser.badgePointValue;
     userProfile.name=currentUser.name||'Teacher'; userProfile.email=currentUser.email; userProfile.avatar=currentUser.avatar;
     userProfile.school=currentUser.school; userProfile.grade=currentUser.grade; userProfile.institutionLogo=currentUser.institutionLogo;
     // Los grados tambien viajan a la nube: antes solo vivian en el dispositivo,
@@ -2637,7 +2849,7 @@ function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_clou
 function pushToCloud(){
   try{
     const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades };
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
     // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
