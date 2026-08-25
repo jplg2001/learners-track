@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Learners Track: plataforma educativa para el seguimiento, la evaluación y el reconocimiento de estudiantes.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#4facfe">
 <title>Learners Track</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -255,6 +258,21 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .fade-in { animation:fadeIn 0.5s ease; }
 .slide-in { animation:slideIn 0.5s ease; }
 @keyframes slideIn { from { transform:translateX(-20px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+.fade-enter { animation:fadeIn 0.35s ease; }
+/* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
+.badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
+.badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
+.badge-armed-hint button { background:rgba(255,255,255,0.25); border:none; color:#fff; border-radius:8px; padding:4px 10px; font-weight:700; cursor:pointer; }
+.student-grid-table td.badge-target { outline:2px dashed var(--success); outline-offset:-3px; cursor:copy; }
+.note-input.note-invalid { border-color:var(--danger) !important; background:rgba(255,107,107,0.13); }
+.empty-state { text-align:center; padding:2.2rem 1rem; }
+.empty-state p { margin-bottom:14px; opacity:0.8; }
+.privacy-note { font-size:0.82em; opacity:0.9; background:var(--badge-bg); border-left:3px solid var(--accent); padding:9px 11px; border-radius:6px; margin-bottom:14px; line-height:1.45; }
+.ai-privacy-row { display:flex; align-items:flex-start; gap:9px; font-size:0.86em; margin:10px 0 4px; text-align:left; }
+.ai-privacy-row input { width:auto; margin-top:2px; flex-shrink:0; }
+:focus-visible { outline:3px solid var(--accent-strong); outline-offset:2px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
 </style>
 </head>
 <body>
@@ -331,9 +349,9 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
         <div class="topbar-center"><div id="classroomSelector" class="classroom-selector"></div></div>
         <div class="topbar-right">
             <img id="headerAvatar" class="user-avatar" style="display:none;" src="" alt="Avatar">
-            <button id="profileBtn" class="profile-btn">👤 Profile</button>
-            <button id="themeToggleBtn" class="theme-toggle-btn">🌙</button>
-            <button id="logoutBtn" class="profile-btn">🚪 Logout</button>
+            <button id="profileBtn" type="button" class="profile-btn">👤 Profile</button>
+            <button id="themeToggleBtn" type="button" class="theme-toggle-btn" title="Tema claro / oscuro" aria-label="Cambiar tema claro u oscuro">🌙</button>
+            <button id="logoutBtn" type="button" class="profile-btn">🚪 Logout</button>
         </div>
     </nav>
     <div class="header">
@@ -393,7 +411,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
                 <button class="add-note-col-btn" id="addNoteColBtn">+ Add Score Column</button>
                 <button class="remove-note-col-btn" id="removeNoteColBtn">- Remove Score Column</button>
             </div>
-            <div style="margin:6px 0 12px;"><input type="text" id="studentSearchInput" placeholder="🔎 Search student..." style="width:100%;max-width:340px;padding:8px 12px;border-radius:8px;border:1px solid #c9d8f6;box-sizing:border-box;font-family:inherit;"></div>
+            <div style="margin:6px 0 12px;"><input type="search" id="studentSearchInput" name="lt-student-search" autocomplete="off" autocapitalize="off" placeholder="🔎 Search student..." style="width:100%;max-width:340px;padding:8px 12px;border-radius:8px;border:1px solid #c9d8f6;box-sizing:border-box;font-family:inherit;"></div>
             <div id="classroomRowsView" class="table-scroll"></div>
             <div id="classroomGridView" class="table-scroll" style="display:none;"></div>
             <div id="classroomScoresView" class="table-scroll" style="display:none;"></div>
@@ -512,6 +530,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
         <div class="ai-analysis-header">
             <h3 style="color:var(--accent-strong);margin-bottom:5px;">🤖 Asistente Docente IA</h3>
             <p style="font-size:0.9em;opacity:0.8;">Pregúntame sobre estrategias, planes de clase o ideas para tus estudiantes.</p>
+            <button type="button" id="clearChatBtn" class="btn-secondary" style="margin-top:8px;padding:5px 12px;font-size:0.85em;" onclick="clearAiChat()">🧹 Nueva conversación</button>
         </div>
         <div id="chatMessages" class="chat-messages">
             <div class="chat-message ai-message">¡Hola! Soy tu asistente de Learners Track. ¿En qué te puedo ayudar hoy con tus clases?</div>
@@ -529,9 +548,16 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
         <button class="modal-close-btn" onclick="closeApiKeySettingsModal()">&times;</button>
         <h3 style="color:var(--accent-strong);">🔐 Configurar IA (Gemini)</h3>
         <p style="font-size:0.9em;opacity:0.85;margin-bottom:15px;">Pega tu API key de Google Gemini para activar el análisis y el chat con IA en tiempo real. Si la dejas vacía, la app usa automáticamente el análisis local (sin conexión). Puedes obtener una key gratis en Google AI Studio.</p>
+        <div class="privacy-note" id="aiPrivacyNote">
+            🔒 <b>Privacidad:</b> las funciones de IA envían los datos del aula (notas, insignias y comentarios) a los servidores de Google. Con la anonimización activada, los nombres se sustituyen por alias antes de salir de este dispositivo y se restituyen solo al mostrarte la respuesta.
+        </div>
         <div class="form-group">
             <label for="geminiApiKeyInput">API Key de Gemini:</label>
             <input type="password" id="geminiApiKeyInput" placeholder="AIza..." autocomplete="off">
+        </div>
+        <div class="ai-privacy-row">
+            <input type="checkbox" id="aiAnonymizeToggle" checked>
+            <label for="aiAnonymizeToggle" id="aiAnonymizeLabel">Anonimizar los nombres de los estudiantes antes de enviarlos a la IA (recomendado)</label>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button type="button" class="btn-danger" onclick="clearStoredApiKey()">Borrar key</button>
@@ -627,11 +653,68 @@ function addLogoToCertificate(pdf,logoData) {
     } catch(e) {}
 }
 
+// === SEGURIDAD: escapado de texto antes de insertarlo en HTML ===
+// Evita que un nombre con comillas o "<" rompa la tabla o inyecte marcado.
+function escapeHtml(value) {
+    return String(value==null?'':value)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Saneador para el HTML que devuelve la IA: conserva el formato util y elimina scripts/eventos.
+const AI_ALLOWED_TAGS = ['H3','H4','H5','P','UL','OL','LI','B','STRONG','I','EM','BR','HR','SPAN','DIV','TABLE','THEAD','TBODY','TR','TH','TD','CODE','SMALL'];
+function sanitizeAiHtml(html) {
+    try {
+        const tpl = document.createElement('div');
+        tpl.innerHTML = String(html==null?'':html);
+        tpl.querySelectorAll('*').forEach(el=>{
+            if(!AI_ALLOWED_TAGS.includes(el.tagName)) { el.replaceWith(...el.childNodes); return; }
+            [...el.attributes].forEach(attr=>{
+                const n = attr.name.toLowerCase();
+                if(n.startsWith('on') || n==='href' || n==='src' || n==='style' || n==='srcset') el.removeAttribute(attr.name);
+            });
+        });
+        return tpl.innerHTML;
+    } catch(e) { return escapeHtml(html); }
+}
+
+// === IMAGENES: comprimir antes de guardar ===
+// Sin esto una foto de celular en base64 (2-5 MB) revienta la cuota de localStorage
+// y el limite de 1 MiB por documento de Firestore.
+function compressImageFile(file, maxSize, quality) {
+    maxSize = maxSize || 320; quality = quality || 0.82;
+    return new Promise((resolve,reject)=>{
+        if(!file){ reject(new Error('no file')); return; }
+        const reader = new FileReader();
+        reader.onerror = ()=>reject(new Error('read error'));
+        reader.onload = ev => {
+            const img = new Image();
+            img.onerror = ()=>resolve(ev.target.result); // si no se puede procesar, se usa el original
+            img.onload = ()=>{
+                try {
+                    let {width:w, height:h} = img;
+                    if(w>maxSize || h>maxSize){ const r=Math.min(maxSize/w, maxSize/h); w=Math.round(w*r); h=Math.round(h*r); }
+                    const canvas = document.createElement('canvas');
+                    canvas.width=w; canvas.height=h;
+                    const ctx = canvas.getContext('2d');
+                    // Fondo blanco para que los PNG transparentes no salgan negros en el JPEG.
+                    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
+                    ctx.drawImage(img,0,0,w,h);
+                    resolve(canvas.toDataURL('image/jpeg',quality));
+                } catch(e){ resolve(ev.target.result); }
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+function approxBytes(str){ return str ? Math.ceil(String(str).length*0.75) : 0; }
+function formatBytes(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.round(b/1024)+' KB'; }
+
 // === TRANSLATIONS ===
 const translations = {
     en: {
         appTitle:"Learners Track", userWelcome:"User:", profileBtn:"👤 Profile", logoutBtn:"🚪 Logout",
-        headerDescription:"Educational platform for student tracking and recognition.<br><span style='font-size:1em;opacity:.77'><b>Tip:</b> Drag badges onto students or days.<br>Use PDF, statistics and scores options for complete tracking.</span>",
+        headerDescription:"Educational platform for student tracking and recognition.<br><span style='font-size:1em;opacity:.77'><b>Tip:</b> Tap a badge, then tap a cell to award it (works on tablets). You can also drag it.<br>Hold <b>Shift</b> while dropping to award it to the whole row.</span>",
         viewLabel:"View:", weeklyRows:"Weekly Rows", weeklyGrid:"Weekly Grid", scores:"SCORES",
         export:"📥 Export", exportViewPdf:"📄 Current View PDF", exportViewExcel:"📊 Current View Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Badges PDF",
@@ -678,7 +761,7 @@ const translations = {
     },
     es: {
         appTitle:"Learners Track", userWelcome:"Usuario:", profileBtn:"👤 Perfil", logoutBtn:"🚪 Cerrar Sesión",
-        headerDescription:"Plataforma educativa para seguimiento y reconocimiento estudiantil.<br><span style='font-size:1em;opacity:.77'><b>Consejo:</b> Arrastra insignias sobre los estudiantes o días.<br>Usa las opciones de PDF, estadísticas y scores para un completo seguimiento.</span>",
+        headerDescription:"Plataforma educativa para seguimiento y reconocimiento estudiantil.<br><span style='font-size:1em;opacity:.77'><b>Consejo:</b> Toca una insignia y luego la celda para otorgarla (funciona en tablet). También puedes arrastrarla.<br>Mantén <b>Shift</b> al soltarla para otorgarla a toda la fila.</span>",
         viewLabel:"Vista:", weeklyRows:"Filas semanales", weeklyGrid:"Cuadrícula semanal", scores:"SCORES",
         export:"📥 Exportar", exportViewPdf:"📄 Vista Actual PDF", exportViewExcel:"📊 Vista Actual Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Insignias PDF",
@@ -731,8 +814,8 @@ let grades = [];
 
 // === DATA FUNCTIONS ===
 function createNewClassroomObject(name) {
-    let headers = getGridHeaders();
-    return { name, students:Array.from({length:28},(_,i)=>createNewStudentObject(i+1,headers)), badges:[...defaultBadges] };
+    // Los salones nuevos arrancan vacios: se llenan con "Importar lista" o "Anadir estudiante".
+    return { name, students:[], badges:defaultBadges.map(b=>({...b})) };
 }
 function createNewStudentObject(id,headers=[]) {
     return { id, name:`Student ${id}`, badges:[], comment:'', gridBadges:Array.from({length:headers.length},()=>[]), notes:Array.from({length:noteColumns.length},()=>"") };
@@ -788,18 +871,23 @@ function updateUIText() {
     ph.forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.placeholder=val; });
     const uw = document.getElementById('userWelcome');
     if(uw) uw.innerHTML = `${t.userWelcome} <span id="teacherNameDisplay">${userProfile.name}</span>`;
-    if(currentLanguage==='es') {
-        weekDays=["Lunes","Martes","Miércoles","Jueves","Viernes"];
-        if(noteColumns[0]==="Evaluation 1") noteColumns=["Evaluación 1","Evaluación 2"];
-    } else {
-        weekDays=["Monday","Tuesday","Wednesday","Thursday","Friday"];
-        if(noteColumns[0]==="Evaluación 1") noteColumns=["Evaluation 1","Evaluation 2"];
-    }
-    weekTitles = weekTitles.map((ti,i) => {
-        if(currentLanguage==='es'&&ti.startsWith("Week")) return `Semana ${i+1}`;
-        else if(currentLanguage==='en'&&ti.startsWith("Semana")) return `Week ${i+1}`;
-        return ti;
+    const es = currentLanguage==='es';
+    weekDays = es ? ["Lunes","Martes","Miércoles","Jueves","Viernes"]
+                  : ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+    // IMPORTANTE: se traduce columna por columna conservando la cantidad y los nombres
+    // personalizados. Antes se reemplazaba el array entero por dos elementos, lo que
+    // borraba de forma permanente las evaluaciones 3 en adelante.
+    const NOTE_DEFAULT = /^(?:Evaluation|Evaluación)\s+(\d+)$/;
+    noteColumns = noteColumns.map(nc => {
+        const m = NOTE_DEFAULT.exec(String(nc||'').trim());
+        return m ? (es?`Evaluación ${m[1]}`:`Evaluation ${m[1]}`) : nc;
     });
+    const WEEK_DEFAULT = /^(?:Week|Semana)\s+(\d+)$/;
+    weekTitles = weekTitles.map(ti => {
+        const m = WEEK_DEFAULT.exec(String(ti||'').trim());
+        return m ? (es?`Semana ${m[1]}`:`Week ${m[1]}`) : ti;
+    });
+    document.documentElement.setAttribute('lang', es?'es':'en');
     updateNewFeaturesText();
     const mc = document.getElementById('mainContainer');
     if(mc && mc.style.display!=='none') renderCurrentView();
@@ -903,7 +991,7 @@ function analyzeBadges() {
     const bd={};
     currentStudents.forEach(s=>s.gridBadges.flat().forEach(b=>{if(b&&b.name)bd[b.name]=(bd[b.name]||0)+1;}));
     const top=Object.entries(bd).sort((a,b)=>b[1]-a[1])[0];
-    if(top) r.patterns.push(currentLanguage==='es'?`La insignia más otorgada es "${top[0]}" (${top[1]} veces).`:`Most awarded badge is "${top[0]}" (${top[1]} times).`);
+    if(top) r.patterns.push(currentLanguage==='es'?`La insignia más otorgada es "${escapeHtml(top[0])}" (${top[1]} veces).`:`Most awarded badge is "${escapeHtml(top[0])}" (${top[1]} times).`);
     return r;
 }
 function analyzeParticipation() {
@@ -929,11 +1017,11 @@ function displayAIAnalysis(a) {
     const rd=document.getElementById('aiAnalysisResults');
     if(currentStudents.length===0){rd.innerHTML=`<div class="ai-result-section ai-student-alert"><h4>⚠️ ${t.aiNoData}</h4></div>`;return;}
     let h='';
-    if(a.studentsAtRisk.length>0) h+=`<div class="ai-result-section ai-student-alert"><h4>🔴 ${t.aiStudentsAtRisk}</h4><ul>${a.studentsAtRisk.map(s=>`<li><strong>${s.name}</strong> - ${currentLanguage==='es'?'Promedio:':'Average:'} ${s.average}</li>`).join('')}</ul></div>`;
-    if(a.highPerformers.length>0) h+=`<div class="ai-result-section ai-student-success"><h4>🟢 ${t.aiHighPerformers}</h4><ul>${a.highPerformers.map(s=>`<li><strong>${s.name}</strong> - ${currentLanguage==='es'?'Promedio:':'Average:'} ${s.average}</li>`).join('')}</ul></div>`;
-    a.sections.forEach(s=>{h+=`<div class="ai-result-section"><h4>📊 ${s.title}</h4>${Array.isArray(s.content)?s.content.map(c=>`<p>${c}</p>`).join(''):s.content}</div>`;});
+    if(a.studentsAtRisk.length>0) h+=`<div class="ai-result-section ai-student-alert"><h4>🔴 ${t.aiStudentsAtRisk}</h4><ul>${a.studentsAtRisk.map(s=>`<li><strong>${escapeHtml(s.name)}</strong> - ${currentLanguage==='es'?'Promedio:':'Average:'} ${escapeHtml(s.average)}</li>`).join('')}</ul></div>`;
+    if(a.highPerformers.length>0) h+=`<div class="ai-result-section ai-student-success"><h4>🟢 ${t.aiHighPerformers}</h4><ul>${a.highPerformers.map(s=>`<li><strong>${escapeHtml(s.name)}</strong> - ${currentLanguage==='es'?'Promedio:':'Average:'} ${escapeHtml(s.average)}</li>`).join('')}</ul></div>`;
+    a.sections.forEach(s=>{h+=`<div class="ai-result-section"><h4>📊 ${escapeHtml(s.title)}</h4>${Array.isArray(s.content)?s.content.map(c=>`<p>${c}</p>`).join(''):s.content}</div>`;});
     if(a.patterns.length>0) h+=`<div class="ai-result-section"><h4>📈 ${t.aiPatterns}</h4><ul>${a.patterns.map(p=>`<li>${p}</li>`).join('')}</ul></div>`;
-    if(a.recommendations.length>0) h+=`<div class="ai-result-section"><h4>💡 ${t.aiRecommendations}</h4><ul>${a.recommendations.map(r=>`<li>${r}</li>`).join('')}</ul></div>`;
+    if(a.recommendations.length>0) h+=`<div class="ai-result-section"><h4>💡 ${t.aiRecommendations}</h4><ul>${a.recommendations.map(r=>`<li>${escapeHtml(r)}</li>`).join('')}</ul></div>`;
     rd.innerHTML=h;
 }
 
@@ -941,24 +1029,71 @@ function displayAIAnalysis(a) {
 function loadUsers() {
     try { const s=localStorage.getItem(USERS_KEY); if(s) { users=JSON.parse(s); users=users.map(u=>{if(!u.classrooms)u.classrooms=[];if(!u.gridWeeks)u.gridWeeks=1;if(!u.weekTitles)u.weekTitles=["Week 1"];if(!u.noteColumns)u.noteColumns=["Evaluation 1","Evaluation 2"];if(!u.activeClassroomIndex)u.activeClassroomIndex=0;return u;}); } } catch(e){users=[];}
 }
-function saveUsers() { try{localStorage.setItem(USERS_KEY,JSON.stringify(users));}catch(e){showNotification("Storage quota exceeded.","error");} }
+function saveUsers() {
+    try{ localStorage.setItem(USERS_KEY,JSON.stringify(users)); }
+    catch(e){
+        const es=currentLanguage==='es';
+        console.error('localStorage lleno',e);
+        showNotification(es
+            ? '⚠️ Almacenamiento local lleno: los cambios podrían no guardarse en este equipo. Exporta tus datos y libera espacio.'
+            : '⚠️ Local storage is full: changes may not be saved on this device. Export your data and free up space.','error');
+    }
+}
 function loadGrades() {
     try { const s=localStorage.getItem(GRADES_KEY); if(s) grades=JSON.parse(s); } catch(e){grades=[];}
     if(grades.length===0) { grades=[{id:1,name:"Grade 1",classrooms:[]},{id:2,name:"Grade 2",classrooms:[]},{id:3,name:"Grade 3",classrooms:[]},{id:4,name:"Grade 4",classrooms:[]},{id:5,name:"Grade 5",classrooms:[]},{id:6,name:"Grade 6",classrooms:[]}]; saveGrades(); }
 }
-function saveGrades() { try{localStorage.setItem(GRADES_KEY,JSON.stringify(grades));}catch(e){} }
-function registerUser(name,email,password,school) {
-    if(users.find(u=>u.email===email)) return false;
-    users.push({id:Date.now(),name,email,password,school,avatar:'https://i.pravatar.cc/150?u='+email,classrooms:[],gridWeeks:1,weekTitles:["Week 1"],noteColumns:["Evaluation 1","Evaluation 2"],activeClassroomIndex:0});
-    saveUsers(); return true;
+function saveGrades() {
+    try{ localStorage.setItem(GRADES_KEY,JSON.stringify(grades)); }catch(e){}
+    if(window.FIREBASE_ON && currentUser && typeof scheduleCloudPush==='function') scheduleCloudPush();
 }
-function authenticateUser(email,password) { return users.find(u=>u.email===email&&u.password===password); }
+// === CONTRASENAS (solo modo local) ===
+// El modo local es el respaldo cuando Firebase no carga. Antes la contrasena se
+// guardaba en texto plano dentro de localStorage; ahora se guarda como SHA-256 + salt.
+function randomSalt(){
+    const a=new Uint8Array(16);
+    if(window.crypto&&window.crypto.getRandomValues) window.crypto.getRandomValues(a);
+    else for(let i=0;i<a.length;i++) a[i]=Math.floor(Math.random()*256);
+    return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function hashPassword(password,salt){
+    if(!(window.crypto&&window.crypto.subtle)) return null;
+    try{
+        const data=new TextEncoder().encode(salt+'::'+password);
+        const buf=await window.crypto.subtle.digest('SHA-256',data);
+        return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){ return null; }
+}
+async function registerUser(name,email,password,school) {
+    if(users.find(u=>u.email===email)) return false;
+    const rec={id:Date.now(),name,email,school,avatar:'https://i.pravatar.cc/150?u='+email,classrooms:[],gridWeeks:1,weekTitles:["Week 1"],noteColumns:["Evaluation 1","Evaluation 2"],activeClassroomIndex:0};
+    const salt=randomSalt(), hash=await hashPassword(password,salt);
+    if(hash){ rec.salt=salt; rec.pwHash=hash; } else { rec.password=password; } // navegador sin WebCrypto
+    users.push(rec); saveUsers(); return true;
+}
+async function authenticateUser(email,password) {
+    const u=users.find(x=>x.email===email); if(!u) return null;
+    if(u.pwHash&&u.salt){ const h=await hashPassword(password,u.salt); return (h&&h===u.pwHash)?u:null; }
+    // Migracion transparente de las cuentas antiguas guardadas en texto plano.
+    if(u.password!==undefined&&u.password===password){
+        const salt=randomSalt(), h=await hashPassword(password,salt);
+        if(h){ u.salt=salt; u.pwHash=h; delete u.password; saveUsers(); }
+        return u;
+    }
+    return null;
+}
 
 // === LOGOUT ===
 function logout() {
     if(window.FIREBASE_ON){ try{ firebase.auth().signOut(); }catch(e){} }
     currentUser=null; selectedGrade=null; institutionLogo=null; profilePhoto=null;
     classrooms=[]; activeClassroomIndex=0; gridWeeks=1; weekTitles=["Week 1"]; noteColumns=["Evaluation 1","Evaluation 2"];
+    // Se limpia tambien el perfil y el aula en memoria para no filtrar datos al siguiente usuario.
+    currentBadges=[]; currentStudents=[]; disarmBadge();
+    userProfile={ name:'Teacher', avatar:'https://i.pravatar.cc/150?u=teacher', email:'', school:'', grade:'', institutionLogo:null };
+    const _hl=document.getElementById('institutionLogoSmall'); if(_hl){_hl.src='';_hl.style.display='none';}
+    const _ha=document.getElementById('headerAvatar'); if(_ha){_ha.src='';_ha.style.display='none';}
+    document.getElementById('statisticsPage').classList.remove('show');
     document.getElementById('authContainer').style.display='flex';
     document.getElementById('profileSetupContainer').style.display='none';
     document.getElementById('mainContainer').style.display='none';
@@ -986,7 +1121,12 @@ function updateUIWithProfile() {
 
 // === THEME ===
 function setTheme(theme) { document.documentElement.setAttribute('data-theme',theme); localStorage.setItem('learnersTrackTheme',theme); const b=document.getElementById('themeToggleBtn'); if(b){b.textContent=theme==='dark'?'☀️':'🌙';} }
-function toggleTheme() { const c=document.documentElement.getAttribute('data-theme')||'light'; setTheme(c==='dark'?'light':'dark'); }
+function toggleTheme() {
+    const c=document.documentElement.getAttribute('data-theme')||'light';
+    setTheme(c==='dark'?'light':'dark');
+    // Chart.js fija los colores al crear la grafica: hay que redibujarlas al cambiar de tema.
+    if(typeof statsPageVisible==='function' && statsPageVisible()) renderStatisticsPage();
+}
 (function(){const s=localStorage.getItem('learnersTrackTheme');const d=window.matchMedia('(prefers-color-scheme:dark)').matches;setTheme(s||(d?'dark':'light'));})();
 
 // === DATA SAVE ===
@@ -1001,9 +1141,15 @@ function resetApplication() {
     const t=translations[currentLanguage];
     if(!confirm(t.resetConfirm))return;
     if(currentUser){
+        // Habia que limpiar TAMBIEN el estado en memoria: saveData() reescribe
+        // currentUser.classrooms = classrooms, asi que vaciar solo el objeto de usuario
+        // dejaba todos los salones intactos y el reset no borraba nada.
+        classrooms=[]; currentBadges=[]; currentStudents=[]; disarmBadge();
+        activeClassroomIndex=0; gridWeeks=1;
+        weekTitles=["Week 1"]; noteColumns=["Evaluation 1","Evaluation 2"];
         currentUser.classrooms=[]; currentUser.activeClassroomIndex=0; currentUser.gridWeeks=1;
         currentUser.weekTitles=["Week 1"]; currentUser.noteColumns=["Evaluation 1","Evaluation 2"];
-        saveUsers(); createClassroomForGrade(selectedGrade?selectedGrade.name:"Classroom 1");
+        saveUsers(); createClassroomForGrade(selectedGrade?selectedGrade.name:(userProfile.grade||"Classroom 1"));
         closeProfileModal(); returnToMain(); showNotification(t.resetSuccess,"success");
     }
 }
@@ -1049,6 +1195,7 @@ function loadActiveClassroom() {
         if(!s.notes||s.notes.length!==noteColumns.length){const old=s.notes||[];s.notes=Array.from({length:noteColumns.length},(_,i)=>old[i]||"");}
     });
     const cn=document.getElementById('className'); if(cn)cn.value=c.name;
+    const _ss=document.getElementById('studentSearchInput'); if(_ss)_ss.value='';
     renderBadges(); renderCurrentView(); updateStats(); updateWeekButtons(); updateNoteButtons();
 }
 const cnEl=document.getElementById('className');
@@ -1097,28 +1244,99 @@ window.editNoteColumnTitle=function(i,el){el.readOnly=false;el.focus();el.select
 window.setNoteColumnTitle=function(i,el){el.readOnly=true;noteColumns[i]=el.value||(currentLanguage==='es'?`Evaluación ${i+1}`:`Evaluation ${i+1}`);saveData();renderCurrentView();};
 
 // === AVERAGES ===
+// Acepta coma o punto decimal. Devuelve null si el texto no es una nota valida.
+function parseNote(raw){
+    if(raw===null||raw===undefined) return null;
+    const s=String(raw).trim().replace(',','.');
+    if(s==='') return null;
+    const v=parseFloat(s);
+    return (isNaN(v)||!isFinite(v)) ? null : v;
+}
+// Marca en rojo lo que no sea un numero entre 0 y 5, en lugar de recortarlo en silencio.
+function isInvalidNote(raw){
+    if(raw===null||raw===undefined||String(raw).trim()==='') return false;
+    const v=parseNote(raw);
+    return v===null || v<0 || v>5;
+}
 function calculateStudentAverage(student) {
     let sum=0,count=0;
     if(!student.notes||!Array.isArray(student.notes))return "-";
-    student.notes.forEach(n=>{if(n===null||n===undefined)return;const v=parseFloat(n.toString().replace(',','.'));if(!isNaN(v)&&n.toString().trim()!==""){sum+=v;count++;}});
+    student.notes.forEach(n=>{ const v=parseNote(n); if(v!==null){ sum+=v; count++; } });
     if(count===0)return "-";
     return Math.max(0,Math.min(5,sum/count)).toFixed(1);
 }
-window.updateStudentNote=function(sid,ci,val){const s=currentStudents.find(x=>x.id===sid);if(s){s.notes[ci]=val;saveData();if(viewMode==='scores')renderClassroomScores();}};
+// Actualiza solo la fila afectada: antes se redibujaba toda la tabla en cada cambio,
+// lo que hacia perder el foco y el orden de tabulacion al capturar notas seguidas.
+window.updateStudentNote=function(sid,ci,val,inputEl){
+    const s=currentStudents.find(x=>x.id===sid); if(!s)return;
+    s.notes[ci]=val; saveData();
+    if(inputEl) inputEl.classList.toggle('note-invalid', isInvalidNote(val));
+    const row=inputEl?inputEl.closest('tr'):null;
+    const cell=row?row.querySelector('.average-cell'):null;
+    if(cell){
+        const avg=calculateStudentAverage(s);
+        cell.textContent=avg;
+        cell.classList.remove('score-high','score-mid','score-low');
+        let cc='score-mid'; if(avg!=="-"){const v=parseFloat(avg); if(v>=3.5)cc='score-high'; else if(v<3)cc='score-low';}
+        cell.classList.add(cc);
+    } else if(viewMode==='scores') renderClassroomScores();
+};
 
 // === BADGES ===
+// --- Insignia "armada" ---
+// El drag & drop de HTML5 no existe en pantallas tactiles, asi que en tablet/movil
+// no habia forma de otorgar una insignia. Ahora se toca la insignia y luego la celda.
+let armedBadge = null;
+function armBadge(badge){
+    if(armedBadge && armedBadge.id===badge.id){ disarmBadge(); return; }
+    armedBadge = badge;
+    document.querySelectorAll('.badge').forEach(el=>el.classList.toggle('badge-armed', String(el.dataset.badgeId)===String(badge.id)));
+    document.querySelectorAll('.student-grid-table td[data-student-id]').forEach(td=>td.classList.add('badge-target'));
+    showArmedHint(badge);
+}
+function disarmBadge(){
+    armedBadge = null;
+    document.querySelectorAll('.badge.badge-armed').forEach(el=>el.classList.remove('badge-armed'));
+    document.querySelectorAll('.student-grid-table td.badge-target').forEach(td=>td.classList.remove('badge-target'));
+    const h=document.getElementById('badgeArmedHint'); if(h)h.remove();
+}
+function showArmedHint(badge){
+    const es=currentLanguage==='es';
+    let h=document.getElementById('badgeArmedHint');
+    if(!h){ h=document.createElement('div'); h.id='badgeArmedHint'; h.className='badge-armed-hint'; h.setAttribute('role','status'); document.body.appendChild(h); }
+    h.innerHTML=`<span>${escapeHtml((badge.icon||'🏅')+' '+badge.name)} — ${es?'toca una celda para otorgarla':'tap a cell to award it'}</span>`;
+    const btn=document.createElement('button'); btn.type='button'; btn.textContent=es?'Cancelar':'Cancel';
+    btn.onclick=disarmBadge; h.appendChild(btn);
+}
 function renderBadges() {
     const c=document.getElementById('badgesContainer'); if(!c)return; c.innerHTML='';
+    const es=currentLanguage==='es';
     currentBadges.forEach(b=>{
-        const el=document.createElement('div'); el.className='badge'; el.draggable=true;
-        const ic=b.image&&b.image.length>0?`<img src="${b.image}" class="badge-icon" alt="${b.name}">`:`<div class="badge-icon">${b.icon}</div>`;
-        el.innerHTML=`${ic}<div class="badge-name">${b.name}</div><button class="badge-edit" onclick="editBadge(${b.id})">✏️</button>`;
-        el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',JSON.stringify(b));});
+        const el=document.createElement('div');
+        el.className='badge'; el.draggable=true; el.dataset.badgeId=b.id;
+        el.tabIndex=0; el.setAttribute('role','button');
+        el.setAttribute('aria-label',(es?'Insignia ':'Badge ')+b.name+(es?'. Actívala y toca una celda para otorgarla.':'. Activate it and tap a cell to award it.'));
+        const safeName=escapeHtml(b.name);
+        const ic = b.image&&b.image.length>0
+            ? `<img src="${escapeHtml(b.image)}" class="badge-icon" alt="${safeName}">`
+            : `<div class="badge-icon" aria-hidden="true">${escapeHtml(b.icon)}</div>`;
+        el.innerHTML=`${ic}<div class="badge-name">${safeName}</div><button class="badge-edit" type="button" aria-label="${es?'Editar ':'Edit '}${safeName}">✏️</button>`;
+        el.querySelector('.badge-edit').addEventListener('click',ev=>{ ev.stopPropagation(); editBadge(b.id); });
+        el.addEventListener('dragstart',e=>{ disarmBadge(); e.dataTransfer.setData('text/plain',JSON.stringify(b)); });
+        el.addEventListener('click',()=>armBadge(b));
+        el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); armBadge(b); } });
         c.appendChild(el);
     });
+    if(armedBadge && !currentBadges.some(b=>b.id===armedBadge.id)) disarmBadge();
 }
 const bii=document.getElementById('badgeImageInput');
-if(bii)bii.addEventListener('change',function(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=function(ev){badgeImageDataUrl=ev.target.result;const bi=document.getElementById('badgeIcon');if(bi)bi.value='';};r.readAsDataURL(f);}});
+if(bii)bii.addEventListener('change',function(e){
+    const f=e.target.files[0]; if(!f)return;
+    compressImageFile(f,96,0.85).then(dataUrl=>{
+        badgeImageDataUrl=dataUrl;
+        const bi=document.getElementById('badgeIcon'); if(bi)bi.value='';
+    }).catch(()=>showNotification(currentLanguage==='es'?'No se pudo leer la imagen':'Could not read the image','error'));
+});
 document.addEventListener('DOMContentLoaded',()=>{
     const ep=document.getElementById('emojiPicker'); if(ep){
         ['🏆','⭐','🎯','🎓','📚','✨','🌟','💡','🎵','🚀','💎','🔥'].forEach(em=>{
@@ -1141,23 +1359,52 @@ function renderCurrentView() {
 }
 function renderCellBadges(student,ci) {
     const b=student.gridBadges[ci]||[]; if(!Array.isArray(b))return '';
-    return b.map((bg,bi)=>{if(!bg)return '';const ic=bg.image&&bg.image.length>0?`<img src="${bg.image}" style="width:1em;height:1em;vertical-align:middle;" alt="${bg.name}">`:(bg.icon||'');return `<span class="grid-badge">${ic} ${bg.name||''} <span class="remove-grid-badge" onclick="removeGridBadge(${student.id},${ci},${bi})">×</span></span>`;}).join('');
+    const es=currentLanguage==='es';
+    return b.map((bg,bi)=>{
+        if(!bg)return '';
+        const safeName=escapeHtml(bg.name||'');
+        const ic = bg.image&&bg.image.length>0
+            ? `<img src="${escapeHtml(bg.image)}" style="width:1em;height:1em;vertical-align:middle;" alt="${safeName}">`
+            : escapeHtml(bg.icon||'');
+        return `<span class="grid-badge">${ic} ${safeName} <span class="remove-grid-badge" role="button" tabindex="0" aria-label="${es?'Quitar ':'Remove '}${safeName}" onclick="removeGridBadge(${student.id},${ci},${bi})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();removeGridBadge(${student.id},${ci},${bi});}">×</span></span>`;
+    }).join('');
+}
+// Celda de nombre del estudiante, con el texto escapado en todos los casos.
+function studentNameCellHtml(s,opts){
+    const es=currentLanguage==='es';
+    const safeName=escapeHtml(s.name||'');
+    const certBtn = (opts&&opts.cert===false) ? '' :
+        `<button class="cert-btn-inline" type="button" title="${es?'Certificado':'Certificate'}" aria-label="${es?'Certificado de ':'Certificate for '}${safeName}" onclick="openCertificateModalFromTable(${s.id},event)">📜</button>`;
+    return `<td class="student-name-cell">`
+        + `<input type="text" value="${safeName}" style="width:90%;" aria-label="${es?'Nombre del estudiante':'Student name'}" onchange="updateStudentNameGrid(${s.id},this.value)">`
+        + `<div class="actions">`
+        + `<button class="cert-btn-inline" type="button" title="${es?'Ficha':'Report'}" aria-label="${es?'Ficha de ':'Report for '}${safeName}" onclick="openStudentReport(${s.id})">📋</button>`
+        + certBtn
+        + `<button class="delete-student-btn" type="button" title="${es?'Eliminar':'Delete'}" aria-label="${es?'Eliminar a ':'Delete '}${safeName}" onclick="deleteStudent(${s.id})">🗑️</button>`
+        + `</div></td>`;
+}
+// Estado vacio con boton para anadir el primer estudiante.
+function emptyClassroomHtml(){
+    const es=currentLanguage==='es';
+    return `<div class="empty-state"><p>${es?'Todavía no hay estudiantes en este salón.':'No students in this classroom yet.'}</p>`
+        + `<button class="add-student-btn" type="button" onclick="addStudentAt(0)">${es?'➕ Añadir estudiante':'➕ Add student'}</button> `
+        + `<button class="add-student-btn" type="button" style="background:var(--success);" onclick="openImportModal()">${es?'📋 Importar lista':'📋 Import list'}</button></div>`;
 }
 function renderClassroomGrid() {
     const gc=document.getElementById("classroomGridView"); if(!gc)return; gc.innerHTML='';
-    if(currentStudents.length===0){gc.innerHTML=`<p style="text-align:center;padding:2rem;">${currentLanguage==='es'?'No hay estudiantes en el aula. Añade uno para comenzar.':'No students in classroom. Add one to start.'}</p>`;return;}
+    if(currentStudents.length===0){gc.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const wb=document.createElement('div');
         const title=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;
-        wb.innerHTML=`<input class="week-title-editable" value="${title}" readonly ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
+        wb.innerHTML=`<input class="week-title-editable" value="${escapeHtml(title)}" readonly aria-label="${currentLanguage==='es'?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
         const table=document.createElement('table'); table.className='student-grid-table';
         const thead=document.createElement('thead');
-        thead.innerHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>${weekDays.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+        thead.innerHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr>`;
         table.appendChild(thead);
         const tbody=document.createElement('tbody');
         currentStudents.forEach(s=>{
             const tr=document.createElement('tr');
-            tr.innerHTML=`<td class="student-name-cell"><input type="text" value="${s.name}" style="width:90%;" onchange="updateStudentNameGrid(${s.id},this.value)"><div class="actions"><button class="cert-btn-inline" onclick="openStudentReport(${s.id})" title="Ficha">📋</button><button class="cert-btn-inline" onclick="openCertificateModalFromTable(${s.id},event)">📜</button><button class="delete-student-btn" onclick="deleteStudent(${s.id})">🗑️</button></div></td>`;
+            tr.innerHTML=studentNameCellHtml(s);
             for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${s.id}" data-cell-idx="${ci}">${renderCellBadges(s,ci)}</td>`;}
             tbody.appendChild(tr);
         });
@@ -1167,20 +1414,20 @@ function renderClassroomGrid() {
 }
 function renderClassroomRows() {
     const g=document.getElementById('classroomRowsView'); if(!g)return; g.innerHTML='';
-    if(currentStudents.length===0){g.innerHTML=`<p style="text-align:center;padding:2rem;">${currentLanguage==='es'?'No hay estudiantes en el aula. Añade uno para comenzar.':'No students in classroom. Add one to start.'}</p>`;return;}
+    if(currentStudents.length===0){g.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const sd=document.createElement('div');
         const title=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;
-        sd.innerHTML=`<input class="week-title-editable" value="${title}" readonly ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
+        sd.innerHTML=`<input class="week-title-editable" value="${escapeHtml(title)}" readonly aria-label="${currentLanguage==='es'?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
         const filas=Math.ceil(currentStudents.length/STUDENTS_PER_ROW);
         for(let f=0;f<filas;f++){
             const table=document.createElement('table'); table.className='student-grid-table';
-            table.innerHTML=`<thead><tr><th>${currentLanguage==='es'?'Fila':'Row'} ${f+1}</th>${weekDays.map(d=>`<th>${d}</th>`).join('')}</tr></thead>`;
+            table.innerHTML=`<thead><tr><th>${currentLanguage==='es'?'Fila':'Row'} ${f+1}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr></thead>`;
             const tbody=document.createElement('tbody');
             for(let s=f*STUDENTS_PER_ROW;s<Math.min((f+1)*STUDENTS_PER_ROW,currentStudents.length);s++){
                 const st=currentStudents[s];
                 const tr=document.createElement('tr');
-                tr.innerHTML=`<td class="student-name-cell"><input type="text" value="${st.name}" style="width:90%;" onchange="updateStudentNameGrid(${st.id},this.value)"><div class="actions"><button class="cert-btn-inline" onclick="openStudentReport(${st.id})" title="Ficha">📋</button><button class="cert-btn-inline" onclick="openCertificateModalFromTable(${st.id},event)">📜</button><button class="delete-student-btn" onclick="deleteStudent(${st.id})">🗑️</button></div></td>`;
+                tr.innerHTML=studentNameCellHtml(st);
                 for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${st.id}" data-cell-idx="${ci}" data-row="${f}">${renderCellBadges(st,ci)}</td>`;}
                 tbody.appendChild(tr);
             }
@@ -1195,17 +1442,22 @@ function renderClassroomRows() {
 }
 function renderClassroomScores() {
     const sc=document.getElementById('classroomScoresView'); if(!sc)return; sc.innerHTML='';
-    if(currentStudents.length===0){sc.innerHTML=`<p style="text-align:center;padding:2rem;">${currentLanguage==='es'?'No hay estudiantes en el aula.':'No students in classroom.'}</p>`;return;}
+    if(currentStudents.length===0){sc.innerHTML=emptyClassroomHtml();return;}
+    const es=currentLanguage==='es';
     const table=document.createElement('table'); table.className='notes-table';
-    let thHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>`;
-    noteColumns.forEach((t,i)=>{thHTML+=`<th><input class="note-col-title" value="${t}" readonly ondblclick="editNoteColumnTitle(${i},this)" onblur="setNoteColumnTitle(${i},this)"></th>`;});
-    thHTML+=`<th>${translations[currentLanguage].averageLabel||"Average (0-5)"}</th></tr>`;
+    let thHTML=`<tr><th>${es?'Estudiante':'Student'}</th>`;
+    noteColumns.forEach((t,i)=>{thHTML+=`<th><input class="note-col-title" value="${escapeHtml(t)}" readonly aria-label="${es?'Nombre de la columna':'Column name'}" ondblclick="editNoteColumnTitle(${i},this)" onblur="setNoteColumnTitle(${i},this)"></th>`;});
+    thHTML+=`<th>${escapeHtml(translations[currentLanguage].averageLabel||"Average (0-5)")}</th></tr>`;
     table.innerHTML=`<thead>${thHTML}</thead>`;
     const tbody=document.createElement('tbody');
     currentStudents.forEach(s=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=`<td class="student-name-cell"><input type="text" value="${s.name}" style="width:90%;" onchange="updateStudentNameGrid(${s.id},this.value)"><div class="actions"><button class="cert-btn-inline" onclick="openStudentReport(${s.id})" title="Ficha">📋</button><button class="delete-student-btn" onclick="deleteStudent(${s.id})">🗑️</button></div></td>`;
-        noteColumns.forEach((_,i)=>{tr.innerHTML+=`<td><input type="text" class="note-input" value="${s.notes[i]||''}" onchange="updateStudentNote(${s.id},${i},this.value)"></td>`;});
+        tr.innerHTML=studentNameCellHtml(s,{cert:false});
+        noteColumns.forEach((nc,i)=>{
+            const raw=s.notes[i]||'';
+            const invalid=isInvalidNote(raw)?' note-invalid':'';
+            tr.innerHTML+=`<td><input type="text" inputmode="decimal" class="note-input${invalid}" value="${escapeHtml(raw)}" placeholder="0-5" title="${es?'Nota de 0 a 5':'Score from 0 to 5'}" aria-label="${escapeHtml(nc)} — ${escapeHtml(s.name||'')}" onchange="updateStudentNote(${s.id},${i},this.value,this)"></td>`;
+        });
         const avg=calculateStudentAverage(s);
         let cc='score-mid'; if(avg!=="-"){const v=parseFloat(avg);if(v>=3.5)cc='score-high';else if(v<3)cc='score-low';}
         tr.innerHTML+=`<td class="average-cell ${cc}">${avg}</td>`;
@@ -1215,10 +1467,17 @@ function renderClassroomScores() {
 }
 
 // === DRAG & DROP ===
+// Aplica la insignia a la celda. Con Shift (o Ctrl) se aplica a toda la fila.
+// Antes, en la vista de filas SIEMPRE se aplicaba a los 7 estudiantes de la fila,
+// asi que era imposible premiar a uno solo y era facil hacerlo sin querer.
+function awardBadgeToCell(td, badge, wholeRow){
+    const sid=parseInt(td.dataset.studentId), ci=parseInt(td.dataset.cellIdx), ri=parseInt(td.dataset.row);
+    if(wholeRow && viewMode==="rows" && !isNaN(ri)) applyBadgeToRow(ri,ci,badge);
+    else addGridBadgeToCell(sid,ci,badge);
+}
 function attachDragAndDropListeners() {
-    document.querySelectorAll('.student-grid-table td[data-student-id]').forEach(td=>{
-        const nt=td.cloneNode(true); td.parentNode.replaceChild(nt,td);
-    });
+    // Las celdas se acaban de crear con innerHTML, no arrastran listeners viejos:
+    // el clonado que habia aqui solo duplicaba trabajo en cada render.
     document.querySelectorAll('.student-grid-table td[data-student-id]').forEach(td=>{
         td.addEventListener('dragover',e=>{e.preventDefault();td.classList.add('drag-over');});
         td.addEventListener('dragleave',()=>td.classList.remove('drag-over'));
@@ -1226,13 +1485,18 @@ function attachDragAndDropListeners() {
             e.preventDefault(); td.classList.remove('drag-over');
             try{
                 const bd=JSON.parse(e.dataTransfer.getData('text/plain'));
-                const sid=parseInt(td.dataset.studentId); const ci=parseInt(td.dataset.cellIdx);
-                const ri=parseInt(td.dataset.row);
-                if(viewMode==="rows"&&!isNaN(ri))applyBadgeToRow(ri,ci,bd);
-                else addGridBadgeToCell(sid,ci,bd);
+                awardBadgeToCell(td, bd, e.shiftKey||e.ctrlKey||e.metaKey);
             }catch(err){console.error(err);}
         });
+        // Modo tactil / clic: primero se toca la insignia, luego la celda.
+        td.addEventListener('click',e=>{
+            if(!armedBadge) return;
+            if(e.target.closest('.remove-grid-badge, input, button')) return;
+            awardBadgeToCell(td, armedBadge, e.shiftKey||e.ctrlKey||e.metaKey);
+        });
     });
+    // Si hay una insignia activa, se vuelven a marcar las celdas tras el redibujado.
+    if(armedBadge) document.querySelectorAll('.student-grid-table td[data-student-id]').forEach(td=>td.classList.add('badge-target'));
 }
 function applyBadgeToRow(ri,ci,badge){
     const si=ri*STUDENTS_PER_ROW; const ei=Math.min(si+STUDENTS_PER_ROW,currentStudents.length);
@@ -1253,7 +1517,14 @@ function openProfileModal(){if(!currentUser){showNotification("Please log in fir
 function closeProfileModal(){hideModal('profileModal');}
 const pb=document.getElementById('profileBtn'); if(pb)pb.addEventListener('click',openProfileModal);
 const ppi=document.getElementById('profilePicInput');
-if(ppi)ppi.addEventListener('change',function(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=function(ev){userProfile.avatar=ev.target.result;saveUserProfile();};r.readAsDataURL(f);}});
+if(ppi)ppi.addEventListener('change',function(e){
+    const f=e.target.files[0]; if(!f)return;
+    compressImageFile(f,256,0.85).then(dataUrl=>{
+        userProfile.avatar=dataUrl;
+        const pp=document.getElementById('profilePicPreview'); if(pp)pp.src=dataUrl;
+        saveUserProfile();
+    }).catch(()=>showNotification(currentLanguage==='es'?'No se pudo leer la imagen':'Could not read the image','error'));
+});
 const pf=document.getElementById('profileForm');
 if(pf)pf.addEventListener('submit',e=>{e.preventDefault();const pn=document.getElementById('profileTeacherName');if(pn)userProfile.name=pn.value;saveUserProfile();closeProfileModal();showNotification(translations[currentLanguage].profileUpdated,"success");});
 
@@ -1317,7 +1588,8 @@ function generateCertificate(){
         showNotification(t.certificateGenerated,"success"); closeCertificateModal();
     }catch(err){console.error(err);showNotification("Error generating certificate.","error");}
 }
-document.getElementById('certificateForm').addEventListener('submit',e=>{e.preventDefault();generateCertificate();});
+const _certForm=document.getElementById('certificateForm');
+if(_certForm)_certForm.addEventListener('submit',e=>{e.preventDefault();generateCertificate();});
 
 // STUDENT COMMENT MODAL
 function openStudentCommentModal(sid){
@@ -1329,7 +1601,8 @@ function openStudentCommentModal(sid){
     showModal('studentCommentModal');
 }
 function closeStudentCommentModal(){hideModal('studentCommentModal');}
-document.getElementById('studentCommentForm').addEventListener('submit',function(e){
+const _commentForm=document.getElementById('studentCommentForm');
+if(_commentForm)_commentForm.addEventListener('submit',function(e){
     e.preventDefault();
     const sm=document.getElementById('studentCommentModal'); if(!sm||!sm.dataset.studentId)return;
     const sid=Number(sm.dataset.studentId); const s=currentStudents.find(x=>x.id===sid);
@@ -1371,14 +1644,31 @@ function deleteGrade(gid){
 }
 window.addGrade=function(){const n=prompt(currentLanguage==='es'?'Nombre del nuevo grado:':'New Grade Name:');if(n){grades.push({id:Date.now(),name:n,classrooms:[]});saveGrades();renderGradeOptions();}};
 function checkContinueButton(){const cb=document.getElementById('continueToAppBtn');if(cb)cb.disabled=!selectedGrade;}
-document.getElementById('editGradeForm').addEventListener('submit',e=>{e.preventDefault();saveEditedGrade();});
+const _editGradeForm=document.getElementById('editGradeForm');
+if(_editGradeForm)_editGradeForm.addEventListener('submit',e=>{e.preventDefault();saveEditedGrade();});
 
 // PROFILE & INSTITUTION SETUP
 const ppi2=document.getElementById('profilePhotoInput');
-if(ppi2)ppi2.addEventListener('change',function(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=function(ev){profilePhoto=ev.target.result;const pp=document.getElementById('profilePhotoPreviewLarge');if(pp)pp.src=profilePhoto;checkContinueButton();};r.readAsDataURL(f);}});
+if(ppi2)ppi2.addEventListener('change',function(e){
+    const f=e.target.files[0]; if(!f)return;
+    compressImageFile(f,256,0.85).then(dataUrl=>{
+        profilePhoto=dataUrl;
+        const pp=document.getElementById('profilePhotoPreviewLarge'); if(pp)pp.src=profilePhoto;
+        checkContinueButton();
+    }).catch(()=>showNotification(currentLanguage==='es'?'No se pudo leer la imagen':'Could not read the image','error'));
+});
 const ili=document.getElementById('institutionLogoInput');
-if(ili)ili.addEventListener('change',function(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=function(ev){institutionLogo=ev.target.result;const ip=document.getElementById('institutionLogoPreview');if(ip)ip.innerHTML=`<img src="${institutionLogo}" style="max-width:100%;max-height:100%;object-fit:contain;">`;checkContinueButton();};r.readAsDataURL(f);}});
-document.getElementById('continueToAppBtn').addEventListener('click',function(){
+if(ili)ili.addEventListener('change',function(e){
+    const f=e.target.files[0]; if(!f)return;
+    compressImageFile(f,320,0.88).then(dataUrl=>{
+        institutionLogo=dataUrl;
+        const ip=document.getElementById('institutionLogoPreview');
+        if(ip){ ip.innerHTML=''; const img=new Image(); img.src=institutionLogo; img.alt=''; img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;'; ip.appendChild(img); }
+        checkContinueButton();
+    }).catch(()=>showNotification(currentLanguage==='es'?'No se pudo leer la imagen':'Could not read the image','error'));
+});
+const _continueBtn=document.getElementById('continueToAppBtn');
+if(_continueBtn)_continueBtn.addEventListener('click',function(){
     if(!selectedGrade){showNotification('Please select a grade','error');return;}
     userProfile.grade=selectedGrade.name;
     userProfile.avatar=profilePhoto||'https://i.pravatar.cc/150?u='+(currentUser?currentUser.email:'teacher');
@@ -1390,13 +1680,15 @@ document.getElementById('continueToAppBtn').addEventListener('click',function(){
     hideProfileSetup();
     showNotification('Profile setup complete! Welcome to Learners Track!','success');
 });
-document.getElementById('gradeSelectorHeader').addEventListener('click',function(){
+const _gradeHeader=document.getElementById('gradeSelectorHeader');
+if(_gradeHeader)_gradeHeader.addEventListener('click',function(){
     const o=document.getElementById('gradeOptions'),a=document.getElementById('gradeSelectorArrow');
     if(o)o.classList.toggle('expanded');
     if(this)this.classList.toggle('expanded');
     if(a)a.classList.toggle('expanded');
 });
-document.getElementById('addGradeBtn').addEventListener('click',window.addGrade);
+const _addGradeBtn=document.getElementById('addGradeBtn');
+if(_addGradeBtn)_addGradeBtn.addEventListener('click',window.addGrade);
 
 // === SHOW/HIDE SETUP ===
 function showProfileSetup(){
@@ -1437,14 +1729,14 @@ function hydrateRememberedEmail(){
         }
     }catch(e){}
 }
-function handleLogin(event){
+async function handleLogin(event){
     event.preventDefault();
     if(window.FIREBASE_ON){ firebaseLogin(); return; }
     const le=document.getElementById('loginEmail'),lp=document.getElementById('loginPassword');
     if(!le||!lp){showNotification(translations[currentLanguage].loginError,"error");return;}
     const email=(le.value||'').trim().toLowerCase(),password=lp.value;
     if(!email||!password){showNotification(translations[currentLanguage].loginError,"error");return;}
-    const user=authenticateUser(email,password);
+    const user=await authenticateUser(email,password);
     if(user){
         persistRememberedEmails();
         currentUser=user;
@@ -1462,7 +1754,7 @@ function handleLogin(event){
         showNotification(translations[currentLanguage].loginSuccess,"success");
     } else { showNotification(translations[currentLanguage].loginError,"error"); }
 }
-function handleRegister(event){
+async function handleRegister(event){
     event.preventDefault();
     if(window.FIREBASE_ON){ firebaseRegister(); return; }
     const rn=document.getElementById('registerName'),re=document.getElementById('registerEmail'),rp=document.getElementById('registerPassword'),rc=document.getElementById('registerConfirmPassword'),rs=document.getElementById('registerSchool');
@@ -1473,7 +1765,7 @@ function handleRegister(event){
     if(!emailValid){showNotification(currentLanguage==='es'?"Ingresa un correo válido":"Enter a valid email address","error");return;}
     if(password.length<6){showNotification(currentLanguage==='es'?"La contraseña debe tener al menos 6 caracteres":"Password must be at least 6 characters long","error");return;}
     if(password!==confirmPassword){showNotification(currentLanguage==='es'?"Las contraseñas no coinciden":"Passwords do not match","error");return;}
-    if(registerUser(name,email,password,school)){
+    if(await registerUser(name,email,password,school)){
         persistRememberedEmails();
         showNotification(translations[currentLanguage].registerSuccess,"success");
         document.getElementById('registerForm').style.display='none';
@@ -1498,6 +1790,21 @@ function returnToMain(){
     document.getElementById('statisticsPage').classList.remove('show');
     document.getElementById('mainContainer').style.display='flex';
 }
+
+// === GRAFICAS ===
+// Registro propio: antes se usaba window.chartInsignias, que choca con la variable
+// global que el navegador crea automaticamente para <canvas id="chartInsignias">.
+const _charts = {};
+function destroyChart(key){ const c=_charts[key]; if(c && typeof c.destroy==='function'){ try{c.destroy();}catch(e){} } _charts[key]=null; }
+// Las etiquetas se adaptan al tema: en modo oscuro el texto por defecto era ilegible.
+function applyChartTheme(){
+    if(typeof Chart==='undefined') return;
+    const dark = (document.documentElement.getAttribute('data-theme')||'light')==='dark';
+    Chart.defaults.color = dark ? '#e8e8ef' : '#3a3f55';
+    Chart.defaults.borderColor = dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.09)';
+    Chart.defaults.font.family = "'Nunito','Montserrat',Arial,sans-serif";
+}
+function statsPageVisible(){ const p=document.getElementById('statisticsPage'); return !!(p&&p.classList.contains('show')); }
 function renderStatisticsPage(){
     const ne=currentStudents.length;
     const ni=currentStudents.reduce((a,s)=>a+(s.gridBadges||[]).reduce((x,y)=>x+(y||[]).length,0),0);
@@ -1514,11 +1821,11 @@ function renderStatisticsPage(){
         const cl=currentLanguage==='es'?'Comentarios escritos:':'Comments written:';
         dr.innerHTML=`<div><b>${sl}</b> ${ne}</div><div><b>${bl}</b> ${ni}</div><div><b>${al}</b> ${ai}</div><div><b>${cl}</b> ${nc}</div>`;
     }
+    applyChartTheme();
     const c1=document.getElementById("chartInsignias");
     if(c1){
-        const ctx1=c1.getContext("2d");
-        if(window.chartInsignias && typeof window.chartInsignias.destroy==='function')window.chartInsignias.destroy();
-        window.chartInsignias=new Chart(ctx1,{
+        destroyChart('badgesByType');
+        _charts.badgesByType=new Chart(c1.getContext("2d"),{
             type:"bar",
             data:{
                 labels:Object.keys(bcm),
@@ -1533,30 +1840,34 @@ function renderStatisticsPage(){
                 plugins:{
                     legend:{display:false},
                     title:{display:true,text:currentLanguage==='es'?'Insignias por tipo':'Badges by type'}
-                }
+                },
+                scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
             }
         });
     }
     const c2=document.getElementById("chartDistribucion");
     if(c2){
-        const ctx2=c2.getContext("2d");
-        if(window.chartDistribucion && typeof window.chartDistribucion.destroy==='function')window.chartDistribucion.destroy();
-        window.chartDistribucion=new Chart(ctx2,{
-            type:"pie",
+        destroyChart('badgeDistribution');
+        // Con muchos estudiantes la torta es ilegible: a partir de 12 se usan barras.
+        const asBar = currentStudents.length>12;
+        _charts.badgeDistribution=new Chart(c2.getContext("2d"),{
+            type: asBar?"bar":"pie",
             data:{
                 labels:currentStudents.map(s=>s.name),
                 datasets:[{
                     label:currentLanguage==='es'?"Insignias por estudiante":"Badges per student",
                     data:dist,
-                    backgroundColor:currentStudents.map((s,i)=>`hsl(${(i*25)%360},70%,60%)`)
+                    backgroundColor:asBar?"#20d184":currentStudents.map((s,i)=>`hsl(${(i*25)%360},70%,60%)`)
                 }]
             },
             options:{
                 responsive:true,
+                indexAxis: asBar?'y':'x',
                 plugins:{
-                    legend:{display:true},
+                    legend:{display:!asBar},
                     title:{display:true,text:currentLanguage==='es'?'Reparto de insignias':'Badge distribution'}
-                }
+                },
+                scales: asBar?{ x:{ beginAtZero:true, ticks:{ precision:0 } } }:{}
             }
         });
     }
@@ -1588,10 +1899,11 @@ function renderProgressCharts(){
         students.forEach(s=>{ for(let d=0;d<weekDays.length;d++){ const ci=(w-1)*weekDays.length+d; sum+=(s.gridBadges[ci]||[]).length; } });
         badgesPerWeek.push(sum);
     }
+    applyChartTheme();
     const c1=document.getElementById('chartBadgesProgress');
     if(c1){
-        if(window.chartBadgesProgress && typeof window.chartBadgesProgress.destroy==='function') window.chartBadgesProgress.destroy();
-        window.chartBadgesProgress=new Chart(c1.getContext('2d'),{
+        destroyChart('badgesProgress');
+        _charts.badgesProgress=new Chart(c1.getContext('2d'),{
             type:'line',
             data:{ labels:weekLabels, datasets:[{ label:es?'Insignias por semana':'Badges per week', data:badgesPerWeek, borderColor:'#667eea', backgroundColor:'rgba(102,126,234,0.15)', fill:true, tension:0.3, pointRadius:4 }] },
             options:{ responsive:true, plugins:{ legend:{display:false}, title:{display:true, text:es?'Insignias por semana':'Badges per week'} }, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
@@ -1606,8 +1918,8 @@ function renderProgressCharts(){
     });
     const c2=document.getElementById('chartScoresProgress');
     if(c2){
-        if(window.chartScoresProgress && typeof window.chartScoresProgress.destroy==='function') window.chartScoresProgress.destroy();
-        window.chartScoresProgress=new Chart(c2.getContext('2d'),{
+        destroyChart('scoresProgress');
+        _charts.scoresProgress=new Chart(c2.getContext('2d'),{
             type:'line',
             data:{ labels:evalLabels, datasets:[{ label:es?'Promedio por evaluación':'Average per evaluation', data:avgPerEval, borderColor:'#20d184', backgroundColor:'rgba(32,209,132,0.15)', fill:true, tension:0.3, pointRadius:4, spanGaps:true }] },
             options:{ responsive:true, plugins:{ legend:{display:false}, title:{display:true, text:es?'Promedio por evaluación (0-5)':'Average per evaluation (0-5)'} }, scales:{ y:{ min:0, max:5 } } }
@@ -1628,16 +1940,47 @@ function updateStats(){
 
 // === EXPORT FUNCTIONS ===
 function getInstitutionalInfo(){return{institution:document.getElementById('schoolName')?.value||userProfile.school||'N/A',teacher:userProfile.name||'N/A',classroom:document.getElementById('className')?.value||'N/A',date:new Date().toLocaleDateString(currentLanguage==='es'?'es-ES':'en-US')};}
-function exportCurrentViewPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);const vt=viewMode==='rows'?t.weeklyRows:viewMode==='grid'?t.weeklyGrid:t.scores;pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${vt} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'Estudiante':'Student',...weekDays]];const data=currentStudents.map(s=>{const r=[s.name];for(let d=0;d<weekDays.length;d++){const ci=d;const b=s.gridBadges[ci]||[];r.push(b.map(x=>x.name).join(', '));}return r;});pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportCurrentViewExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const headers=[currentLanguage==='es'?'Estudiante':'Student',...weekDays];const data=[headers];currentStudents.forEach(s=>{const r=[s.name];for(let d=0;d<weekDays.length;d++){const ci=d;const b=s.gridBadges[ci]||[];r.push(b.map(x=>x.name).join(', '));}data.push(r);});const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.sheet_add_aoa(ws,[[t.institutionHeader,info.institution],[t.teacherHeader,info.teacher],[t.classroomHeader,info.classroom],[t.dateHeader,info.date]],{origin:'A1'});window.XLSX.utils.book_append_sheet(wb,ws,currentLanguage==='es'?'Vista Actual':'Current View');window.XLSX.writeFile(wb,`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+// Devuelve las tablas de la vista ACTIVA (notas, o una tabla por semana).
+// Antes "Vista actual" exportaba siempre la semana 1 en formato de dias, incluso
+// estando en la vista de SCORES o teniendo varias semanas cargadas.
+function buildCurrentViewTables(){
+    const es=currentLanguage==='es', t=translations[currentLanguage], tables=[];
+    if(viewMode==='scores'){
+        tables.push({
+            title: t.scores,
+            head: [es?'Estudiante':'Student', ...noteColumns, t.averageLabel],
+            body: currentStudents.map(s=>[s.name, ...noteColumns.map((_,i)=>s.notes[i]||''), calculateStudentAverage(s)])
+        });
+    } else {
+        for(let w=1;w<=gridWeeks;w++){
+            tables.push({
+                title: weekTitles[w-1]||(es?'Semana ':'Week ')+w,
+                head: [es?'Estudiante':'Student', ...weekDays],
+                body: currentStudents.map(s=>{
+                    const r=[s.name];
+                    for(let d=0;d<weekDays.length;d++){ const ci=(w-1)*weekDays.length+d; r.push((s.gridBadges[ci]||[]).map(x=>x&&x.name).filter(Boolean).join(', ')); }
+                    return r;
+                })
+            });
+        }
+    }
+    return tables;
+}
+// Nombre de hoja valido para Excel: max 31 caracteres y sin : \ / ? * [ ]
+function safeSheetName(name,fallback){
+    let n=String(name||fallback||'Hoja').replace(/[:\\\/\?\*\[\]]/g,'-').trim().substring(0,31);
+    return n||fallback||'Hoja';
+}
+function exportCurrentViewPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);const vt=viewMode==='rows'?t.weeklyRows:viewMode==='grid'?t.weeklyGrid:t.scores;pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${vt} - ${new Date().toLocaleString()}`,105,60,{align:'center'});buildCurrentViewTables().forEach((tb,idx)=>{let sy=65;if(idx>0){pdf.addPage();sy=20;}pdf.setTextColor(102,126,234);pdf.setFontSize(12);pdf.text(tb.title,105,sy,{align:'center'});pdf.autoTable({head:[tb.head],body:tb.body,startY:sy+5,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});});pdf.save(`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportCurrentViewExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();buildCurrentViewTables().forEach((tb,idx)=>{const data=[[t.institutionHeader,info.institution],[t.teacherHeader,info.teacher],[t.classroomHeader,info.classroom],[t.dateHeader,info.date],[],[tb.title],tb.head,...tb.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(tb.title,(currentLanguage==='es'?'Vista ':'View ')+(idx+1)));});window.XLSX.writeFile(wb,`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportScoresPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.scores} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'Estudiante':'Student',...noteColumns,t.averageLabel]];const data=currentStudents.map(s=>[s.name,...s.notes,calculateStudentAverage(s)]);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const headers=[currentLanguage==='es'?'Estudiante':'Student',...noteColumns,t.averageLabel];const data=[headers,...currentStudents.map(s=>[s.name,...s.notes,calculateStudentAverage(s)])];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,t.scores);window.XLSX.writeFile(wb,`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportBadgesPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,45);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.availableBadges} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon']];const data=currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️']);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3}});let y=pdf.lastAutoTable.finalY+15;pdf.setFontSize(12);pdf.text(currentLanguage==='es'?'Insignias por Estudiante:':'Badges per Student:',10,y);y+=10;const bd=currentStudents.map(s=>[s.name,s.gridBadges.flat().length]);pdf.autoTable({head:[[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges']],body:bd,startY:y,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const headers=[currentLanguage==='es'?'Estudiante':'Student',...noteColumns,t.averageLabel];const data=[headers,...currentStudents.map(s=>[s.name,...s.notes,calculateStudentAverage(s)])];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(t.scores,'Scores'));window.XLSX.writeFile(wb,`Scores_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportBadgesPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.availableBadges} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon']];const data=currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️']);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3}});let y=pdf.lastAutoTable.finalY+15;pdf.setFontSize(12);pdf.text(currentLanguage==='es'?'Insignias por Estudiante:':'Badges per Student:',10,y);y+=10;const bd=currentStudents.map(s=>[s.name,s.gridBadges.flat().length]);pdf.autoTable({head:[[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges']],body:bd,startY:y,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportBadgesExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const bh=[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon'];const bd=[bh,...currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️'])];const bw=window.XLSX.utils.aoa_to_sheet(bd);window.XLSX.utils.book_append_sheet(wb,bw,currentLanguage==='es'?'Insignias':'Badges');const sh=[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges'];const sd=[sh,...currentStudents.map(s=>[s.name,s.gridBadges.flat().length])];const sw=window.XLSX.utils.aoa_to_sheet(sd);window.XLSX.utils.book_append_sheet(wb,sw,currentLanguage==='es'?'Por Estudiante':'Per Student');window.XLSX.writeFile(wb,`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportStatisticsPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.statisticsTitle} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const ne=currentStudents.length,ni=currentStudents.reduce((a,s)=>a+s.gridBadges.reduce((x,y)=>x+y.length,0),0),ai=ne>0?(ni/ne).toFixed(2):0,nc=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;const sd=[[t.studentsLabel,ne],[t.badgesAwardedLabel,ni],[t.avgBadgesLabel,ai],[t.commentsLabel,nc]];pdf.autoTable({body:sd,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3},columnStyles:{0:{fontStyle:'bold'}}});pdf.save(`Statistics_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportStatisticsExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const ne=currentStudents.length,ni=currentStudents.reduce((a,s)=>a+s.gridBadges.reduce((x,y)=>x+y.length,0),0),ai=ne>0?(ni/ne).toFixed(2):0,nc=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;const data=[[t.studentsLabel,ne],[t.badgesAwardedLabel,ni],[t.avgBadgesLabel,ai],[t.commentsLabel,nc]];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,t.statisticsTitle);window.XLSX.writeFile(wb,`Statistics_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportStatisticsExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const ne=currentStudents.length,ni=currentStudents.reduce((a,s)=>a+s.gridBadges.reduce((x,y)=>x+y.length,0),0),ai=ne>0?(ni/ne).toFixed(2):0,nc=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;const data=[[t.studentsLabel,ne],[t.badgesAwardedLabel,ni],[t.avgBadgesLabel,ai],[t.commentsLabel,nc]];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(String(t.statisticsTitle).replace(/[^\p{L}\p{N} .()-]/gu,'').trim(),'Stats'));window.XLSX.writeFile(wb,`Statistics_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportWeeklyGridPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('l','mm','a4');const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,297,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:260,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,148.5,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.weeklyGrid} - ${new Date().toLocaleString()}`,148.5,60,{align:'center'});for(let w=1;w<=gridWeeks;w++){const wt=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;const headers=[[currentLanguage==='es'?'Estudiante':'Student',...weekDays]];const data=currentStudents.map(s=>{const r=[s.name];for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;const b=s.gridBadges[ci]||[];r.push(b.map(x=>x.name).join(', '));}return r;});pdf.autoTable({head:headers,body:data,startY:w===1?65:undefined,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:7,cellPadding:2},margin:{top:w===1?65:35},didParsePage:function(data){if(data.pageNumber>1)pdf.text(wt,148.5,30,{align:'center'});}});if(w<gridWeeks)pdf.addPage();}pdf.save(`WeeklyGrid_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportWeeklyGridExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();for(let w=1;w<=gridWeeks;w++){const wt=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;const headers=[currentLanguage==='es'?'Estudiante':'Student',...weekDays];const data=[headers];currentStudents.forEach(s=>{const r=[s.name];for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;const b=s.gridBadges[ci]||[];r.push(b.map(x=>x.name).join(', '));}data.push(r);});const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,wt.substring(0,31));}window.XLSX.writeFile(wb,`WeeklyGrid_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportWeeklyGridExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();for(let w=1;w<=gridWeeks;w++){const wt=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;const headers=[currentLanguage==='es'?'Estudiante':'Student',...weekDays];const data=[headers];currentStudents.forEach(s=>{const r=[s.name];for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;const b=s.gridBadges[ci]||[];r.push(b.map(x=>x.name).join(', '));}data.push(r);});const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(wt,'W'+w));}window.XLSX.writeFile(wb,`WeeklyGrid_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportToPDF(){const btn=document.getElementById('exportPdfBtn');if(!btn)return;const ot=btn.innerHTML;btn.innerHTML='<span class="spinner"></span>Generating...';btn.disabled=true;if(!window.jspdf){showNotification("PDF Library not loaded.","error");btn.innerHTML=ot;btn.disabled=false;return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(18);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);const rt=currentLanguage==='es'?'REPORTE COMPLETO DEL AULA':'COMPLETE CLASSROOM REPORT';pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(rt,105,60,{align:'center'});let y=70;currentStudents.forEach(s=>{if(y>260){pdf.addPage();y=20;}pdf.setFontSize(11);pdf.setTextColor(67,172,254);pdf.text(s.name||'Student '+s.id,10,y);y+=6;pdf.setFontSize(9);pdf.setTextColor(44,62,80);for(let w=1;w<=gridWeeks;w++){let wh=false;const wt=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;const b=s.gridBadges[ci]||[];if(b.length>0){if(!wh){pdf.text(`${wt}:`,15,y);y+=5;wh=true;}pdf.text(`- ${weekDays[d]}: ${b.map(x=>x.name).join(', ')}`,20,y);y+=5;}}}for(let i=0;i<s.notes.length;i++){if(s.notes[i]&&s.notes[i].trim()!==""){pdf.text(`- ${noteColumns[i]}: ${s.notes[i]}`,15,y);y+=5;}}const avg=calculateStudentAverage(s);if(avg!=="-"){pdf.setTextColor(102,126,234);pdf.setFont('helvetica','bold');pdf.text(`${t.averageLabel}: ${avg}`,15,y);pdf.setFont('helvetica','normal');pdf.setTextColor(44,62,80);y+=5;}if(s.comment&&s.comment.trim().length>0){pdf.setFontSize(9);pdf.setTextColor(102,126,234);const cl=currentLanguage==='es'?'Comentario:':'Comment:';pdf.text(cl,18,y);y+=5;pdf.text(s.comment,18,y,{maxWidth:170});y+=5;pdf.setFontSize(9);pdf.setTextColor(44,62,80);}y+=4;});pdf.save(`CompleteReport_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);}catch(e){console.error(e);showNotification(currentLanguage==='es'?"No se pudo exportar el PDF.":"Could not export PDF.","error");}finally{btn.innerHTML=ot;btn.disabled=false;}}
 
 // === IMPORTAR LISTA DE ESTUDIANTES ===
@@ -1671,11 +2014,31 @@ function importStudents(mode){
 
 // === BUSCAR / FILTRAR ESTUDIANTES ===
 function filterStudents(){
-    const inp=document.getElementById('studentSearchInput'); const q=(inp?inp.value:'').trim().toLowerCase();
-    document.querySelectorAll('#classroomRowsView tr, #classroomGridView tr, #classroomScoresView tr').forEach(tr=>{
-        const cell=tr.querySelector('.student-name-cell input'); if(!cell)return;
-        const name=(cell.value||'').toLowerCase();
-        tr.style.display=(!q||name.includes(q))?'':'none';
+    const inp=document.getElementById('studentSearchInput');
+    // Se normalizan los acentos: buscar "perez" ahora encuentra "Pérez".
+    const norm = v => String(v||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const q=norm((inp?inp.value:'').trim());
+    let totalVisible=0;
+    document.querySelectorAll('#classroomRowsView table, #classroomGridView table, #classroomScoresView table').forEach(table=>{
+        let visible=0;
+        table.querySelectorAll('tbody tr').forEach(tr=>{
+            const cell=tr.querySelector('.student-name-cell input'); if(!cell)return;
+            const match=(!q||norm(cell.value).includes(q));
+            tr.style.display=match?'':'none';
+            if(match)visible++;
+        });
+        // Sin esto quedaban tablas con solo el encabezado y ninguna fila.
+        table.style.display=(q&&visible===0)?'none':'';
+        totalVisible+=visible;
+    });
+    const views=['classroomRowsView','classroomGridView','classroomScoresView'];
+    views.forEach(id=>{
+        const v=document.getElementById(id); if(!v)return;
+        let msg=v.querySelector('.no-search-results');
+        if(q&&totalVisible===0&&currentStudents.length>0){
+            if(!msg){ msg=document.createElement('p'); msg.className='no-search-results'; msg.style.cssText='text-align:center;padding:1.6rem;opacity:.75;'; v.appendChild(msg); }
+            msg.textContent=currentLanguage==='es'?'Ningún estudiante coincide con la búsqueda.':'No student matches your search.';
+        } else if(msg) msg.remove();
     });
 }
 
@@ -1690,15 +2053,15 @@ function openStudentReport(sid){
         let wLines='';
         for(let d=0;d<weekDays.length;d++){
             const ci=(w-1)*weekDays.length+d; const b=(s.gridBadges[ci]||[]);
-            if(b.length>0) wLines+=`<li><b>${weekDays[d]}:</b> ${b.map(x=>`${x.icon||''} ${x.name||''}`).join(', ')}</li>`;
+            if(b.length>0) wLines+=`<li><b>${escapeHtml(weekDays[d])}:</b> ${b.map(x=>escapeHtml(`${x.icon||''} ${x.name||''}`.trim())).join(', ')}</li>`;
         }
-        if(wLines){ const wt=weekTitles[w-1]||(es?'Semana ':'Week ')+w; badgesHtml+=`<div style="margin-bottom:6px;"><b style="color:var(--accent-strong);">${wt}</b><ul style="margin:4px 0;">${wLines}</ul></div>`; }
+        if(wLines){ const wt=weekTitles[w-1]||(es?'Semana ':'Week ')+w; badgesHtml+=`<div style="margin-bottom:6px;"><b style="color:var(--accent-strong);">${escapeHtml(wt)}</b><ul style="margin:4px 0;">${wLines}</ul></div>`; }
     }
     if(!badgesHtml) badgesHtml=`<p style="opacity:.7;">${es?'Sin insignias aún.':'No badges yet.'}</p>`;
-    const scoresHtml=noteColumns.map((nc,i)=>`<li><b>${nc}:</b> ${s.notes[i]||'—'}</li>`).join('');
+    const scoresHtml=noteColumns.map((nc,i)=>`<li><b>${escapeHtml(nc)}:</b> ${escapeHtml(s.notes[i]||'—')}</li>`).join('');
     let ac='score-mid'; if(avg!=="-"){const v=parseFloat(avg);if(v>=3.5)ac='score-high';else if(v<3)ac='score-low';}
     document.getElementById('studentReportBody').innerHTML=
-      `<h3 style="color:var(--accent-strong);margin-bottom:4px;">📋 ${s.name||('Student '+s.id)}</h3>
+      `<h3 style="color:var(--accent-strong);margin-bottom:4px;">📋 ${escapeHtml(s.name||('Student '+s.id))}</h3>
        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;">
          <div><b>${es?'Promedio:':'Average:'}</b> <span class="${ac}" style="font-weight:700;">${avg}</span></div>
          <div><b>${es?'Insignias:':'Badges:'}</b> ${totalBadges}</div>
@@ -1706,7 +2069,7 @@ function openStudentReport(sid){
        <h4 style="color:var(--accent-strong);">${es?'Notas':'Scores'}</h4><ul style="margin:4px 0 12px;">${scoresHtml}</ul>
        <h4 style="color:var(--accent-strong);">${es?'Insignias':'Badges'}</h4>${badgesHtml}
        <h4 style="color:var(--accent-strong);margin-top:10px;">${es?'Comentario':'Comment'}</h4>
-       <p style="background:var(--bg-card);border-radius:8px;padding:10px;min-height:20px;">${s.comment?s.comment:`<span style="opacity:.6;">${es?'(sin comentario)':'(no comment)'}</span>`}</p>
+       <p style="background:var(--bg-card);border-radius:8px;padding:10px;min-height:20px;white-space:pre-wrap;">${s.comment?escapeHtml(s.comment):`<span style="opacity:.6;">${es?'(sin comentario)':'(no comment)'}</span>`}</p>
        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;">
          <button type="button" class="btn-secondary" onclick="closeStudentReport();openStudentCommentModal(${s.id});">✏️ ${es?'Editar comentario':'Edit comment'}</button>
          <button type="button" class="btn-secondary" onclick="closeStudentReport();openCertificateModal(${s.id});">📜 ${es?'Certificado':'Certificate'}</button>
@@ -1754,6 +2117,15 @@ function updateNewFeaturesText(){
     if(typeof updateCloudStatusPill==='function') updateCloudStatusPill();
     const fp=document.getElementById('forgotPasswordLink'); if(fp)fp.textContent=es?'¿Olvidaste tu contraseña?':'Forgot your password?';
     const ss=document.getElementById('studentSearchInput'); if(ss)ss.placeholder=es?'🔎 Buscar estudiante...':'🔎 Search student...';
+    const cch=document.getElementById('clearChatBtn'); if(cch)cch.textContent=es?'🧹 Nueva conversación':'🧹 New conversation';
+    const anl=document.getElementById('aiAnonymizeLabel');
+    if(anl)anl.textContent=es
+        ? 'Anonimizar los nombres de los estudiantes antes de enviarlos a la IA (recomendado)'
+        : 'Anonymize student names before sending them to the AI (recommended)';
+    const apn=document.getElementById('aiPrivacyNote');
+    if(apn)apn.innerHTML=es
+        ? '🔒 <b>Privacidad:</b> las funciones de IA envían los datos del aula (notas, insignias y comentarios) a los servidores de Google. Con la anonimización activada, los nombres se sustituyen por alias antes de salir de este dispositivo y se restituyen solo al mostrarte la respuesta.'
+        : '🔒 <b>Privacy:</b> the AI features send classroom data (scores, badges and comments) to Google servers. With anonymization enabled, names are replaced by aliases before leaving this device and restored only when the answer is shown to you.';
 }
 
 // === INIT ===
@@ -1839,7 +2211,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const removeWeekBtn=document.getElementById('removeWeekBtn'); if(removeWeekBtn) removeWeekBtn.addEventListener('click',window.removeWeek);
     const addNoteColBtn=document.getElementById('addNoteColBtn'); if(addNoteColBtn) addNoteColBtn.addEventListener('click',window.addNoteColumn);
     const removeNoteColBtn=document.getElementById('removeNoteColBtn'); if(removeNoteColBtn) removeNoteColBtn.addEventListener('click',window.removeNoteColumn);
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal[style*="flex"]').forEach(m=>hideModal(m.id));});
+    document.addEventListener('keydown',e=>{
+        if(e.key!=='Escape')return;
+        // Primero se cancela la insignia activa; si no hay ninguna, se cierran los modales.
+        if(armedBadge){ disarmBadge(); return; }
+        document.querySelectorAll('.modal').forEach(m=>{ if(m.style.display==='flex') hideModal(m.id); });
+    });
     document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)hideModal(m.id);});});
 });
 </script>
@@ -1853,9 +2230,21 @@ const GEMINI_MODEL = 'gemini-2.5-flash'; // Si Google cambia el nombre del model
 function animateElement(id){const el=document.getElementById(id);if(!el)return;el.classList.remove('fade-enter');void el.offsetWidth;el.classList.add('fade-enter');}
 
 // --- Configuración de la API key ---
-function openApiKeySettingsModal(){const i=document.getElementById('geminiApiKeyInput');if(i)i.value=GEMINI_API_KEY||'';showModal('apiKeySettingsModal');}
+function openApiKeySettingsModal(){
+  const i=document.getElementById('geminiApiKeyInput'); if(i)i.value=GEMINI_API_KEY||'';
+  const a=document.getElementById('aiAnonymizeToggle'); if(a)a.checked=AI_ANONYMIZE;
+  showModal('apiKeySettingsModal');
+}
 function closeApiKeySettingsModal(){hideModal('apiKeySettingsModal');}
-function saveApiKeySettings(){const i=document.getElementById('geminiApiKeyInput');if(!i)return;GEMINI_API_KEY=(i.value||'').trim();if(GEMINI_API_KEY)localStorage.setItem('learnersTrackGeminiApiKey',GEMINI_API_KEY);else localStorage.removeItem('learnersTrackGeminiApiKey');hideModal('apiKeySettingsModal');showNotification(currentLanguage==='es'?'Configuración de IA guardada':'AI settings saved','success');}
+function saveApiKeySettings(){
+  const i=document.getElementById('geminiApiKeyInput'); if(!i)return;
+  GEMINI_API_KEY=(i.value||'').trim();
+  if(GEMINI_API_KEY)localStorage.setItem('learnersTrackGeminiApiKey',GEMINI_API_KEY);
+  else localStorage.removeItem('learnersTrackGeminiApiKey');
+  const a=document.getElementById('aiAnonymizeToggle'); if(a)setAiAnonymize(a.checked);
+  hideModal('apiKeySettingsModal');
+  showNotification(currentLanguage==='es'?'Configuración de IA guardada':'AI settings saved','success');
+}
 function clearStoredApiKey(){GEMINI_API_KEY='';localStorage.removeItem('learnersTrackGeminiApiKey');const i=document.getElementById('geminiApiKeyInput');if(i)i.value='';showNotification(currentLanguage==='es'?'API key eliminada':'API key cleared','info');}
 function hasApiKey(){return !!(GEMINI_API_KEY&&GEMINI_API_KEY.trim());}
 function ensureAiKey(){if(hasApiKey())return true;showNotification(currentLanguage==='es'?'Configura tu API key de Gemini para usar IA avanzada':'Configure your Gemini API key to use advanced AI','error');openApiKeySettingsModal();return false;}
@@ -1864,12 +2253,58 @@ function ensureAiKey(){if(hasApiKey())return true;showNotification(currentLangua
 function openAiChatModal(){showModal('aiChatModal');}
 function closeAiChatModal(){hideModal('aiChatModal');}
 
-// --- Contexto real del aula para la IA ---
+// --- PRIVACIDAD: anonimizacion antes de enviar a Gemini ---
+// Los nombres de los estudiantes son datos personales de menores. Por defecto se
+// sustituyen por alias ("Estudiante 01") antes de salir del navegador, y se vuelven
+// a traducir a los nombres reales al mostrar la respuesta, de modo que el docente
+// ve el analisis completo sin que Google reciba los nombres.
+let AI_ANONYMIZE = localStorage.getItem('learnersTrackAiAnonymize') !== '0';
+let _aiAliasMap = new Map();
+
 function buildClassroomContext(){
   const className=document.getElementById('className')?.value||'';
   const schoolName=document.getElementById('schoolName')?.value||'';
-  const students=(currentStudents||[]).map(s=>({name:s.name, average:calculateStudentAverage(s), notes:s.notes||[], badges:(s.gridBadges||[]).flat().map(b=>b?.name||b?.icon||'').filter(Boolean), comment:s.comment||''}));
-  return JSON.stringify({className,schoolName,weekTitles,weekDays,noteColumns,students},null,2);
+  const list=(currentStudents||[]);
+  const width=String(Math.max(list.length,1)).length;
+  const map=new Map();
+  const realNames=list.map(s=>(s.name||'').trim()).filter(n=>n.length>1);
+  const students=list.map((s,i)=>{
+    const alias=`Estudiante ${String(i+1).padStart(width,'0')}`;
+    let comment=s.comment||'';
+    if(AI_ANONYMIZE){
+      map.set(alias, s.name||alias);
+      // El nombre real tambien puede aparecer dentro del comentario del docente.
+      realNames.forEach((rn,j)=>{
+        const a=`Estudiante ${String(j+1).padStart(width,'0')}`;
+        comment=comment.split(rn).join(a);
+      });
+    }
+    return {
+      name: AI_ANONYMIZE ? alias : (s.name||alias),
+      average: calculateStudentAverage(s),
+      notes: s.notes||[],
+      badges: (s.gridBadges||[]).flat().map(b=>b?.name||b?.icon||'').filter(Boolean),
+      comment
+    };
+  });
+  _aiAliasMap = map;
+  return JSON.stringify({
+    className,
+    schoolName: AI_ANONYMIZE ? '' : schoolName,
+    weekTitles, weekDays, noteColumns, students
+  },null,2);
+}
+// Devuelve los nombres reales en la respuesta de la IA. Los alias tienen el mismo
+// ancho ("Estudiante 01", "Estudiante 12"), asi que no hay colisiones de prefijo.
+function deanonymizeAiText(text){
+  let out=String(text==null?'':text);
+  if(!AI_ANONYMIZE || _aiAliasMap.size===0) return out;
+  _aiAliasMap.forEach((real,alias)=>{ if(real&&real!==alias) out=out.split(alias).join(real); });
+  return out;
+}
+function setAiAnonymize(on){
+  AI_ANONYMIZE=!!on;
+  localStorage.setItem('learnersTrackAiAnonymize', AI_ANONYMIZE?'1':'0');
 }
 
 // --- Envolver el análisis: usa Gemini si hay API key, o el análisis local si no ---
@@ -1900,19 +2335,39 @@ runAIAnalysis = async function(){
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if(!res.ok || data?.error || !text) throw new Error(data?.error?.message || 'No analysis returned');
-    rd.innerHTML = '<div class="ai-result-section">'+text.replace(/\n/g,'<br>')+'</div>';
+    rd.innerHTML = '<div class="ai-result-section">'+sanitizeAiHtml(deanonymizeAiText(text).replace(/\n/g,'<br>'))+'</div>';
     showNotification(t.aiAnalysisComplete,'success');
   } catch(err) {
     console.error(err);
-    if(_origRunAIAnalysis) { _origRunAIAnalysis(); return; }
-    rd.innerHTML = '<div class="ai-result-section ai-student-alert"><h4>⚠️ AI Error</h4><p>'+(err.message||'Unknown error')+'</p></div>';
+    if(_origRunAIAnalysis) {
+      // Antes el fallback al analisis local era silencioso y parecia que la IA habia respondido.
+      showNotification((currentLanguage==='es'
+        ? 'La IA no respondió; se muestra el análisis local. Detalle: '
+        : 'AI did not respond; showing local analysis. Details: ')+(err.message||''),'error');
+      _origRunAIAnalysis(); return;
+    }
+    rd.innerHTML = '<div class="ai-result-section ai-student-alert"><h4>⚠️ AI Error</h4><p>'+escapeHtml(err.message||'Unknown error')+'</p></div>';
   } finally {
     if(btn){ btn.disabled=false; btn.textContent='✨ '+(currentLanguage==='es'?'Analizar con IA':'Run AI Analysis'); }
   }
 };
 
 // --- Chat con la IA (con respaldo si no hay key) ---
-sendChatMessage = async function(){
+// El chat conserva el hilo: antes cada mensaje se enviaba suelto, asi que la IA
+// no podia responder a preguntas de seguimiento ("y con ese estudiante, que hago?").
+let _chatHistory = [];
+const CHAT_HISTORY_MAX = 16; // pares de turnos que se envian como contexto
+window.clearAiChat = function(){
+  _chatHistory=[];
+  const wrap=document.getElementById('chatMessages');
+  if(wrap){
+    wrap.innerHTML='';
+    appendChatMessageSafe('ai', currentLanguage==='es'
+      ? '¡Hola! Soy tu asistente de Learners Track. ¿En qué te puedo ayudar hoy con tus clases?'
+      : "Hi! I'm your Learners Track assistant. How can I help with your classes today?");
+  }
+};
+window.sendChatMessage = async function(){
   const input=document.getElementById('chatInput'); const btn=document.getElementById('sendChatBtn'); if(!input||!btn) return;
   const message=input.value.trim(); if(!message) return;
   if(!hasApiKey()){
@@ -1927,14 +2382,26 @@ sendChatMessage = async function(){
   input.value=''; btn.disabled=true; btn.innerHTML=(currentLanguage==='es'?'Pensando...':'Thinking...');
   const typingId=appendChatMessageSafe('ai', currentLanguage==='es'?'Analizando tu aula...':'Analysing your classroom...');
   try {
-    const prompt=(currentLanguage==='es'
+    const system=(currentLanguage==='es'
       ? 'Eres un asistente docente útil. Responde en español y usa la información real del aula siguiente. Si falta información, dilo claramente.\n\n'
       : 'You are a helpful teaching assistant. Reply in English and use the real classroom information below. If information is missing, say so clearly.\n\n')
-      + buildClassroomContext() + '\n\n' + (currentLanguage==='es'?'Pregunta: ':'Question: ') + message;
-    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(GEMINI_API_KEY), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+      + buildClassroomContext();
+    // Se anonimiza tambien lo que el docente escribe, por si menciona un nombre real.
+    let outbound=message;
+    if(AI_ANONYMIZE) _aiAliasMap.forEach((real,alias)=>{ if(real&&real!==alias) outbound=outbound.split(real).join(alias); });
+    const contents=[
+      {role:'user', parts:[{text:system}]},
+      {role:'model', parts:[{text: currentLanguage==='es'?'Entendido, tengo los datos del aula.':'Understood, I have the classroom data.'}]},
+      ..._chatHistory.slice(-CHAT_HISTORY_MAX),
+      {role:'user', parts:[{text:outbound}]}
+    ];
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(GEMINI_API_KEY), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents})});
     const data=await res.json();
     const text=data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if(!res.ok || data?.error || !text) throw new Error(data?.error?.message || 'No response returned');
+    _chatHistory.push({role:'user', parts:[{text:outbound}]});
+    _chatHistory.push({role:'model', parts:[{text}]});
+    if(_chatHistory.length>CHAT_HISTORY_MAX*2) _chatHistory=_chatHistory.slice(-CHAT_HISTORY_MAX*2);
     updateChatMessageSafe(typingId, text);
   } catch(err) {
     console.error(err);
@@ -1951,7 +2418,15 @@ function appendChatMessageSafe(role,text){
   div.id=id; div.className='chat-message '+(role==='user'?'user-message':'ai-message');
   div.textContent=text; wrap.appendChild(div); wrap.scrollTop=wrap.scrollHeight; return id;
 }
-function updateChatMessageSafe(id,text){ const el=document.getElementById(id); const wrap=document.getElementById('chatMessages'); if(el){ el.innerHTML=String(text).replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'); if(wrap)wrap.scrollTop=wrap.scrollHeight; } }
+function updateChatMessageSafe(id,text){
+  const el=document.getElementById(id); const wrap=document.getElementById('chatMessages');
+  if(!el) return;
+  // Se escapa primero y solo despues se reintroduce el formato basico (negritas y saltos),
+  // asi el modelo no puede inyectar marcado en la pagina.
+  const safe=escapeHtml(deanonymizeAiText(text)).replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+  el.innerHTML=safe;
+  if(wrap)wrap.scrollTop=wrap.scrollHeight;
+}
 
 // --- Helper reutilizable para llamar a Gemini ---
 async function callGeminiAI(prompt){
@@ -1971,12 +2446,18 @@ async function suggestCommentAI(){
   const btn=document.getElementById('suggestCommentBtn'); const ta=document.getElementById('studentCommentInput');
   if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'+(es?'Generando...':'Generating...'); }
   try{
-    const data={ name:s.name, promedio:calculateStudentAverage(s), notas:s.notes, insignias:(s.gridBadges||[]).flat().map(b=>b?.name).filter(Boolean), comentarioActual:s.comment||'' };
+    // Si la anonimizacion esta activa se envia un alias y se restituye el nombre al recibir.
+    const realName=s.name||'';
+    const alias=AI_ANONYMIZE?'ALUMNO':realName;
+    let comentarioActual=s.comment||'';
+    if(AI_ANONYMIZE&&realName.length>1) comentarioActual=comentarioActual.split(realName).join(alias);
+    const data={ name:alias, promedio:calculateStudentAverage(s), notas:s.notes, insignias:(s.gridBadges||[]).flat().map(b=>b?.name).filter(Boolean), comentarioActual };
     const prompt=(es
-      ? 'Eres un docente. Escribe UN comentario breve (2-3 frases), cálido, personalizado y constructivo para el boletín de este estudiante, en español, basándote en sus datos reales. Devuelve solo el texto del comentario, sin listas ni encabezados ni comillas. Datos del estudiante: '
-      : 'You are a teacher. Write ONE short (2-3 sentences), warm, personalized and constructive report-card comment for this student, in English, based on their real data. Return only the comment text, no lists, headings or quotes. Student data: ')
+      ? 'Eres un docente. Escribe UN comentario breve (2-3 frases), cálido, personalizado y constructivo para el boletín de este estudiante, en español, basándote en sus datos reales. Usa el nombre tal cual aparece en el campo "name". Devuelve solo el texto del comentario, sin listas ni encabezados ni comillas. Datos del estudiante: '
+      : 'You are a teacher. Write ONE short (2-3 sentences), warm, personalized and constructive report-card comment for this student, in English, based on their real data. Use the name exactly as given in the "name" field. Return only the comment text, no lists, headings or quotes. Student data: ')
       + JSON.stringify(data);
-    const text=await callGeminiAI(prompt);
+    let text=await callGeminiAI(prompt);
+    if(AI_ANONYMIZE&&realName) text=text.split('ALUMNO').join(realName);
     if(ta) ta.value=text.trim().replace(/^["']|["']$/g,'');
     showNotification(es?'Comentario sugerido (revísalo y guarda)':'Comment suggested (review and save)','success');
   }catch(err){ console.error(err); showNotification((es?'Error de IA: ':'AI error: ')+(err.message||''),'error'); }
@@ -1997,8 +2478,8 @@ async function weeklySummaryAI(){
       : 'You are a pedagogical analyst. Using the real classroom data, write a short WEEKLY SUMMARY in English, in simple HTML (use <h4>, <ul>, <li>, <p>). Include: overall weekly participation, standout students, students needing attention, and 2-3 actionable recommendations for the teacher. Classroom data: ')
       + buildClassroomContext();
     const text=await callGeminiAI(prompt);
-    if(body) body.innerHTML='<h3 style="color:var(--accent-strong);">📅 '+(es?'Resumen semanal del salón':'Weekly classroom summary')+'</h3><div class="ai-result-section">'+text+'</div>';
-  }catch(err){ console.error(err); if(body) body.innerHTML='<div class="ai-result-section ai-student-alert"><h4>⚠️ '+(es?'Error de IA':'AI Error')+'</h4><p>'+(err.message||'')+'</p></div>'; }
+    if(body) body.innerHTML='<h3 style="color:var(--accent-strong);">📅 '+(es?'Resumen semanal del salón':'Weekly classroom summary')+'</h3><div class="ai-result-section">'+sanitizeAiHtml(deanonymizeAiText(text))+'</div>';
+  }catch(err){ console.error(err); if(body) body.innerHTML='<div class="ai-result-section ai-student-alert"><h4>⚠️ '+(es?'Error de IA':'AI Error')+'</h4><p>'+escapeHtml(err.message||'')+'</p></div>'; }
 }
 
 // Enviar el chat con Enter (Shift+Enter = salto de línea)
@@ -2037,6 +2518,26 @@ let db = null;
   }catch(e){ console.error('Firebase no se pudo iniciar; se usa modo local:', e); window.FIREBASE_ON = false; }
 })();
 
+// === SESION PERSISTENTE ===
+// Firebase ya recordaba al usuario, pero la app arrancaba siempre en la pantalla de
+// login: habia que reescribir la contrasena en cada recarga. Ahora se restaura sola.
+let _manualAuthInFlight = false;
+let _authRestoreDone = false;
+function initAuthPersistence(){
+  if(!window.FIREBASE_ON) return;
+  try{
+    firebase.auth().onAuthStateChanged(function(user){
+      if(!user){ _authRestoreDone=true; return; }
+      // Si el usuario acaba de pulsar "Iniciar sesion"/"Registrarse", esa ruta ya carga los datos.
+      if(_manualAuthInFlight || _authRestoreDone || currentUser) return;
+      _authRestoreDone = true;
+      loadUserFromCloud(user.uid, user.email);
+    });
+  }catch(e){ console.error('auth persistence',e); }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initAuthPersistence);
+else initAuthPersistence();
+
 function updateCloudStatusPill(){
   const el=document.getElementById('cloudStatusPill'); if(!el) return;
   const es=(localStorage.getItem('learnersTrackLanguage')||currentLanguage||'en')==='es';
@@ -2072,9 +2573,12 @@ function firebaseLogin(){
   const le=document.getElementById('loginEmail'), lp=document.getElementById('loginPassword');
   const email=(le?le.value:'').trim().toLowerCase(), pw=lp?lp.value:'';
   if(!email||!pw){ showNotification(translations[currentLanguage].loginError,'error'); return; }
+  _manualAuthInFlight = true;
+  persistRememberedEmails();
   firebase.auth().signInWithEmailAndPassword(email,pw)
     .then(cred=>loadUserFromCloud(cred.user.uid,email))
-    .catch(err=>{ console.error(err); showNotification((currentLanguage==='es'?'No se pudo iniciar sesión: ':'Sign-in failed: ')+fbErr(err),'error'); });
+    .catch(err=>{ console.error(err); showNotification((currentLanguage==='es'?'No se pudo iniciar sesión: ':'Sign-in failed: ')+fbErr(err),'error'); })
+    .finally(()=>{ _manualAuthInFlight=false; _authRestoreDone=true; });
 }
 
 function firebaseRegister(){
@@ -2084,13 +2588,18 @@ function firebaseRegister(){
   if(!name||!email||!pw||!pw2||!school){ showNotification(es?'Por favor completa todos los campos':'Please fill in all fields','error'); return; }
   if(pw.length<6){ showNotification(es?'La contraseña debe tener al menos 6 caracteres':'Password must be at least 6 characters long','error'); return; }
   if(pw!==pw2){ showNotification(es?'Las contraseñas no coinciden':'Passwords do not match','error'); return; }
+  const emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!emailValid){ showNotification(es?'Ingresa un correo válido':'Enter a valid email address','error'); return; }
+  _manualAuthInFlight = true;
+  persistRememberedEmails();
   firebase.auth().createUserWithEmailAndPassword(email,pw)
     .then(cred=>{
       const uid=cred.user.uid;
       return db.collection('users').doc(uid).set({ email, data:JSON.stringify({ name, school, avatar:'https://i.pravatar.cc/150?u='+email, grade:'', institutionLogo:null, classrooms:[], gridWeeks:1, weekTitles:["Week 1"], noteColumns:["Evaluation 1","Evaluation 2"], activeClassroomIndex:0 }), updatedAt:Date.now() },{merge:true}).then(()=>uid);
     })
     .then(uid=>{ showNotification(es?'Cuenta creada':'Account created','success'); loadUserFromCloud(uid,email); })
-    .catch(err=>{ console.error(err); showNotification((es?'No se pudo registrar: ':'Registration failed: ')+fbErr(err),'error'); });
+    .catch(err=>{ console.error(err); showNotification((es?'No se pudo registrar: ':'Registration failed: ')+fbErr(err),'error'); })
+    .finally(()=>{ _manualAuthInFlight=false; _authRestoreDone=true; });
 }
 
 function loadUserFromCloud(uid,email){
@@ -2108,6 +2617,9 @@ function loadUserFromCloud(uid,email){
     };
     userProfile.name=currentUser.name||'Teacher'; userProfile.email=currentUser.email; userProfile.avatar=currentUser.avatar;
     userProfile.school=currentUser.school; userProfile.grade=currentUser.grade; userProfile.institutionLogo=currentUser.institutionLogo;
+    // Los grados tambien viajan a la nube: antes solo vivian en el dispositivo,
+    // asi que al entrar desde otra computadora aparecian los de fabrica.
+    if(Array.isArray(d.grades)&&d.grades.length>0){ grades=d.grades; saveGrades(); }
     document.getElementById('authContainer').style.display='none';
     if(currentUser.classrooms && currentUser.classrooms.length>0){
       classrooms=currentUser.classrooms; activeClassroomIndex=currentUser.activeClassroomIndex||0;
@@ -2125,8 +2637,17 @@ function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_clou
 function pushToCloud(){
   try{
     const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex };
-    db.collection('users').doc(u.uid).set({ email:currentUser.email||u.email||'', data:JSON.stringify(payload), updatedAt:Date.now() },{merge:true}).catch(err=>{ console.error(err); showNotification(currentLanguage==='es'?'No se pudo sincronizar con la nube (tus datos siguen guardados en este equipo)':'Could not sync to cloud (your data is still saved on this device)','error'); });
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades };
+    const serialized=JSON.stringify(payload);
+    // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
+    // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
+    if(serialized.length>950000){
+        showNotification(currentLanguage==='es'
+            ? `⚠️ Tus datos (${formatBytes(serialized.length)}) superan el límite de sincronización. Se guardan en este equipo, pero no en la nube. Usa imágenes más pequeñas o divide los salones.`
+            : `⚠️ Your data (${formatBytes(serialized.length)}) exceeds the sync limit. It is saved on this device but not in the cloud. Use smaller images or split classrooms.`,'error');
+        return;
+    }
+    db.collection('users').doc(u.uid).set({ email:currentUser.email||u.email||'', data:serialized, updatedAt:Date.now() },{merge:true}).catch(err=>{ console.error(err); showNotification(currentLanguage==='es'?'No se pudo sincronizar con la nube (tus datos siguen guardados en este equipo)':'Could not sync to cloud (your data is still saved on this device)','error'); });
   }catch(e){ console.error(e); }
 }
 </script>
