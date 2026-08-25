@@ -277,6 +277,22 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .cert-logo-actions { display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px; }
 .cert-logo-btn { text-align:center; cursor:pointer; font-size:0.9em; padding:7px 12px; }
 .cert-logo-help { font-size:0.78em; opacity:0.75; line-height:1.4; }
+/* --- Certificados masivos --- */
+.bulk-cert-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0 14px; }
+.bulk-cert-preview { margin-top:6px; border:1px solid var(--badge-border); border-radius:10px; padding:12px; background:var(--bg); max-height:230px; overflow-y:auto; }
+.bulk-cert-count { font-weight:700; margin-bottom:8px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+.bulk-cert-count .ok { color:var(--success); }
+.bulk-cert-count .no { color:var(--danger); }
+.bulk-cert-count .na { opacity:0.7; }
+.bulk-cert-list { list-style:none; margin:0; padding:0; font-size:0.88em; }
+.bulk-cert-list li { display:flex; justify-content:space-between; gap:10px; padding:4px 6px; border-radius:6px; }
+.bulk-cert-list li:nth-child(odd) { background:var(--bg-alt); }
+.bulk-cert-list li.aprueba { color:var(--success); font-weight:600; }
+.bulk-cert-list li.reprueba { color:var(--danger); }
+.bulk-cert-list li.sin-notas { opacity:0.65; font-style:italic; }
+.bulk-cert-progress { margin-top:12px; }
+.bulk-cert-bar { height:10px; background:var(--bg-card); border-radius:999px; overflow:hidden; margin-top:6px; }
+.bulk-cert-bar span { display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--success)); width:0%; transition:width 0.2s; }
 /* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
 .badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
 .badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
@@ -432,6 +448,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div id="scoresControls" class="notes-controls" style="display:none;">
                 <button class="add-note-col-btn" id="addNoteColBtn">+ Add Score Column</button>
                 <button class="remove-note-col-btn" id="removeNoteColBtn">- Remove Score Column</button>
+                <button class="add-student-btn" id="bulkCertBtn" type="button" style="background:linear-gradient(135deg,#667eea,#764ba2);" onclick="openBulkCertModal()">🎓 <span id="bulkCertBtnText">Certificados del curso</span></button>
                 <div class="badge-points-box">
                     <label class="badge-points-toggle">
                         <input type="checkbox" id="badgePointsEnabledInput">
@@ -627,6 +644,41 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
     </div>
 </div>
 
+<!-- Bulk Certificates Modal -->
+<div class="modal" id="bulkCertModal" style="display:none;" aria-hidden="true">
+    <div class="modal-content" style="max-width:620px;">
+        <button class="modal-close-btn" onclick="closeBulkCertModal()">&times;</button>
+        <h3 id="bulkCertTitle" style="color:var(--accent-strong);">🎓 Certificados del curso</h3>
+        <p id="bulkCertIntro" style="font-size:0.9em;opacity:0.85;margin-bottom:14px;">Se generará un certificado por cada estudiante que haya aprobado, y se descargarán juntos en un archivo ZIP.</p>
+        <div class="bulk-cert-grid">
+            <div class="form-group">
+                <label for="bulkCertMinGrade" id="bulkCertMinLabel">Nota mínima para aprobar:</label>
+                <input type="number" id="bulkCertMinGrade" min="0" max="5" step="0.1" value="3" inputmode="decimal">
+            </div>
+            <div class="form-group">
+                <label for="bulkCertDate" id="bulkCertDateLabel">Fecha:</label>
+                <input type="date" id="bulkCertDate">
+            </div>
+        </div>
+        <div class="bulk-cert-grid">
+            <div class="form-group"><label for="bulkCertCourse" id="bulkCertCourseLabel">Curso/Grado:</label><input type="text" id="bulkCertCourse"></div>
+            <div class="form-group"><label for="bulkCertInstitution" id="bulkCertInstLabel">Institución:</label><input type="text" id="bulkCertInstitution"></div>
+        </div>
+        <div class="form-group"><label for="bulkCertTeacher" id="bulkCertTeacherLabel">Nombre del docente:</label><input type="text" id="bulkCertTeacher"></div>
+        <div class="form-group"><label for="bulkCertComment" id="bulkCertCommentLabel">Comentario para todos (opcional):</label><textarea id="bulkCertComment" rows="2" placeholder="Comentario adicional..."></textarea></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="bulkCertUseOwnComment" checked style="width:auto;transform:scale(1.1);">
+            <label for="bulkCertUseOwnComment" id="bulkCertOwnCommentLabel" style="margin:0;cursor:pointer;">Usar el comentario propio de cada estudiante si lo tiene</label>
+        </div>
+        <div id="bulkCertPreview" class="bulk-cert-preview"></div>
+        <div id="bulkCertProgress" class="bulk-cert-progress" style="display:none;"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;">
+            <button type="button" class="btn-secondary" onclick="closeBulkCertModal()" id="bulkCertCancelBtn">Cancelar</button>
+            <button type="button" class="btn-primary" id="bulkCertGenerateBtn" onclick="generateBulkCertificates()">📦 Generar y descargar ZIP</button>
+        </div>
+    </div>
+</div>
+
 <!-- Weekly Summary (AI) Modal -->
 <div class="modal" id="weeklySummaryModal" style="display:none;" aria-hidden="true">
     <div class="modal-content"><button class="modal-close-btn" onclick="hideModal('weeklySummaryModal')">&times;</button>
@@ -638,6 +690,8 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- JSZip: empaqueta los certificados en un .zip (al abrirlo aparece la carpeta) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
@@ -1796,6 +1850,42 @@ function openCertificateModal(sid=null){
     });
 })();
 function closeCertificateModal(){hideModal('certificateModal');}
+// Dibuja UN certificado en la pagina actual del PDF que se le pase.
+// Se extrajo de generateCertificate para poder reutilizarlo en la generacion masiva.
+function drawCertificatePage(pdf,data){
+    const t=translations[currentLanguage];
+    const {studentName,institution,course,date,comment,teacher,logo}=data;
+    const PW=297,PH=210;
+    pdf.setFillColor(255,255,255);pdf.rect(0,0,PW,PH,'F');
+    // La marca de agua va primero, para que el texto quede por encima.
+    addCertificateWatermark(pdf,logo,PW,PH);
+    pdf.setLineWidth(2);pdf.setDrawColor(102,126,234);pdf.rect(10,10,277,190);
+    pdf.setLineWidth(0.5);pdf.rect(15,15,267,180);
+    // Logo nitido en la esquina superior izquierda, dentro del marco interior.
+    addCertificateCornerLogo(pdf,logo);
+    pdf.setFillColor(102,126,234);pdf.setFontSize(36);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);pdf.text(t.certificateTitle,148.5,45,{align:'center'});
+    pdf.setDrawColor(102,126,234);pdf.line(50,50,247,50);
+    pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.certificateText,148.5,70,{align:'center'});
+    // Los nombres muy largos se reducen para que no se salgan del marco.
+    pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);
+    let fs=32;
+    pdf.setFontSize(fs);
+    while(fs>14 && pdf.getTextWidth(studentName)>230){ fs-=2; pdf.setFontSize(fs); }
+    pdf.text(studentName,148.5,90,{align:'center'});
+    pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.hasSuccessfully,148.5,110,{align:'center'});
+    pdf.setFontSize(20);pdf.setFont('helvetica','bold');pdf.text(course,148.5,125,{align:'center'});
+    pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.text(t.withOutstanding,148.5,140,{align:'center'});
+    if(comment&&comment.trim().length>0){pdf.setFontSize(12);pdf.setFont('helvetica','italic');const sc=pdf.splitTextToSize(`"${comment}"`,200);pdf.text(sc,148.5,155,{align:'center'});}
+    pdf.setFontSize(14);pdf.setFont('helvetica','bold');pdf.setTextColor(60,60,60);pdf.text(`${t.institutionHeader}: ${institution}`,148.5,175,{align:'center'});
+    pdf.setFontSize(12);pdf.setFont('helvetica','normal');pdf.text(`${t.dateHeader}: ${date}`,40,195);pdf.text(`${t.teacherSignature}: ${teacher}`,220,195,{align:'right'});
+}
+function certificateFileName(studentName,date){
+    const limpio=String(studentName||'Estudiante')
+        .normalize('NFD').replace(/[̀-ͯ]/g,'')       // quita acentos
+        .replace(/[^A-Za-z0-9 _-]/g,'')                 // quita caracteres no validos en nombres de archivo
+        .trim().replace(/\s+/g,'_') || 'Estudiante';
+    return `Certificado_${limpio}_${date}.pdf`;
+}
 function generateCertificate(){
     const t=translations[currentLanguage];
     const cs=document.getElementById('certStudentName'),csc=document.getElementById('certSchoolName'),cc=document.getElementById('certCourseName'),cd=document.getElementById('certDate'),cm=document.getElementById('certComment'),tn=document.getElementById('teacherName');
@@ -1805,30 +1895,150 @@ function generateCertificate(){
     if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}
     try{
         const{jsPDF}=window.jspdf; const pdf=new jsPDF('l','mm','a4');
-        const PW=297,PH=210;
-        pdf.setFillColor(255,255,255);pdf.rect(0,0,PW,PH,'F');
-        // La marca de agua va primero, para que el texto quede por encima.
-        addCertificateWatermark(pdf,certificateLogoDataUrl,PW,PH);
-        pdf.setLineWidth(2);pdf.setDrawColor(102,126,234);pdf.rect(10,10,277,190);
-        pdf.setLineWidth(0.5);pdf.rect(15,15,267,180);
-        // Logo nitido en la esquina superior izquierda, dentro del marco interior.
-        addCertificateCornerLogo(pdf,certificateLogoDataUrl);
-        pdf.setFillColor(102,126,234);pdf.setFontSize(36);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);pdf.text(t.certificateTitle,148.5,45,{align:'center'});
-        pdf.setDrawColor(102,126,234);pdf.line(50,50,247,50);
-        pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.certificateText,148.5,70,{align:'center'});
-        pdf.setFontSize(32);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);pdf.text(sn,148.5,90,{align:'center'});
-        pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.hasSuccessfully,148.5,110,{align:'center'});
-        pdf.setFontSize(20);pdf.setFont('helvetica','bold');pdf.text(crs,148.5,125,{align:'center'});
-        pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.text(t.withOutstanding,148.5,140,{align:'center'});
-        if(com&&com.trim().length>0){pdf.setFontSize(12);pdf.setFont('helvetica','italic');const sc=pdf.splitTextToSize(`"${com}"`,200);pdf.text(sc,148.5,155,{align:'center'});}
-        pdf.setFontSize(14);pdf.setFont('helvetica','bold');pdf.setTextColor(60,60,60);pdf.text(`${t.institutionHeader}: ${inst}`,148.5,175,{align:'center'});
-        pdf.setFontSize(12);pdf.setFont('helvetica','normal');pdf.text(`${t.dateHeader}: ${dt}`,40,195);pdf.text(`${t.teacherSignature}: ${teach}`,220,195,{align:'right'});
-        pdf.save(`Certificate_${sn.replace(/\s+/g,'_')}_${dt}.pdf`);
+        drawCertificatePage(pdf,{studentName:sn,institution:inst,course:crs,date:dt,comment:com,teacher:teach,logo:certificateLogoDataUrl});
+        pdf.save(certificateFileName(sn,dt));
         showNotification(t.certificateGenerated,"success"); closeCertificateModal();
     }catch(err){console.error(err);showNotification("Error generating certificate.","error");}
 }
 const _certForm=document.getElementById('certificateForm');
 if(_certForm)_certForm.addEventListener('submit',e=>{e.preventDefault();generateCertificate();});
+
+// === CERTIFICADOS MASIVOS (SOLO APROBADOS) ===
+// Clasifica al salon segun la nota minima. El promedio usado es el mismo que se ve
+// en la app, asi que si los puntos por insignia estan activos, ya vienen incluidos.
+function classifyStudentsForCertificates(minGrade){
+    const aprueban=[], reprueban=[], sinNotas=[];
+    (currentStudents||[]).forEach(s=>{
+        const avg=calculateStudentAverage(s);
+        if(avg==="-"){ sinNotas.push({student:s, average:null}); return; }
+        const v=parseFloat(avg);
+        (v>=minGrade ? aprueban : reprueban).push({student:s, average:v});
+    });
+    return {aprueban, reprueban, sinNotas};
+}
+function getBulkMinGrade(){
+    const el=document.getElementById('bulkCertMinGrade');
+    const v=parseFloat(String(el?el.value:'3').replace(',','.'));
+    return (isNaN(v)||v<0||v>5) ? 3 : v;
+}
+function renderBulkCertPreview(){
+    const box=document.getElementById('bulkCertPreview'); if(!box) return;
+    const es=currentLanguage==='es';
+    const min=getBulkMinGrade();
+    const {aprueban,reprueban,sinNotas}=classifyStudentsForCertificates(min);
+    const fila=(item,clase,etiqueta)=>`<li class="${clase}"><span>${escapeHtml(item.student.name||'')}</span><span>${item.average===null?etiqueta:item.average.toFixed(1)}</span></li>`;
+    box.innerHTML=
+        `<div class="bulk-cert-count">`
+        + `<span class="ok">✅ ${es?'Aprueban':'Passing'}: ${aprueban.length}</span>`
+        + `<span class="no">❌ ${es?'No aprueban':'Not passing'}: ${reprueban.length}</span>`
+        + (sinNotas.length?`<span class="na">➖ ${es?'Sin notas':'No scores'}: ${sinNotas.length}</span>`:'')
+        + `</div>`
+        + `<ul class="bulk-cert-list">`
+        + aprueban.map(i=>fila(i,'aprueba','')).join('')
+        + reprueban.map(i=>fila(i,'reprueba','')).join('')
+        + sinNotas.map(i=>fila(i,'sin-notas',es?'sin notas':'no scores')).join('')
+        + `</ul>`;
+    const btn=document.getElementById('bulkCertGenerateBtn');
+    if(btn) btn.disabled = aprueban.length===0;
+}
+window.openBulkCertModal=function(){
+    const es=currentLanguage==='es';
+    if((currentStudents||[]).length===0){
+        showNotification(es?'No hay estudiantes en el salón':'No students in the classroom','error'); return;
+    }
+    certificateLogoDataUrl = userProfile.institutionLogo || '';
+    const setV=(id,v)=>{const el=document.getElementById(id); if(el)el.value=v;};
+    setV('bulkCertDate', new Date().toISOString().split('T')[0]);
+    setV('bulkCertCourse', document.getElementById('className')?.value || userProfile.grade || '');
+    setV('bulkCertInstitution', document.getElementById('schoolName')?.value || userProfile.school || '');
+    setV('bulkCertTeacher', userProfile.name || '');
+    setV('bulkCertComment', sharedCertificateComment || '');
+    const prog=document.getElementById('bulkCertProgress'); if(prog){prog.style.display='none';prog.innerHTML='';}
+    renderBulkCertPreview();
+    showModal('bulkCertModal');
+};
+window.closeBulkCertModal=function(){ hideModal('bulkCertModal'); };
+
+window.generateBulkCertificates=async function(){
+    const es=currentLanguage==='es';
+    if(!window.jspdf){ showNotification(es?'La librería de PDF no cargó':'PDF library not loaded','error'); return; }
+    const min=getBulkMinGrade();
+    const {aprueban}=classifyStudentsForCertificates(min);
+    if(aprueban.length===0){ showNotification(es?'Ningún estudiante alcanza la nota mínima':'No student meets the minimum grade','error'); return; }
+
+    const val=id=>{const el=document.getElementById(id); return el?el.value:'';};
+    const institution=val('bulkCertInstitution'), course=val('bulkCertCourse');
+    const date=val('bulkCertDate')||new Date().toISOString().split('T')[0];
+    const teacher=val('bulkCertTeacher'), comentarioGeneral=val('bulkCertComment');
+    const usarPropio=document.getElementById('bulkCertUseOwnComment')?.checked;
+
+    const btn=document.getElementById('bulkCertGenerateBtn');
+    const cancelBtn=document.getElementById('bulkCertCancelBtn');
+    const prog=document.getElementById('bulkCertProgress');
+    if(btn){ btn.disabled=true; }
+    if(cancelBtn){ cancelBtn.disabled=true; }
+    const pintar=(hechos,total,texto)=>{
+        if(!prog) return;
+        prog.style.display='block';
+        prog.innerHTML=`<div style="font-size:0.9em;font-weight:600;">${escapeHtml(texto)}</div>`
+            + `<div class="bulk-cert-bar"><span style="width:${Math.round(hechos/total*100)}%"></span></div>`;
+    };
+
+    try{
+        const {jsPDF}=window.jspdf;
+        const hayZip = typeof window.JSZip==='function';
+        const zip = hayZip ? new window.JSZip() : null;
+        // Sin JSZip se cae a un unico PDF de varias paginas, para no dejar al docente sin nada.
+        const pdfUnico = hayZip ? null : new jsPDF('l','mm','a4');
+        const usados=new Set();
+
+        for(let i=0;i<aprueban.length;i++){
+            const s=aprueban[i].student;
+            pintar(i,aprueban.length,`${es?'Generando':'Generating'} ${i+1}/${aprueban.length}: ${s.name||''}`);
+            const comment = (usarPropio && s.comment && s.comment.trim()) ? s.comment : comentarioGeneral;
+            const datos={ studentName:s.name||`Estudiante ${s.id}`, institution, course, date, comment, teacher, logo:certificateLogoDataUrl };
+            if(hayZip){
+                const pdf=new jsPDF('l','mm','a4');
+                drawCertificatePage(pdf,datos);
+                let nombre=certificateFileName(datos.studentName,date);
+                // Dos estudiantes con el mismo nombre no deben pisarse dentro del ZIP.
+                if(usados.has(nombre)) nombre=nombre.replace(/\.pdf$/,`_${i+1}.pdf`);
+                usados.add(nombre);
+                zip.file(nombre, pdf.output('arraybuffer'));
+            } else {
+                if(i>0) pdfUnico.addPage('a4','l');
+                drawCertificatePage(pdfUnico,datos);
+            }
+            // Cede el hilo para que la barra de progreso se repinte en salones grandes.
+            if(i%3===2) await new Promise(r=>setTimeout(r,0));
+        }
+
+        const carpeta=`Certificados_${String(course||'Curso').replace(/[^A-Za-z0-9]+/g,'_')}_${date}`;
+        if(hayZip){
+            pintar(aprueban.length,aprueban.length,es?'Comprimiendo...':'Compressing...');
+            const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+            const url=URL.createObjectURL(blob);
+            const a=document.createElement('a');
+            a.href=url; a.download=`${carpeta}.zip`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(()=>URL.revokeObjectURL(url),4000);
+            showNotification(es?`${aprueban.length} certificado(s) descargados en ${carpeta}.zip`:`${aprueban.length} certificate(s) downloaded in ${carpeta}.zip`,'success');
+        } else {
+            pdfUnico.save(`${carpeta}.pdf`);
+            showNotification(es
+                ? `Se generó un único PDF con ${aprueban.length} certificados (no se pudo cargar el compresor ZIP).`
+                : `Generated a single PDF with ${aprueban.length} certificates (ZIP library unavailable).`,'info');
+        }
+        closeBulkCertModal();
+    }catch(err){
+        console.error(err);
+        showNotification((es?'Error al generar los certificados: ':'Error generating certificates: ')+(err.message||''),'error');
+    }finally{
+        if(btn) btn.disabled=false;
+        if(cancelBtn) cancelBtn.disabled=false;
+        if(prog){ prog.style.display='none'; prog.innerHTML=''; }
+    }
+};
 
 // STUDENT COMMENT MODAL
 function openStudentCommentModal(sid){
@@ -2421,6 +2631,21 @@ function updateNewFeaturesText(){
         ? 'Aparecerá en la esquina superior izquierda y como marca de agua al centro.'
         : 'It will appear in the top-left corner and as a watermark in the center.';
     const cle=document.getElementById('certLogoEmpty'); if(cle)cle.textContent=es?'Sin logo':'No logo';
+    const bct=document.getElementById('bulkCertBtnText'); if(bct)bct.textContent=es?'Certificados del curso':'Course certificates';
+    const setTxt=(id,esTxt,enTxt)=>{const el=document.getElementById(id); if(el)el.textContent=es?esTxt:enTxt;};
+    setTxt('bulkCertTitle','🎓 Certificados del curso','🎓 Course certificates');
+    setTxt('bulkCertIntro','Se generará un certificado por cada estudiante que haya aprobado, y se descargarán juntos en un archivo ZIP.','One certificate will be generated for each student who passed, and they will download together in a ZIP file.');
+    setTxt('bulkCertMinLabel','Nota mínima para aprobar:','Minimum passing score:');
+    setTxt('bulkCertDateLabel','Fecha:','Date:');
+    setTxt('bulkCertCourseLabel','Curso/Grado:','Course/Grade:');
+    setTxt('bulkCertInstLabel','Institución:','Institution:');
+    setTxt('bulkCertTeacherLabel','Nombre del docente:','Teacher name:');
+    setTxt('bulkCertCommentLabel','Comentario para todos (opcional):','Comment for everyone (optional):');
+    setTxt('bulkCertOwnCommentLabel','Usar el comentario propio de cada estudiante si lo tiene','Use each student’s own comment when they have one');
+    setTxt('bulkCertCancelBtn','Cancelar','Cancel');
+    setTxt('bulkCertGenerateBtn','📦 Generar y descargar ZIP','📦 Generate and download ZIP');
+    const bcc=document.getElementById('bulkCertComment'); if(bcc)bcc.placeholder=es?'Comentario adicional...':'Additional comment...';
+    if(document.getElementById('bulkCertPreview')&&document.getElementById('bulkCertModal')?.style.display==='flex') renderBulkCertPreview();
     syncBadgePointsControls();
     const anl=document.getElementById('aiAnonymizeLabel');
     if(anl)anl.textContent=es
@@ -2519,6 +2744,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(bpEnabled) bpEnabled.addEventListener('change',function(){ setBadgePointsEnabled(this.checked); });
     const bpValue=document.getElementById('badgePointValueInput');
     if(bpValue) bpValue.addEventListener('change',function(){ setBadgePointValue(this.value); });
+    // La lista de aprobados se recalcula mientras se ajusta la nota mínima.
+    const bcMin=document.getElementById('bulkCertMinGrade');
+    if(bcMin){ bcMin.addEventListener('input',renderBulkCertPreview); bcMin.addEventListener('change',renderBulkCertPreview); }
     document.addEventListener('keydown',e=>{
         if(e.key!=='Escape')return;
         // Primero se cancela la insignia activa; si no hay ninguna, se cierran los modales.
