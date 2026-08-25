@@ -270,6 +270,13 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .bonus-cell { background:rgba(32,209,132,0.12); font-weight:700; color:var(--success); border-left:2px solid var(--success); }
 .bonus-leftover { display:block; font-size:0.7em; font-weight:600; opacity:0.7; color:var(--fg); }
 .original-note { font-size:0.72em; opacity:0.65; display:block; margin-top:2px; }
+/* --- Logo del certificado --- */
+.cert-logo-row { display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+.cert-logo-preview { width:90px; height:90px; flex-shrink:0; border:2px dashed var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--bg); overflow:hidden; font-size:0.75em; opacity:0.9; text-align:center; padding:4px; box-sizing:border-box; }
+.cert-logo-preview img { max-width:100%; max-height:100%; object-fit:contain; }
+.cert-logo-actions { display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px; }
+.cert-logo-btn { text-align:center; cursor:pointer; font-size:0.9em; padding:7px 12px; }
+.cert-logo-help { font-size:0.78em; opacity:0.75; line-height:1.4; }
 /* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
 .badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
 .badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
@@ -493,6 +500,19 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div class="form-group"><label>Date:</label><input type="date" id="certDate"></div>
             <div class="form-group"><label>Comment (optional):</label><textarea id="certComment" rows="2" placeholder="Additional comment..."></textarea></div>
             <div class="form-group"><label>Teacher Name:</label><input type="text" id="teacherName"></div>
+            <div class="form-group">
+                <label id="certLogoLabel">Logo de la institución:</label>
+                <div class="cert-logo-row">
+                    <div class="cert-logo-preview" id="certLogoPreview"><span id="certLogoEmpty">Sin logo</span></div>
+                    <div class="cert-logo-actions">
+                        <label for="certLogoInput" class="btn-secondary cert-logo-btn" id="certLogoUploadBtn">📷 Subir logo</label>
+                        <input type="file" id="certLogoInput" accept="image/*" style="display:none;">
+                        <button type="button" class="btn-secondary cert-logo-btn" id="certLogoProfileBtn" onclick="useProfileLogoForCert()">🏫 Usar el de mi perfil</button>
+                        <button type="button" class="btn-secondary cert-logo-btn" id="certLogoClearBtn" onclick="clearCertLogo()">🚫 Sin logo</button>
+                        <span class="cert-logo-help" id="certLogoHelp">Aparecerá en la esquina superior izquierda y como marca de agua al centro.</span>
+                    </div>
+                </div>
+            </div>
             <div style="display:flex;gap:8px;justify-content:flex-end;"><button type="button" class="btn-secondary" onclick="closeCertificateModal()">Cancel</button><button type="submit" class="btn-primary">Generate Certificate PDF</button></div>
         </form>
     </div>
@@ -667,24 +687,52 @@ function addInstitutionLogoToPDF(pdf,logoData,config) {
     try {
         const {x=15,y=12,width=30,height=25,opacity=1} = config || {};
         if(opacity<1) pdf.setGState(new pdf.GState({opacity}));
-        let fmt='PNG';
-        if(logoData.startsWith('image/jpeg')||logoData.startsWith('image/jpg')) fmt='JPEG';
-        else if(logoData.startsWith('image/gif')) fmt='GIF';
-        pdf.addImage(logoData,fmt,x,y,width,height);
+        // Se respeta la proporcion del logo para que no salga estirado.
+        const {w,h}=fitImageInBox(pdf,logoData,width,height);
+        pdf.addImage(logoData,detectImageFormat(logoData),x,y,w,h);
         if(opacity<1) pdf.setGState(new pdf.GState({opacity:1}));
         return true;
     } catch(e) { return false; }
 }
-function addLogoToCertificate(pdf,logoData) {
+// Detecta el formato real a partir del data URL.
+// Antes se comprobaba logoData.startsWith('image/jpeg'), pero un data URL empieza
+// por "data:image/jpeg;base64,", asi que la condicion nunca se cumplia.
+function detectImageFormat(dataUrl){
+    const s=String(dataUrl||'').slice(0,40).toLowerCase();
+    if(s.includes('image/jpeg')||s.includes('image/jpg')) return 'JPEG';
+    if(s.includes('image/webp')) return 'WEBP';
+    if(s.includes('image/gif')) return 'GIF';
+    return 'PNG';
+}
+// Calcula el tamano que cabe en un rectangulo SIN deformar el logo.
+function fitImageInBox(pdf,dataUrl,maxW,maxH){
+    try{
+        const p=pdf.getImageProperties(dataUrl);
+        if(p&&p.width&&p.height){
+            const r=Math.min(maxW/p.width,maxH/p.height);
+            return { w:p.width*r, h:p.height*r };
+        }
+    }catch(e){}
+    return { w:maxW, h:maxH };
+}
+// Marca de agua: el logo grande y muy tenue en el centro de la hoja.
+// Se dibuja ANTES que el texto para que quede por detras.
+function addCertificateWatermark(pdf,logoData,pageW,pageH){
     if(!logoData) return;
-    try {
-        let fmt='PNG';
-        if(logoData.startsWith('image/jpeg')) fmt='JPEG';
-        const lw=35,lh=30,lx=(297-lw)/2,ly=8;
-        pdf.setGState(new pdf.GState({opacity:0.2}));
-        pdf.addImage(logoData,fmt,lx,ly,lw,lh);
+    try{
+        const {w,h}=fitImageInBox(pdf,logoData,130,105);
+        pdf.setGState(new pdf.GState({opacity:0.10}));
+        pdf.addImage(logoData,detectImageFormat(logoData),(pageW-w)/2,(pageH-h)/2,w,h);
         pdf.setGState(new pdf.GState({opacity:1}));
-    } catch(e) {}
+    }catch(e){ console.error('marca de agua',e); }
+}
+// Logo nitido en la esquina superior izquierda, dentro del marco.
+function addCertificateCornerLogo(pdf,logoData){
+    if(!logoData) return;
+    try{
+        const {w,h}=fitImageInBox(pdf,logoData,34,26);
+        pdf.addImage(logoData,detectImageFormat(logoData),22,20,w,h);
+    }catch(e){ console.error('logo esquina',e); }
 }
 
 // === SEGURIDAD: escapado de texto antes de insertarlo en HTML ===
@@ -1685,7 +1733,42 @@ if(bf)bf.addEventListener('submit',e=>{
 
 // CERTIFICATE MODAL
 function openCertificateModalFromTable(sid,ev){ev.stopPropagation();ev.preventDefault();const s=currentStudents.find(x=>x.id===sid);if(s)openCertificateModal(sid);}
+// === LOGO DEL CERTIFICADO ===
+// Se pide antes de generar: por defecto se propone el logo del perfil, pero se
+// puede subir otro solo para este certificado sin cambiar el de la institucion.
+let certificateLogoDataUrl = '';
+function renderCertLogoPreview(){
+    const box=document.getElementById('certLogoPreview'); if(!box) return;
+    const es=currentLanguage==='es';
+    box.innerHTML='';
+    if(certificateLogoDataUrl){
+        const img=new Image();
+        img.src=certificateLogoDataUrl;
+        img.alt=es?'Logo del certificado':'Certificate logo';
+        box.appendChild(img);
+    } else {
+        const span=document.createElement('span');
+        span.id='certLogoEmpty';
+        span.textContent=es?'Sin logo':'No logo';
+        box.appendChild(span);
+    }
+    const btn=document.getElementById('certLogoProfileBtn');
+    if(btn) btn.style.display=userProfile.institutionLogo?'':'none';
+}
+window.useProfileLogoForCert=function(){
+    const es=currentLanguage==='es';
+    if(!userProfile.institutionLogo){
+        showNotification(es?'No tienes un logo guardado en tu perfil':'No logo saved in your profile','error');
+        return;
+    }
+    certificateLogoDataUrl=userProfile.institutionLogo;
+    renderCertLogoPreview();
+};
+window.clearCertLogo=function(){ certificateLogoDataUrl=''; renderCertLogoPreview(); };
+
 function openCertificateModal(sid=null){
+    // Arranca con el logo de la institucion ya cargado, si existe.
+    certificateLogoDataUrl = userProfile.institutionLogo || '';
     const s=sid?currentStudents.find(x=>x.id===sid):null;
     const cs=document.getElementById('certStudentName'),csc=document.getElementById('certSchoolName'),cc=document.getElementById('certCourseName'),cd=document.getElementById('certDate'),cm=document.getElementById('certComment'),tn=document.getElementById('teacherName'),sn=document.getElementById('schoolName'),cn=document.getElementById('className');
     if(csc)csc.value=userProfile.school||sn?.value||'';
@@ -1694,8 +1777,24 @@ function openCertificateModal(sid=null){
     if(tn)tn.value=userProfile.name;
     if(cs)cs.value=s?s.name:'';
     if(cm)cm.value=sharedCertificateComment;
+    renderCertLogoPreview();
     showModal('certificateModal');
 }
+// Selector de logo propio del certificado.
+(function(){
+    const input=document.getElementById('certLogoInput');
+    if(!input) return;
+    input.addEventListener('change',function(e){
+        const f=e.target.files[0]; if(!f) return;
+        // 420 px: el logo se imprime como marca de agua grande, necesita mas resolucion
+        // que el logo pequeno de la barra superior.
+        compressImageFile(f,420,0.9).then(dataUrl=>{
+            certificateLogoDataUrl=dataUrl;
+            renderCertLogoPreview();
+            input.value='';
+        }).catch(()=>showNotification(currentLanguage==='es'?'No se pudo leer la imagen':'Could not read the image','error'));
+    });
+})();
 function closeCertificateModal(){hideModal('certificateModal');}
 function generateCertificate(){
     const t=translations[currentLanguage];
@@ -1706,10 +1805,14 @@ function generateCertificate(){
     if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}
     try{
         const{jsPDF}=window.jspdf; const pdf=new jsPDF('l','mm','a4');
-        pdf.setFillColor(255,255,255);pdf.rect(0,0,297,210,'F');
-        if(userProfile.institutionLogo)addLogoToCertificate(pdf,userProfile.institutionLogo);
+        const PW=297,PH=210;
+        pdf.setFillColor(255,255,255);pdf.rect(0,0,PW,PH,'F');
+        // La marca de agua va primero, para que el texto quede por encima.
+        addCertificateWatermark(pdf,certificateLogoDataUrl,PW,PH);
         pdf.setLineWidth(2);pdf.setDrawColor(102,126,234);pdf.rect(10,10,277,190);
         pdf.setLineWidth(0.5);pdf.rect(15,15,267,180);
+        // Logo nitido en la esquina superior izquierda, dentro del marco interior.
+        addCertificateCornerLogo(pdf,certificateLogoDataUrl);
         pdf.setFillColor(102,126,234);pdf.setFontSize(36);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);pdf.text(t.certificateTitle,148.5,45,{align:'center'});
         pdf.setDrawColor(102,126,234);pdf.line(50,50,247,50);
         pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.certificateText,148.5,70,{align:'center'});
@@ -2310,6 +2413,14 @@ function updateNewFeaturesText(){
     const bph=document.getElementById('badgePointsHelp'); if(bph)bph.textContent=es
         ? 'Los puntos se suman a la nota más baja; si llega a 5.0, pasan a la siguiente. La nota que escribes no se modifica.'
         : 'Points go to the lowest score; once it reaches 5.0 they move to the next lowest. Your typed score is never modified.';
+    const cll=document.getElementById('certLogoLabel'); if(cll)cll.textContent=es?'Logo de la institución:':'Institution logo:';
+    const clu=document.getElementById('certLogoUploadBtn'); if(clu)clu.textContent=es?'📷 Subir logo':'📷 Upload logo';
+    const clp=document.getElementById('certLogoProfileBtn'); if(clp)clp.textContent=es?'🏫 Usar el de mi perfil':'🏫 Use my profile logo';
+    const clc=document.getElementById('certLogoClearBtn'); if(clc)clc.textContent=es?'🚫 Sin logo':'🚫 No logo';
+    const clh=document.getElementById('certLogoHelp'); if(clh)clh.textContent=es
+        ? 'Aparecerá en la esquina superior izquierda y como marca de agua al centro.'
+        : 'It will appear in the top-left corner and as a watermark in the center.';
+    const cle=document.getElementById('certLogoEmpty'); if(cle)cle.textContent=es?'Sin logo':'No logo';
     syncBadgePointsControls();
     const anl=document.getElementById('aiAnonymizeLabel');
     if(anl)anl.textContent=es
