@@ -12,44 +12,101 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
---bg: #f6f9fc; --bg-alt: #ffffff;
---bg-header: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
---bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
---accent: #4facfe; --accent-strong: #667eea;
---danger: #ff6b6b; --success: #20d184; --warning: #f39c12;
---badge-bg: #e8f4fd; --badge-border: #4facfe;
---fg: #232946; --fg-light: #ffffff;
---shadow: 0 8px 40px rgba(50,60,130,0.15);
---radius: 20px; --transition: all 0.22s cubic-bezier(.7,0,.3,1.1);
---bg-card: #f3f6fc;
---ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%, #a084ff 100%);
+/* --- Superficies --- */
+--bg: #f1f4fb; --bg-alt: #ffffff; --bg-card: #f7f9fd;
+--bg-gradient: linear-gradient(160deg, #eef1fb 0%, #e7ecfa 45%, #f3eefb 100%);
+--bg-header: linear-gradient(120deg, #4f46e5 0%, #6366f1 45%, #8b5cf6 100%);
+--surface-2: #eef2fb;
+/* --- Marca --- */
+--accent: #5b5bd6; --accent-strong: #4f46e5; --accent-soft: #eef0fe;
+--brand-1: #4f46e5; --brand-2: #7c3aed; --brand-3: #06b6d4;
+--danger: #ef4467; --success: #10b981; --warning: #f59e0b;
+--badge-bg: #eef0fe; --badge-border: #d9ddfa;
+/* --- Texto --- */
+--fg: #1f2340; --fg-muted: #6b7290; --fg-light: #ffffff;
+--border: #e2e7f4;
+/* --- Elevación --- */
+--shadow-sm: 0 1px 2px rgba(31,35,64,.06), 0 1px 3px rgba(31,35,64,.05);
+--shadow: 0 4px 12px rgba(31,35,64,.07), 0 12px 32px rgba(31,35,64,.08);
+--shadow-lg: 0 12px 28px rgba(31,35,64,.10), 0 28px 64px rgba(31,35,64,.12);
+--shadow-brand: 0 8px 22px rgba(79,70,229,.28);
+--radius: 18px; --radius-sm: 11px; --radius-lg: 26px;
+--transition: all .2s cubic-bezier(.4,0,.2,1);
+--ai-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #a855f7 100%);
 }
 [data-theme="dark"] {
---bg: #161a23; --bg-alt: #23283a;
---bg-header: linear-gradient(135deg, #23283a 0%, #303652 100%);
---bg-gradient: linear-gradient(135deg, #303652 0%, #23283a 100%);
---accent: #6b8cff; --accent-strong: #a084ff;
---danger: #ff5353; --badge-bg: #23355d; --badge-border: #6b8cff;
---fg: #eee; --fg-light: #fff; --bg-card: #23283a;
+--bg: #12141f; --bg-alt: #1b1e2e; --bg-card: #212539;
+--bg-gradient: linear-gradient(160deg, #0f111b 0%, #161a2b 50%, #1a1530 100%);
+--bg-header: linear-gradient(120deg, #2b2a63 0%, #3b3486 45%, #4c3a83 100%);
+--surface-2: #262b42;
+--accent: #8b8bf0; --accent-strong: #a5a3f7; --accent-soft: #262b48;
+--brand-1: #6366f1; --brand-2: #8b5cf6; --brand-3: #22d3ee;
+--danger: #f8617f; --success: #34d399; --warning: #fbbf24;
+--badge-bg: #262b48; --badge-border: #343a5c;
+--fg: #e8eaf5; --fg-muted: #9aa1c0; --fg-light: #ffffff;
+--border: #2c3149;
+--shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+--shadow: 0 4px 14px rgba(0,0,0,.34), 0 14px 36px rgba(0,0,0,.30);
+--shadow-lg: 0 14px 32px rgba(0,0,0,.42), 0 30px 70px rgba(0,0,0,.38);
+--shadow-brand: 0 8px 22px rgba(99,102,241,.34);
 }
 html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); font-family:'Nunito','Montserrat',Arial,sans-serif; scroll-behavior:smooth; margin:0; padding:0; }
-.auth-container { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
-.auth-card { background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow); padding:30px; width:100%; max-width:450px; text-align:center; }
-.auth-title { font-family:'Montserrat',sans-serif; font-size:2rem; color:var(--accent-strong); margin-bottom:20px; }
-.auth-logo { font-size:3rem; margin-bottom:20px; }
-.form-group { margin-bottom:15px; text-align:left; }
-.form-group label { display:block; margin-bottom:5px; font-weight:600; }
-.form-group input { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-family:inherit; font-size:1rem; box-sizing:border-box; }
-.auth-button { width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:var(--transition); margin-top:10px; font-size:1rem; }
-.auth-button:hover { background:var(--accent-strong); }
-.auth-switch { margin-top:20px; font-size:0.9rem; }
-.auth-switch a { color:var(--accent); text-decoration:none; font-weight:600; }
+.auth-container { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:24px; }
+.auth-shell { display:grid; grid-template-columns:1.05fr .95fr; width:100%; max-width:980px; background:var(--bg-alt); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); overflow:hidden; }
+/* Sin min-width las columnas del grid no se encogen, y sin border-box el relleno
+   se suma al ancho de la columna: el formulario se salía de la tarjeta. */
+.auth-hero,.auth-card { min-width:0; box-sizing:border-box; }
+.auth-shell > * { max-width:100%; }
+/* Panel ilustrado */
+.auth-hero { background:var(--bg-header); color:#fff; padding:38px 34px; position:relative; overflow:hidden; display:flex; align-items:center; }
+.auth-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 18% 12%, rgba(255,255,255,.20), transparent 45%), radial-gradient(circle at 88% 82%, rgba(255,255,255,.14), transparent 42%); pointer-events:none; }
+.auth-hero-inner { position:relative; width:100%; }
+.auth-brand { display:flex; align-items:center; gap:11px; margin-bottom:26px; }
+.brand-mark { width:40px; height:40px; flex-shrink:0; filter:drop-shadow(0 3px 8px rgba(0,0,0,.22)); }
+.brand-word { font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.14rem; letter-spacing:.3px; }
+.auth-hero-title { font-family:'Montserrat',sans-serif; font-size:1.62rem; line-height:1.28; margin:0 0 10px; font-weight:700; }
+.auth-hero-sub { margin:0 0 20px; opacity:.9; font-size:.97rem; line-height:1.5; }
+.auth-illustration { width:100%; max-width:360px; height:auto; display:block; margin:0 auto 20px; }
+.auth-features { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
+.auth-features li { display:flex; align-items:center; gap:11px; font-size:.93rem; opacity:.96; }
+.feat-ico { width:32px; height:32px; flex-shrink:0; display:grid; place-items:center; background:rgba(255,255,255,.18); border-radius:10px; font-size:1rem; backdrop-filter:blur(4px); }
+/* Panel del formulario */
+.auth-card { background:var(--bg-alt); padding:40px 38px; width:100%; text-align:center; display:flex; flex-direction:column; justify-content:center; }
+.auth-title { font-family:'Montserrat',sans-serif; font-size:1.72rem; color:var(--fg); margin:0 0 6px; font-weight:700; letter-spacing:-.3px; }
+.auth-card > p { color:var(--fg-muted); margin:0 0 18px; font-size:.94rem; }
+.auth-logo { font-size:2.1rem; margin-bottom:10px; }
+.form-group { margin-bottom:14px; text-align:left; }
+.form-group label { display:block; margin-bottom:6px; font-weight:600; font-size:.88rem; color:var(--fg-muted); }
+.form-group input,.form-group textarea,.form-group select { width:100%; padding:11px 13px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:inherit; font-size:.97rem; box-sizing:border-box; background:var(--bg-alt); color:var(--fg); transition:var(--transition); }
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3.5px var(--accent-soft); }
+.form-group input::placeholder,.form-group textarea::placeholder { color:var(--fg-muted); opacity:.62; }
+.auth-button { width:100%; padding:13px; background:var(--bg-header); color:#fff; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; transition:var(--transition); margin-top:12px; font-size:1rem; box-shadow:var(--shadow-brand); }
+.auth-button:hover { transform:translateY(-2px); filter:brightness(1.07); }
+.auth-button:active { transform:translateY(0); }
+.auth-switch { margin-top:18px; font-size:.9rem; color:var(--fg-muted); }
+.auth-switch a { color:var(--accent); text-decoration:none; font-weight:700; }
 .auth-switch a:hover { text-decoration:underline; }
-.language-selector { position:absolute; top:20px; right:20px; }
-.language-btn { background:var(--bg-alt); border:1px solid var(--accent); border-radius:6px; padding:8px 12px; cursor:pointer; font-weight:600; color:var(--accent); }
+.language-selector { position:absolute; top:20px; right:20px; z-index:5; }
+.language-btn { background:var(--bg-alt); border:1.5px solid var(--border); border-radius:10px; padding:8px 14px; cursor:pointer; font-weight:700; color:var(--accent); box-shadow:var(--shadow-sm); transition:var(--transition); }
+.language-btn:hover { border-color:var(--accent); transform:translateY(-1px); }
+/* La fila de contraseña es flex: el input debe encogerse, no el botón Mostrar. */
+.form-group > div[style*="flex"] > input { flex:1 1 auto; min-width:0; }
+#cloudStatusPill { align-self:center; }
+.auth-form { display:block; }
+@media (max-width:880px) {
+  .auth-shell { grid-template-columns:1fr; max-width:460px; }
+  .auth-hero { padding:26px 24px 22px; }
+  .auth-illustration,.auth-features { display:none; }
+  .auth-hero-title { font-size:1.28rem; }
+  .auth-hero-sub { margin-bottom:0; font-size:.9rem; }
+  .auth-card { padding:28px 22px 30px; }
+  .auth-logo { display:none; }
+}
 .profile-setup-container { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
-.profile-setup-card { background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow); padding:40px; width:100%; max-width:500px; text-align:center; }
-.profile-setup-title { font-family:'Montserrat',sans-serif; font-size:1.8rem; color:var(--accent-strong); margin-bottom:30px; }
+.profile-setup-card { background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:36px 34px; width:100%; max-width:500px; text-align:center; box-sizing:border-box; }
+.profile-setup-title { font-family:'Montserrat',sans-serif; font-size:1.45rem; color:var(--fg); margin:0 0 6px; font-weight:700; }
+#profileSetupSubtitle { color:var(--fg-muted); font-size:.93rem; margin:0 0 26px; }
+.continue-btn { background:var(--bg-header) !important; border-radius:var(--radius-sm) !important; box-shadow:var(--shadow-brand); font-family:inherit; }
 .profile-photo-section { margin-bottom:30px; }
 .profile-photo-preview-large { width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid var(--accent); margin-bottom:15px; }
 .profile-photo-upload-btn-large { padding:12px 20px; border-radius:8px; border:2px dashed var(--accent); background:var(--badge-bg); color:var(--accent); cursor:pointer; font-weight:600; transition:var(--transition); font-size:1rem; }
@@ -70,8 +127,8 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .grade-edit-btn,.grade-delete-btn { background:none; border:none; cursor:pointer; font-size:1rem; padding:2px 6px; border-radius:4px; transition:background 0.2s; }
 .grade-edit-btn:hover { background:rgba(79,172,254,0.2); }
 .grade-delete-btn:hover { background:rgba(255,107,107,0.2); }
-.add-grade-btn { width:100%; padding:10px; background:var(--success); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:var(--transition); margin-top:10px; }
-.add-grade-btn:hover { background:#1a9f55; }
+.add-grade-btn { width:100%; padding:10px; background:var(--bg-card); color:var(--fg); border:1px dashed var(--accent); border-radius:var(--radius-sm); font-weight:600; cursor:pointer; transition:var(--transition); margin-top:10px; font-family:inherit; font-size:.9rem; }
+.add-grade-btn:hover { background:var(--accent-soft); color:var(--accent-strong); }
 .institution-logo-section { margin-bottom:30px; }
 .institution-logo-preview { width:100px; height:100px; border:2px dashed var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; background:var(--bg); overflow:hidden; }
 .institution-logo-preview img { max-width:100%; max-height:100%; object-fit:contain; }
@@ -80,45 +137,71 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .continue-btn { width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:8px; font-weight:700; font-size:1.1rem; cursor:pointer; transition:var(--transition); margin-top:20px; }
 .continue-btn:hover { background:var(--accent-strong); transform:translateY(-2px); box-shadow:0 6px 20px rgba(102,126,234,0.3); }
 .continue-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:none; }
-.container { max-width:1440px; margin:36px auto 32px auto; background:var(--bg-alt); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; }
-.topbar { background:var(--bg-header); display:flex; align-items:center; justify-content:space-between; padding:0 16px; min-height:72px; gap:12px; border-radius:0 0 20px 20px; box-shadow:0 2px 18px #00f2fe22; flex-wrap:wrap; }
-.topbar-left,.topbar-center,.topbar-right { display:flex; align-items:center; gap:12px; }
-.topbar-left { flex:1; } .topbar-center { flex:2; justify-content:center; } .topbar-right { flex:1; justify-content:flex-end; }
-.app-title-wrapper { display:flex; align-items:center; gap:15px; }
-.app-title { font-size:2.1rem; font-family:'Montserrat','Nunito',sans-serif; font-weight:700; color:var(--fg-light); letter-spacing:1.1px; }
-.user-welcome { font-size:1rem; font-family:'Nunito',sans-serif; color:var(--fg-light); opacity:0.9; }
-.user-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--fg-light); }
-.institution-logo-small { width:40px; height:40px; object-fit:contain; border-radius:8px; margin-right:10px; }
-.profile-btn { background:var(--bg-alt); border:none; border-radius:9px; padding:7px 16px; font-weight:600; color:var(--accent); box-shadow:0 2px 10px #4facfe1a; cursor:pointer; transition:var(--transition); font-size:1em; outline:none; display:flex; align-items:center; gap:8px; }
-.profile-btn:hover { background:var(--accent); color:var(--fg-light); box-shadow:0 4px 25px #00f2fe22; }
-.classroom-selector { display:flex; gap:9px; flex-wrap:wrap; }
-.classroom-selector button { background:var(--bg-alt); border:none; border-radius:9px; padding:7px 16px; font-weight:600; color:var(--accent); box-shadow:0 2px 10px #4facfe1a; cursor:pointer; transition:var(--transition); font-size:1.1em; outline:none; }
-.classroom-selector button.active,.classroom-selector button:hover { background:var(--accent); color:var(--fg-light); box-shadow:0 4px 25px #00f2fe22; }
-.theme-toggle-btn { background:transparent; border:none; font-size:2em; color:var(--fg-light); cursor:pointer; margin-left:8px; transition:color .3s; }
-.theme-toggle-btn:focus { outline:2px solid var(--accent); }
-.header { text-align:center; padding:18px 34px 8px 34px; color:var(--fg); font-size:1.15em; }
-.view-mode-selector { display:flex; gap:13px; align-items:center; margin-bottom:20px; padding:0 32px; flex-wrap:wrap; }
-.view-mode-btn { background:var(--bg-alt); border:none; border-radius:9px; padding:7px 15px; cursor:pointer; font-weight:600; color:var(--accent); font-size:1.09em; transition:var(--transition); }
-.view-mode-btn.active,.view-mode-btn:hover { background:var(--accent); color:var(--fg-light); }
+.container { max-width:1480px; margin:22px auto 26px; background:var(--bg-alt); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); overflow:hidden; display:flex; flex-direction:column; }
+.topbar { background:var(--bg-header); display:flex; align-items:center; justify-content:space-between; padding:13px 22px; min-height:66px; gap:14px; flex-wrap:wrap; position:relative; }
+.topbar::after { content:''; position:absolute; inset:0; background:radial-gradient(circle at 12% 0%, rgba(255,255,255,.16), transparent 40%); pointer-events:none; }
+.topbar-left,.topbar-center,.topbar-right { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
+.topbar-left { flex:1 1 auto; } .topbar-center { flex:2 1 auto; justify-content:center; } .topbar-right { flex:1 1 auto; justify-content:flex-end; }
+.app-title-wrapper { display:flex; align-items:center; gap:11px; }
+.topbar-mark { width:36px; height:36px; flex-shrink:0; }
+.app-title { font-size:1.3rem; font-family:'Montserrat','Nunito',sans-serif; font-weight:700; color:var(--fg-light); letter-spacing:.2px; line-height:1.15; }
+.user-welcome { font-size:.82rem; color:var(--fg-light); opacity:.82; line-height:1.2; }
+.app-title-text { display:flex; flex-direction:column; }
+.user-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.55); }
+.institution-logo-small { width:36px; height:36px; object-fit:contain; border-radius:9px; background:rgba(255,255,255,.92); padding:3px; }
+.profile-btn { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24); border-radius:10px; padding:8px 14px; font-weight:600; color:#fff; cursor:pointer; transition:var(--transition); font-size:.9rem; outline:none; display:flex; align-items:center; gap:7px; backdrop-filter:blur(6px); }
+.profile-btn:hover { background:rgba(255,255,255,.28); transform:translateY(-1px); }
+.classroom-selector { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; }
+.classroom-selector button { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); border-radius:10px; padding:8px 15px; font-weight:600; color:#fff; cursor:pointer; transition:var(--transition); font-size:.92rem; outline:none; backdrop-filter:blur(6px); }
+.classroom-selector button:hover { background:rgba(255,255,255,.28); transform:translateY(-1px); }
+.classroom-selector button.active { background:#fff; color:var(--accent-strong); border-color:#fff; box-shadow:0 3px 12px rgba(0,0,0,.16); }
+.theme-toggle-btn { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24); border-radius:10px; width:38px; height:38px; display:grid; place-items:center; font-size:1.05rem; color:#fff; cursor:pointer; transition:var(--transition); padding:0; }
+.theme-toggle-btn:hover { background:rgba(255,255,255,.28); }
+.theme-toggle-btn:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+/* Aviso de ayuda compacto, en vez del bloque de texto que ocupaba media pantalla */
+.header { padding:14px 24px 0; color:var(--fg); }
+.header-tip { display:flex; align-items:flex-start; gap:11px; background:var(--accent-soft); border:1px solid var(--badge-border); border-left:3px solid var(--accent); border-radius:var(--radius-sm); padding:11px 14px; font-size:.88rem; line-height:1.5; color:var(--fg); }
+.header-tip .tip-ico { font-size:1.05rem; line-height:1.3; }
+.header-tip b { color:var(--accent-strong); }
+.header-tip button { margin-left:auto; background:none; border:none; color:var(--fg-muted); cursor:pointer; font-size:1.15rem; line-height:1; padding:0 2px; border-radius:5px; flex-shrink:0; }
+.header-tip button:hover { color:var(--danger); }
+.view-mode-selector { display:flex; gap:9px; align-items:center; margin:14px 0 4px; padding:0 24px; flex-wrap:wrap; }
+.view-mode-selector > span { font-size:.8rem; color:var(--fg-muted); font-weight:700; text-transform:uppercase; letter-spacing:.6px; }
+.view-mode-btn { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:8px 15px; cursor:pointer; font-weight:600; color:var(--fg-muted); font-size:.9rem; transition:var(--transition); }
+.view-mode-btn:hover { border-color:var(--accent); color:var(--accent); }
+.view-mode-btn.active { background:var(--bg-header); color:#fff; border-color:transparent; box-shadow:var(--shadow-brand); }
 .export-dropdown { position:relative; display:inline-block; }
-.export-dropdown-btn { background:var(--success); color:white; border:none; border-radius:9px; padding:7px 15px; cursor:pointer; font-weight:600; font-size:1.09em; transition:var(--transition); display:flex; align-items:center; gap:5px; }
-.export-dropdown-btn:hover { background:#1a9f55; }
-.export-dropdown-content { display:none; position:absolute; right:0; top:100%; background:var(--bg-alt); min-width:200px; box-shadow:0 8px 25px rgba(0,0,0,0.15); border-radius:9px; z-index:1000; margin-top:5px; overflow:hidden; }
+.export-dropdown-btn { background:var(--bg-card); color:var(--fg); border:1px solid var(--border); border-radius:10px; padding:8px 15px; cursor:pointer; font-weight:600; font-size:.9rem; transition:var(--transition); display:flex; align-items:center; gap:6px; }
+.export-dropdown-btn:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+.export-dropdown-content { display:none; position:absolute; right:0; top:100%; background:var(--bg-alt); min-width:230px; box-shadow:var(--shadow-lg); border:1px solid var(--border); border-radius:var(--radius-sm); z-index:1000; margin-top:6px; overflow:hidden; padding:5px; }
 .export-dropdown-content.show { display:block; animation:fadeIn 0.2s; }
-.export-dropdown-content button { width:100%; padding:10px 15px; border:none; background:transparent; text-align:left; cursor:pointer; font-size:0.95em; transition:background 0.2s; display:flex; align-items:center; gap:8px; }
-.export-dropdown-content button:hover { background:var(--badge-bg); }
-.export-dropdown-content hr { margin:5px 0; border:none; border-top:1px solid var(--badge-border); }
+.export-dropdown-content button { width:100%; padding:9px 12px; border:none; background:transparent; text-align:left; cursor:pointer; font-size:.88rem; color:var(--fg); font-family:inherit; border-radius:8px; transition:background .15s; display:flex; align-items:center; gap:8px; }
+.export-dropdown-content button:hover { background:var(--accent-soft); color:var(--accent-strong); }
+.export-dropdown-content hr { margin:5px 4px; border:none; border-top:1px solid var(--border); }
 .main-content { display:flex; min-height:80vh; }
-.sidebar { width:340px; background:linear-gradient(120deg,#f5f6fa 80%,#e3f0ff 100%); border-right:1px solid #e1e8ed; box-shadow:4px 0 20px -8px #a3a3a326; padding:28px 22px 22px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:24px; }
-.sidebar h3 { margin:0 0 10px 0; font-family:'Montserrat',sans-serif; font-size:1.29em; color:var(--accent-strong); }
-.badges-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(75px,1fr)); gap:10px; min-height:44px; padding:12px; background:var(--bg-card); border-radius:12px; border:1px solid var(--badge-border); }
-.badge { display:flex; flex-direction:column; align-items:center; justify-content:space-between; background:linear-gradient(145deg,var(--badge-bg),var(--bg-alt)); border:2px solid var(--badge-border); border-radius:10px; padding:8px 6px; width:75px; height:85px; box-shadow:0 3px 12px rgba(79,172,254,0.15); position:relative; cursor:grab; user-select:none; transition:all 0.25s cubic-bezier(0.4,0,0.2,1); overflow:hidden; }
-.badge:hover { transform:translateY(-3px) scale(1.05); box-shadow:0 8px 25px rgba(79,172,254,0.35); border-color:var(--accent); background:linear-gradient(145deg,var(--accent),var(--badge-border)); }
-.badge:hover .badge-name { color:var(--fg-light); }
+.sidebar { width:318px; flex-shrink:0; background:var(--bg-card); border-right:1px solid var(--border); padding:20px 18px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:18px; }
+.sidebar h3 { margin:0 0 10px 0; font-family:'Montserrat',sans-serif; font-size:.82rem; color:var(--fg-muted); text-transform:uppercase; letter-spacing:.7px; font-weight:700; }
+.side-section { display:flex; flex-direction:column; gap:7px; }
+.side-heading { display:flex; align-items:center; gap:7px; }
+.side-section-ai { background:linear-gradient(135deg,var(--accent-soft),transparent); border:1px solid var(--badge-border); border-radius:var(--radius); padding:13px 12px; }
+/* Un solo estilo de botón para toda la barra: antes cada uno tenía su propio degradado. */
+.side-btn { display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; font-family:inherit; font-size:.9rem; font-weight:600; color:var(--fg); cursor:pointer; transition:var(--transition); box-shadow:var(--shadow-sm); }
+.side-btn:hover { border-color:var(--accent); transform:translateX(3px); box-shadow:var(--shadow); }
+.side-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+.side-btn-quiet { background:transparent; box-shadow:none; font-weight:500; color:var(--fg-muted); }
+.sb-ico { width:30px; height:30px; flex-shrink:0; display:grid; place-items:center; border-radius:9px; font-size:.95rem; }
+.sb-ico.green { background:rgba(16,185,129,.14); } .sb-ico.blue { background:rgba(59,130,246,.14); }
+.sb-ico.slate { background:rgba(100,116,139,.14); } .sb-ico.amber { background:rgba(245,158,11,.16); }
+.sb-ico.violet { background:rgba(139,92,246,.16); } .sb-ico.teal { background:rgba(20,184,166,.15); }
+.sb-ico.sky { background:rgba(14,165,233,.15); }
+.badges-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:9px; min-height:44px; padding:11px; background:var(--bg-alt); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+.badge { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; background:var(--bg-card); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:9px 5px; height:84px; box-shadow:none; position:relative; cursor:grab; user-select:none; transition:var(--transition); overflow:hidden; }
+.badge:hover { transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent); background:var(--accent-soft); }
+.badge:hover .badge-name { color:var(--accent-strong); }
 .badge:active { cursor:grabbing; transform:scale(0.98); }
-.badge-icon { font-size:1.8em; margin-bottom:4px; border-radius:8px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.3); backdrop-filter:blur(5px); transition:all 0.25s ease; flex-shrink:0; }
-.badge-icon img { width:100%; height:100%; object-fit:contain; border-radius:6px; }
-.badge-name { font-size:0.65em; font-weight:700; color:var(--accent-strong); text-align:center; line-height:1.1; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; max-width:100%; transition:color 0.25s ease; flex-shrink:0; }
+.badge-icon { font-size:1.45rem; border-radius:10px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:var(--bg-alt); border:1px solid var(--border); transition:var(--transition); flex-shrink:0; }
+.badge-icon img { width:100%; height:100%; object-fit:contain; border-radius:8px; }
+.badge-name { font-size:.63rem; font-weight:700; color:var(--fg-muted); text-align:center; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; max-width:100%; transition:color .2s ease; flex-shrink:0; }
 .badge-edit { background:rgba(255,255,255,0.8); border:none; font-size:0.8em; color:#666; cursor:pointer; position:absolute; top:2px; right:2px; border-radius:5px; width:18px; height:18px; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease; opacity:0; transform:scale(0.8); }
 .badge:hover .badge-edit { opacity:1; transform:scale(1); }
 .badge-edit:hover { background:var(--accent); color:var(--fg-light); }
@@ -134,22 +217,29 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .control-group { margin-bottom:12px; }
 .control-group label { font-weight:600; display:block; margin-bottom:2px; }
 .control-group input { width:100%; border-radius:7px; border:1px solid #c9d8f6; padding:6px; font-size:1em; box-sizing:border-box; }
-.stats { background:var(--bg); border-radius:14px; padding:12px 14px; margin-top:14px; box-shadow:0 4px 12px #667eea08; }
-.stats h4 { color:var(--accent-strong); margin-bottom:7px; }
-.stat-item { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--bg-alt); font-size:1em; }
-.stat-item:last-child { border-bottom:none; }
-.classroom { flex:1; padding:30px 30px 24px 30px; overflow-x:auto; }
-.week-controls,.notes-controls { margin:15px 0; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.add-week-btn,.remove-week-btn,.add-note-col-btn,.remove-note-col-btn,.add-student-btn { font-size:1em; border:none; border-radius:8px; padding:7px 18px; font-weight:600; cursor:pointer; transition:background 0.3s; color:var(--fg-light); }
-.add-week-btn,.add-note-col-btn,.add-student-btn { background:var(--bg-header); }
-.remove-week-btn,.remove-note-col-btn { background:var(--danger); }
-.add-week-btn:disabled,.remove-week-btn:disabled,.add-note-col-btn:disabled,.remove-note-col-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.stats { background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow-sm); }
+.stats h4 { color:var(--fg-muted); margin:0 0 11px; font-size:.78rem; text-transform:uppercase; letter-spacing:.7px; font-weight:700; }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.stat-tile { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 11px; display:flex; flex-direction:column; gap:2px; }
+.stat-num { font-family:'Montserrat',sans-serif; font-size:1.42rem; font-weight:700; color:var(--accent-strong); line-height:1.1; }
+.stat-lbl { font-size:.72rem; color:var(--fg-muted); font-weight:600; line-height:1.25; }
+.classroom { flex:1; min-width:0; padding:20px 24px 26px; overflow-x:auto; }
+.week-controls,.notes-controls { margin:14px 0; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.week-controls > span,.notes-controls > span { font-size:.85rem; color:var(--fg-muted); font-weight:600; }
+.add-week-btn,.remove-week-btn,.add-note-col-btn,.remove-note-col-btn,.add-student-btn { font-size:.88rem; border:1px solid var(--border); border-radius:10px; padding:8px 15px; font-weight:600; cursor:pointer; transition:var(--transition); background:var(--bg-card); color:var(--fg); font-family:inherit; }
+.add-week-btn:hover,.add-note-col-btn:hover,.add-student-btn:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+.remove-week-btn,.remove-note-col-btn { color:var(--danger); }
+.remove-week-btn:hover,.remove-note-col-btn:hover { border-color:var(--danger); background:rgba(239,68,103,.08); transform:translateY(-1px); }
+.add-week-btn:disabled,.remove-week-btn:disabled,.add-note-col-btn:disabled,.remove-note-col-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
 .table-scroll { overflow-x:auto; border-radius:14px; margin-bottom:1.7em; }
-.student-grid-table,.notes-table { width:100%; min-width:650px; border-collapse:collapse; background:var(--bg); border-radius:14px; overflow:hidden; margin-bottom:40px; }
-.student-grid-table th,.student-grid-table td,.notes-table th,.notes-table td { border:1px solid var(--badge-border); padding:8px; text-align:center; }
-.student-grid-table th,.notes-table th { background:var(--accent); color:var(--fg-light); font-weight:700; font-size:1rem; }
-.student-grid-table td,.notes-table td { min-width:55px; min-height:45px; position:relative; background:var(--bg-alt); transition:background 0.3s; }
-.student-grid-table .student-name-cell,.notes-table .student-name-cell { background:var(--bg-card,#f3f6fc); color:var(--fg); font-weight:600; text-align:left; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:space-between; }
+.student-grid-table,.notes-table { width:100%; min-width:650px; border-collapse:separate; border-spacing:0; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:26px; box-shadow:var(--shadow-sm); }
+.student-grid-table th,.student-grid-table td,.notes-table th,.notes-table td { border-bottom:1px solid var(--border); border-right:1px solid var(--border); padding:9px 10px; text-align:center; }
+.student-grid-table th:last-child,.student-grid-table td:last-child,.notes-table th:last-child,.notes-table td:last-child { border-right:none; }
+.student-grid-table tbody tr:last-child td,.notes-table tbody tr:last-child td { border-bottom:none; }
+.student-grid-table th,.notes-table th { background:var(--surface-2); color:var(--fg); font-weight:700; font-size:.84rem; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid var(--border); }
+.student-grid-table td,.notes-table td { min-width:55px; position:relative; background:var(--bg-alt); transition:background .18s; }
+.student-grid-table tbody tr:hover td,.notes-table tbody tr:hover td { background:var(--bg-card); }
+.student-grid-table .student-name-cell,.notes-table .student-name-cell { background:var(--bg-card); color:var(--fg); font-weight:600; text-align:left; padding:7px 9px; display:flex; align-items:center; gap:6px; justify-content:space-between; }
 .student-name-cell input { background:transparent; border:1px solid transparent; color:inherit; font:inherit; padding:2px 5px; border-radius:4px; flex-grow:1; box-sizing:border-box; }
 .student-name-cell input:hover,.student-name-cell input:focus { background:var(--bg-alt); border-color:var(--accent); outline:none; }
 .student-name-cell .actions { display:flex; gap:5px; flex-shrink:0; }
@@ -171,27 +261,31 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .score-low { color:var(--danger); }
 #statisticsPage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #statisticsPage.show { display:block; animation:fadeIn .3s; }
-.statistics-content { margin:40px auto 40px auto; background:var(--bg); border-radius:30px; max-width:820px; padding:44px 34px 34px 34px; box-shadow:var(--shadow); }
-.statistics-content h2 { color:var(--accent-strong); margin-bottom:20px; display:flex; align-items:center; gap:12px; font-size:2.1em; }
-.statistics-data-row { display:flex; flex-wrap:wrap; gap:35px 60px; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid var(--bg-alt); }
-.statistics-data-row>div { font-size:1.21em; flex:1 1 200px; }
-.statistics-graphics { display:flex; flex-wrap:wrap; gap:40px; justify-content:center; }
-.statistics-graphics>div { flex:1 1 330px; background:var(--bg-alt); border-radius:18px; padding:25px 20px 25px 20px; min-width:280px; min-height:260px; }
-.volver-btn { background:var(--danger); color:#fff; border:none; font-weight:700; border-radius:10px; padding:13px 30px; font-size:1.19em; margin-bottom:20px; margin-top:0; cursor:pointer; transition:background 0.21s; }
-.volver-btn:hover { background:#be2d2d; }
-.modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(36,46,61,0.25); display:flex; align-items:center; justify-content:center; z-index:2000; animation:modalFadeIn .2s; }
-.modal-content { background:var(--bg-alt); border-radius:22px; box-shadow:0 10px 40px #667eea21; padding:36px 28px 24px 28px; min-width:310px; max-width:98vw; animation:modalIn 0.25s; position:relative; max-height:90vh; overflow-y:auto; }
+.statistics-content { margin:32px auto; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); max-width:900px; padding:32px 30px 34px; box-shadow:var(--shadow-lg); }
+.statistics-content h2 { color:var(--fg); margin:0 0 20px; display:flex; align-items:center; gap:11px; font-size:1.55rem; font-family:'Montserrat',sans-serif; }
+.statistics-data-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:26px; padding-bottom:0; border-bottom:none; }
+.statistics-data-row>div { font-size:.86rem; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:13px 15px; display:flex; flex-direction:column-reverse; gap:3px; }
+.statistics-data-row>div b { font-size:1.5rem; color:var(--accent-strong); font-family:'Montserrat',sans-serif; font-weight:700; }
+.statistics-graphics { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; }
+.statistics-graphics>div { flex:1 1 330px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; min-width:280px; min-height:260px; }
+.volver-btn { background:var(--bg-card); color:var(--fg); border:1px solid var(--border); font-weight:700; border-radius:10px; padding:10px 20px; font-size:.92rem; margin-bottom:20px; cursor:pointer; transition:var(--transition); font-family:inherit; }
+.volver-btn:hover { border-color:var(--accent); color:var(--accent); transform:translateX(-3px); }
+.modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,20,31,.5); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:2000; animation:modalFadeIn .2s; padding:16px; box-sizing:border-box; }
+.modal-content { background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); padding:30px 26px 24px; min-width:300px; max-width:98vw; animation:modalIn .25s; position:relative; max-height:90vh; overflow-y:auto; }
+.modal-content > h3 { font-family:'Montserrat',sans-serif; margin:0 0 16px; font-size:1.16rem; color:var(--fg); }
 @keyframes modalIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
 @keyframes modalFadeIn { from { opacity:0 } to { opacity:1 } }
 @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-.btn-primary { background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:700; padding:8px 18px; cursor:pointer; transition:background 0.18s; }
-.btn-primary:hover { background:var(--accent-strong); }
-.btn-secondary { background:#e5e7ef; color:#232946; border:none; border-radius:8px; font-weight:600; padding:8px 18px; cursor:pointer; transition:background 0.18s; }
-.btn-secondary:hover { background:#d1d5e2; }
-.btn-danger { background:var(--danger); color:#fff; border:none; border-radius:8px; font-weight:600; padding:8px 18px; cursor:pointer; transition:background 0.18s; }
-.btn-danger:hover { background:#d32f2f; }
-.btn-ai { background:var(--ai-gradient); color:#fff; border:none; border-radius:8px; font-weight:700; padding:10px 20px; cursor:pointer; transition:var(--transition); }
-.btn-ai:hover { background:linear-gradient(135deg,#764ba2 0%,#a084ff 100%); transform:translateY(-2px); }
+.btn-primary,.btn-secondary,.btn-danger,.btn-ai { font-family:inherit; font-size:.92rem; border-radius:10px; padding:9px 18px; cursor:pointer; transition:var(--transition); border:1px solid transparent; }
+.btn-primary { background:var(--accent-strong); color:#fff; font-weight:700; }
+.btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:var(--shadow-brand); }
+.btn-secondary { background:var(--bg-card); color:var(--fg); border-color:var(--border); font-weight:600; }
+.btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+.btn-danger { background:rgba(239,68,103,.1); color:var(--danger); border-color:rgba(239,68,103,.3); font-weight:600; }
+.btn-danger:hover { background:var(--danger); color:#fff; }
+.btn-ai { background:var(--ai-gradient); color:#fff; font-weight:700; box-shadow:var(--shadow-brand); }
+.btn-ai:hover { filter:brightness(1.08); transform:translateY(-2px); }
+.btn-primary:disabled,.btn-ai:disabled,.btn-secondary:disabled { opacity:.5; cursor:not-allowed; transform:none; filter:none; }
 .emoji-option { background:#fff; border:1px solid #e1e8ed; border-radius:7px; font-size:1.25em; cursor:pointer; transition:background 0.13s; }
 .emoji-option:hover { background:#e7f0fb; }
 [data-tooltip] { position:relative; cursor:pointer; }
@@ -337,8 +431,12 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .badge-armed-hint button { background:rgba(255,255,255,0.25); border:none; color:#fff; border-radius:8px; padding:4px 10px; font-weight:700; cursor:pointer; }
 .student-grid-table td.badge-target { outline:2px dashed var(--success); outline-offset:-3px; cursor:copy; }
 .note-input.note-invalid { border-color:var(--danger) !important; background:rgba(255,107,107,0.13); }
-.empty-state { text-align:center; padding:2.2rem 1rem; }
-.empty-state p { margin-bottom:14px; opacity:0.8; }
+.empty-state { text-align:center; padding:2.4rem 1rem 2.8rem; }
+.empty-illo { width:210px; max-width:70%; height:auto; margin-bottom:14px; }
+.empty-state h4 { font-family:'Montserrat',sans-serif; font-size:1.08rem; color:var(--fg); margin:0 0 6px; }
+.empty-state p { margin:0 auto 18px; opacity:.75; max-width:380px; font-size:.92rem; line-height:1.5; }
+.empty-actions { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
+.empty-actions .btn-primary { background:var(--bg-header); box-shadow:var(--shadow-brand); padding:10px 18px; }
 .privacy-note { font-size:0.82em; opacity:0.9; background:var(--badge-bg); border-left:3px solid var(--accent); padding:9px 11px; border-radius:6px; margin-bottom:14px; line-height:1.45; }
 .ai-privacy-row { display:flex; align-items:flex-start; gap:9px; font-size:0.86em; margin:10px 0 4px; text-align:left; }
 .ai-privacy-row input { width:auto; margin-top:2px; flex-shrink:0; }
@@ -352,8 +450,75 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 <!-- Login/Register Container -->
 <div id="authContainer" class="auth-container">
     <div class="language-selector"><button id="languageToggle" class="language-btn">ES</button></div>
-    <div class="auth-card">
-        <div class="auth-logo">🎓</div>
+    <div class="auth-shell">
+      <!-- Panel ilustrado -->
+      <aside class="auth-hero">
+        <div class="auth-hero-inner">
+            <div class="auth-brand">
+                <svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true">
+                    <rect x="2" y="2" width="40" height="40" rx="12" fill="url(#bmg)"/>
+                    <path d="M22 12.5 33 18l-11 5.5L11 18l11-5.5Z" fill="#fff" opacity=".95"/>
+                    <path d="M15.5 20.8V26c0 2.2 2.9 4 6.5 4s6.5-1.8 6.5-4v-5.2L22 24l-6.5-3.2Z" fill="#fff" opacity=".72"/>
+                    <path d="M33 18v6.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" opacity=".9"/>
+                    <defs><linearGradient id="bmg" x1="0" y1="0" x2="44" y2="44">
+                        <stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/>
+                    </linearGradient></defs>
+                </svg>
+                <span class="brand-word">Learners Track</span>
+            </div>
+            <h2 class="auth-hero-title" id="authHeroTitle">Cada logro de tus estudiantes, en un solo lugar.</h2>
+            <p class="auth-hero-sub" id="authHeroSub">Insignias, notas, certificados y planeaciones con IA para tu salón.</p>
+
+            <!-- Ilustración -->
+            <svg class="auth-illustration" viewBox="0 0 420 300" role="img" aria-labelledby="illoTitle">
+                <title id="illoTitle">Ilustración de seguimiento estudiantil</title>
+                <defs>
+                    <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+                    <linearGradient id="gB" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#22d3ee"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+                    <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fbbf24"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+                </defs>
+                <circle cx="340" cy="70" r="78" fill="#fff" opacity=".07"/>
+                <circle cx="72" cy="240" r="58" fill="#fff" opacity=".06"/>
+                <!-- Tarjeta con gráfico -->
+                <g transform="translate(38 74)">
+                    <rect width="212" height="150" rx="16" fill="#fff" opacity=".97"/>
+                    <rect x="18" y="18" width="86" height="9" rx="4.5" fill="#c7d2fe"/>
+                    <rect x="18" y="34" width="54" height="7" rx="3.5" fill="#e0e7ff"/>
+                    <rect x="18" y="96" width="26" height="36" rx="6" fill="url(#gB)"/>
+                    <rect x="54" y="80" width="26" height="52" rx="6" fill="url(#gA)"/>
+                    <rect x="90" y="62" width="26" height="70" rx="6" fill="url(#gA)"/>
+                    <rect x="126" y="44" width="26" height="88" rx="6" fill="url(#gC)"/>
+                    <rect x="162" y="70" width="26" height="62" rx="6" fill="url(#gB)"/>
+                    <path d="M31 92 67 76l36-18 36-18 36 26" fill="none" stroke="#4f46e5" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+                </g>
+                <!-- Insignia grande -->
+                <g transform="translate(268 128)">
+                    <circle cx="46" cy="46" r="46" fill="#fff" opacity=".97"/>
+                    <circle cx="46" cy="46" r="36" fill="none" stroke="url(#gC)" stroke-width="3.5"/>
+                    <path d="M46 26l5.9 12.6 13.6 1.9-9.9 9.9 2.4 13.9L46 57.6 33.9 64.3l2.4-13.9-9.9-9.9 13.6-1.9L46 26Z" fill="url(#gC)"/>
+                </g>
+                <!-- Insignias pequeñas flotantes -->
+                <g>
+                    <circle cx="286" cy="56" r="24" fill="#fff" opacity=".95"/>
+                    <path d="M286 44l3.2 6.9 7.4 1-5.4 5.4 1.3 7.6-6.5-3.6-6.5 3.6 1.3-7.6-5.4-5.4 7.4-1L286 44Z" fill="url(#gA)"/>
+                    <circle cx="356" cy="212" r="21" fill="#fff" opacity=".92"/>
+                    <path d="M348 212h16M356 204v16" stroke="url(#gB)" stroke-width="3.6" stroke-linecap="round"/>
+                    <circle cx="196" cy="252" r="18" fill="#fff" opacity=".9"/>
+                    <path d="M189 252l5 5 9-10" fill="none" stroke="#10b981" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+            </svg>
+
+            <ul class="auth-features">
+                <li><span class="feat-ico">🏅</span><span id="featBadges">Insignias que puedes arrastrar o tocar</span></li>
+                <li><span class="feat-ico">📄</span><span id="featCerts">Certificados de todo el curso en un clic</span></li>
+                <li><span class="feat-ico">✨</span><span id="featAI">Planeaciones y análisis con IA</span></li>
+            </ul>
+        </div>
+      </aside>
+
+      <!-- Panel del formulario -->
+      <div class="auth-card">
+        <div class="auth-logo" aria-hidden="true">🎓</div>
         <h1 class="auth-title" id="authTitle">Learners Track</h1>
         <p id="authSubtitle">Sign in to your account</p>
         <div id="cloudStatusPill" style="display:inline-block;font-size:0.8rem;font-weight:700;padding:5px 12px;border-radius:999px;margin-bottom:14px;"></div>
@@ -385,6 +550,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <button type="submit" class="auth-button" id="registerBtn">Register</button>
             <div class="auth-switch"><span id="haveAccountText">Already have an account?</span> <a href="#" id="showLoginLink" role="button">Sign In</a></div>
         </form>
+      </div>
     </div>
 </div>
 
@@ -418,8 +584,16 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
         <div class="topbar-left">
             <div class="app-title-wrapper">
                 <img id="institutionLogoSmall" class="institution-logo-small" style="display:none;" src="" alt="Logo">
-                <div class="app-title" id="appTitle">Learners Track</div>
-                <div class="user-welcome" id="userWelcome">User: <span id="teacherNameDisplay">Teacher</span></div>
+                <svg class="topbar-mark" id="topbarMark" viewBox="0 0 44 44" aria-hidden="true">
+                    <rect x="2" y="2" width="40" height="40" rx="12" fill="rgba(255,255,255,.20)"/>
+                    <path d="M22 12.5 33 18l-11 5.5L11 18l11-5.5Z" fill="#fff"/>
+                    <path d="M15.5 20.8V26c0 2.2 2.9 4 6.5 4s6.5-1.8 6.5-4v-5.2L22 24l-6.5-3.2Z" fill="#fff" opacity=".7"/>
+                    <path d="M33 18v6.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+                <div class="app-title-text">
+                    <div class="app-title" id="appTitle">Learners Track</div>
+                    <div class="user-welcome" id="userWelcome">User: <span id="teacherNameDisplay">Teacher</span></div>
+                </div>
             </div>
         </div>
         <div class="topbar-center"><div id="classroomSelector" class="classroom-selector"></div></div>
@@ -430,8 +604,12 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <button id="logoutBtn" type="button" class="profile-btn">🚪 Logout</button>
         </div>
     </nav>
-    <div class="header">
-        <p id="headerDescription">Educational platform for student tracking and recognition.<br><span style="font-size:1em;opacity:.77"><b>Tip:</b> Drag badges onto students or days.<br>Use PDF, statistics and scores options for complete tracking.</span></p>
+    <div class="header" id="headerTipWrap">
+        <div class="header-tip">
+            <span class="tip-ico" aria-hidden="true">💡</span>
+            <span id="headerDescription">Tap a badge, then tap a cell to award it. Hold <b>Shift</b> to award it to the whole row.</span>
+            <button type="button" id="dismissTipBtn" title="Ocultar" aria-label="Ocultar consejo" onclick="dismissHeaderTip()">&times;</button>
+        </div>
     </div>
     <div class="view-mode-selector">
         <span id="viewLabel">View:</span>
@@ -459,24 +637,35 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <h3 id="availableBadgesTitle">🏆 Available Badges</h3>
             <div class="badges-container" id="badgesContainer"></div>
             <button class="add-badge-btn" onclick="openBadgeModal()">➕ <span id="addBadgeText">Add Badge</span></button>
-            <div class="controls">
-                <div class="control-group"><label for="className" id="classNameLabel">Classroom Name:</label><input type="text" id="className" placeholder="e.g: Grade 5 - Section B"></div>
-                <div class="control-group"><label for="schoolName" id="schoolNameLabel">Institution:</label><input type="text" id="schoolName" placeholder="Institution name"></div>
-                <button class="export-btn" id="exportPdfBtn">📄 Export Full Report PDF</button>
+
+            <div class="side-section">
+                <h3 class="side-heading" id="sideClassHeading">🏫 <span>Aula</span></h3>
+                <div class="controls">
+                    <div class="control-group"><label for="className" id="classNameLabel">Classroom Name:</label><input type="text" id="className" placeholder="e.g: Grade 5 - Section B"></div>
+                    <div class="control-group"><label for="schoolName" id="schoolNameLabel">Institution:</label><input type="text" id="schoolName" placeholder="Institution name"></div>
+                </div>
+                <button class="side-btn" onclick="openImportModal()"><span class="sb-ico green">📋</span><span id="importStudentsBtnText">Import list</span></button>
+                <button class="side-btn" onclick="goToStatisticsPage()"><span class="sb-ico blue">📊</span><span id="statisticsBtnText">Course Statistics</span></button>
+                <button class="side-btn" id="exportPdfBtn"><span class="sb-ico slate">📄</span><span id="exportPdfBtnText">Export Full Report PDF</span></button>
             </div>
-            <button class="obtener-estadisticas-btn" style="background:var(--success);" onclick="openImportModal()">📋 <span id="importStudentsBtnText">Import list</span></button>
-            <button class="obtener-estadisticas-btn" onclick="goToStatisticsPage()">📊 Course Statistics</button>
-            <button class="ai-analysis-btn" onclick="openAIAnalysisModal()">🤖 AI Classroom Analysis</button>
-            <button class="ai-analysis-btn" onclick="weeklySummaryAI()" style="margin-top:10px;background:linear-gradient(135deg,#20d184 0%,#4facfe 100%);">📅 <span id="weeklySummaryBtnText">Weekly summary (AI)</span></button>
-            <button class="ai-analysis-btn" onclick="openAiChatModal()" style="margin-top:10px;background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);">💬 Hablar con el Asistente IA</button>
-            <button class="ai-analysis-btn" onclick="openLessonPlanModal()" style="margin-top:10px;background:linear-gradient(135deg,#f39c12 0%,#e8617d 100%);">📝 <span id="lessonPlanBtnText">Planeaciones (IA)</span></button>
-            <button class="ai-analysis-btn" onclick="openApiKeySettingsModal()" style="margin-top:10px;background:linear-gradient(135deg,#232946 0%,#667eea 100%);">🔐 Configurar IA</button>
+
+            <div class="side-section side-section-ai">
+                <h3 class="side-heading" id="sideAiHeading">✨ <span>Inteligencia artificial</span></h3>
+                <button class="side-btn" onclick="openLessonPlanModal()"><span class="sb-ico amber">📝</span><span id="lessonPlanBtnText">Planeaciones (IA)</span></button>
+                <button class="side-btn" onclick="openAIAnalysisModal()"><span class="sb-ico violet">🤖</span><span id="aiAnalysisBtnText">AI Classroom Analysis</span></button>
+                <button class="side-btn" onclick="weeklySummaryAI()"><span class="sb-ico teal">📅</span><span id="weeklySummaryBtnText">Weekly summary (AI)</span></button>
+                <button class="side-btn" onclick="openAiChatModal()"><span class="sb-ico sky">💬</span><span id="aiChatBtnText">Asistente IA</span></button>
+                <button class="side-btn side-btn-quiet" onclick="openApiKeySettingsModal()"><span class="sb-ico slate">🔐</span><span id="aiConfigBtnText">Configurar IA</span></button>
+            </div>
+
             <div class="stats">
                 <h4 id="statsTitle">📊 Statistics</h4>
-                <div class="stat-item"><span id="studentsLabel">Students:</span> <span id="studentCount">0</span></div>
-                <div class="stat-item"><span id="badgesAwardedLabel">Badges awarded:</span> <span id="badgeCount">0</span></div>
-                <div class="stat-item"><span id="avgBadgesLabel">Avg badges/student:</span> <span id="avgBadgeCount">0</span></div>
-                <div class="stat-item"><span id="commentsLabel">Comments written:</span> <span id="commentsCount">0</span></div>
+                <div class="stat-grid">
+                    <div class="stat-tile"><span class="stat-num" id="studentCount">0</span><span class="stat-lbl" id="studentsLabel">Students:</span></div>
+                    <div class="stat-tile"><span class="stat-num" id="badgeCount">0</span><span class="stat-lbl" id="badgesAwardedLabel">Badges awarded:</span></div>
+                    <div class="stat-tile"><span class="stat-num" id="avgBadgeCount">0</span><span class="stat-lbl" id="avgBadgesLabel">Avg badges/student:</span></div>
+                    <div class="stat-tile"><span class="stat-num" id="commentsCount">0</span><span class="stat-lbl" id="commentsLabel">Comments written:</span></div>
+                </div>
             </div>
         </aside>
         <section class="classroom">
@@ -958,7 +1147,7 @@ function formatBytes(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.
 const translations = {
     en: {
         appTitle:"Learners Track", userWelcome:"User:", profileBtn:"👤 Profile", logoutBtn:"🚪 Logout",
-        headerDescription:"Educational platform for student tracking and recognition.<br><span style='font-size:1em;opacity:.77'><b>Tip:</b> Tap a badge, then tap a cell to award it (works on tablets). You can also drag it.<br>Hold <b>Shift</b> while dropping to award it to the whole row.</span>",
+        headerDescription:"<b>Tip:</b> tap a badge, then tap a cell to award it — works on tablets. You can also drag it. Hold <b>Shift</b> to award it to the whole row.",
         viewLabel:"View:", weeklyRows:"Weekly Rows", weeklyGrid:"Weekly Grid", scores:"SCORES",
         export:"📥 Export", exportViewPdf:"📄 Current View PDF", exportViewExcel:"📊 Current View Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Badges PDF",
@@ -1005,7 +1194,7 @@ const translations = {
     },
     es: {
         appTitle:"Learners Track", userWelcome:"Usuario:", profileBtn:"👤 Perfil", logoutBtn:"🚪 Cerrar Sesión",
-        headerDescription:"Plataforma educativa para seguimiento y reconocimiento estudiantil.<br><span style='font-size:1em;opacity:.77'><b>Consejo:</b> Toca una insignia y luego la celda para otorgarla (funciona en tablet). También puedes arrastrarla.<br>Mantén <b>Shift</b> al soltarla para otorgarla a toda la fila.</span>",
+        headerDescription:"<b>Consejo:</b> toca una insignia y luego la celda para otorgarla — funciona en tablet. También puedes arrastrarla. Mantén <b>Shift</b> para otorgarla a toda la fila.",
         viewLabel:"Vista:", weeklyRows:"Filas semanales", weeklyGrid:"Cuadrícula semanal", scores:"SCORES",
         export:"📥 Exportar", exportViewPdf:"📄 Vista Actual PDF", exportViewExcel:"📊 Vista Actual Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Insignias PDF",
@@ -1081,7 +1270,7 @@ function updateUIText() {
         ['appTitle','textContent',t.appTitle],['profileBtn','innerHTML',t.profileBtn],['logoutBtn','innerHTML',t.logoutBtn],
         ['headerDescription','innerHTML',t.headerDescription],['viewLabel','textContent',t.viewLabel],
         ['viewRowsBtn','textContent',t.weeklyRows],['viewGridBtn','textContent',t.weeklyGrid],['viewScoresBtn','textContent',t.scores],
-        ['exportPdfBtn','textContent',t.exportFullPdf],['availableBadgesTitle','textContent',t.availableBadges],
+        ['availableBadgesTitle','textContent',t.availableBadges],
         ['addBadgeText','textContent',currentLanguage==='es'?'Agregar Insignia':'Add Badge'],
         ['classNameLabel','textContent',t.classNameLabel],['schoolNameLabel','textContent',t.schoolNameLabel],
         ['statisticsBtn','textContent',t.statisticsBtn],['statsTitle','textContent',t.statsTitle],
@@ -1135,6 +1324,21 @@ function updateUIText() {
     updateNewFeaturesText();
     const mc = document.getElementById('mainContainer');
     if(mc && mc.style.display!=='none') renderCurrentView();
+}
+
+// El consejo de la cabecera se puede ocultar; la preferencia queda en este equipo.
+window.dismissHeaderTip=function(){
+    const w=document.getElementById('headerTipWrap');
+    if(w) w.style.display='none';
+    try{ localStorage.setItem('learnersTrackHideTip','1'); }catch(e){}
+};
+function applyHeaderTipPreference(){
+    try{
+        if(localStorage.getItem('learnersTrackHideTip')==='1'){
+            const w=document.getElementById('headerTipWrap');
+            if(w) w.style.display='none';
+        }
+    }catch(e){}
 }
 
 // === NOTIFICATIONS ===
@@ -1720,9 +1924,27 @@ function studentNameCellHtml(s,opts){
 // Estado vacio con boton para anadir el primer estudiante.
 function emptyClassroomHtml(){
     const es=currentLanguage==='es';
-    return `<div class="empty-state"><p>${es?'Todavía no hay estudiantes en este salón.':'No students in this classroom yet.'}</p>`
-        + `<button class="add-student-btn" type="button" onclick="addStudentAt(0)">${es?'➕ Añadir estudiante':'➕ Add student'}</button> `
-        + `<button class="add-student-btn" type="button" style="background:var(--success);" onclick="openImportModal()">${es?'📋 Importar lista':'📋 Import list'}</button></div>`;
+    // Ilustración SVG en línea: no depende de archivos externos y se adapta al tema.
+    const illo=`<svg class="empty-illo" viewBox="0 0 240 160" aria-hidden="true">
+        <defs><linearGradient id="eg1" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="var(--accent)" stop-opacity=".85"/><stop offset="1" stop-color="var(--brand-2)" stop-opacity=".85"/>
+        </linearGradient></defs>
+        <ellipse cx="120" cy="140" rx="76" ry="9" fill="var(--accent)" opacity=".10"/>
+        <rect x="52" y="34" width="136" height="94" rx="12" fill="var(--bg-alt)" stroke="var(--border)" stroke-width="2"/>
+        <rect x="68" y="52" width="60" height="8" rx="4" fill="var(--border)"/>
+        <rect x="68" y="70" width="104" height="6" rx="3" fill="var(--border)" opacity=".65"/>
+        <rect x="68" y="84" width="88" height="6" rx="3" fill="var(--border)" opacity=".65"/>
+        <rect x="68" y="98" width="72" height="6" rx="3" fill="var(--border)" opacity=".65"/>
+        <circle cx="176" cy="46" r="21" fill="url(#eg1)"/>
+        <path d="M176 37v18M167 46h18" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
+    </svg>`;
+    return `<div class="empty-state">${illo}`
+        + `<h4>${es?'Este salón está vacío':'This classroom is empty'}</h4>`
+        + `<p>${es?'Añade a tus estudiantes uno a uno o pega la lista completa desde Excel.':'Add your students one by one, or paste the whole list from Excel.'}</p>`
+        + `<div class="empty-actions">`
+        + `<button class="btn-primary" type="button" onclick="addStudentAt(0)">${es?'➕ Añadir estudiante':'➕ Add student'}</button>`
+        + `<button class="add-student-btn" type="button" onclick="openImportModal()">${es?'📋 Importar lista':'📋 Import list'}</button>`
+        + `</div></div>`;
 }
 function renderClassroomGrid() {
     const gc=document.getElementById("classroomGridView"); if(!gc)return; gc.innerHTML='';
@@ -2761,6 +2983,26 @@ function updateNewFeaturesText(){
     if(document.getElementById('bulkCertPreview')&&document.getElementById('bulkCertModal')?.style.display==='flex') renderBulkCertPreview();
     // --- Planeaciones ---
     const lpb=document.getElementById('lessonPlanBtnText'); if(lpb)lpb.textContent=es?'Planeaciones (IA)':'Lesson plans (AI)';
+    // --- Barra lateral e interfaz ---
+    const sch=document.querySelector('#sideClassHeading span'); if(sch)sch.textContent=es?'Aula':'Classroom';
+    const sah=document.querySelector('#sideAiHeading span'); if(sah)sah.textContent=es?'Inteligencia artificial':'Artificial intelligence';
+    setTxt('statisticsBtnText','Estadísticas del curso','Course statistics');
+    setTxt('exportPdfBtnText','Reporte completo en PDF','Full report PDF');
+    setTxt('aiAnalysisBtnText','Analizar salón con IA','AI classroom analysis');
+    setTxt('aiChatBtnText','Asistente IA','AI assistant');
+    setTxt('aiConfigBtnText','Configurar IA','Configure AI');
+    const dtb=document.getElementById('dismissTipBtn'); if(dtb)dtb.title=es?'Ocultar':'Hide';
+    setTxt('authHeroTitle','Cada logro de tus estudiantes, en un solo lugar.','Every student achievement, in one place.');
+    setTxt('authHeroSub','Insignias, notas, certificados y planeaciones con IA para tu salón.','Badges, scores, certificates and AI lesson plans for your classroom.');
+    setTxt('featBadges','Insignias que puedes arrastrar o tocar','Badges you can drag or tap');
+    setTxt('featCerts','Certificados de todo el curso en un clic','Whole-class certificates in one click');
+    setTxt('featAI','Planeaciones y análisis con IA','AI lesson plans and analysis');
+    // Las etiquetas de estadísticas ahora van debajo del número: sobra el dos puntos.
+    ['studentsLabel','badgesAwardedLabel','avgBadgesLabel','commentsLabel'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.textContent=el.textContent.replace(/:\s*$/,'');
+    });
+    applyHeaderTipPreference();
     setTxt('lpTitle','📝 Planeaciones con IA','📝 AI Lesson Plans');
     setTxt('lpIntro','Sube tus planeaciones para que la IA aprenda tu estilo, y genera la de la próxima clase en Word.','Upload your lesson plans so the AI learns your style, then generate the next class as a Word file.');
     setTxt('lpTabMineText','Mis planeaciones','My lesson plans');
