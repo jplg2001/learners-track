@@ -475,6 +475,29 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .lp-result th,.lp-result td { border:1px solid var(--badge-border); padding:6px 8px; text-align:left; vertical-align:top; }
 .lp-result th { background:var(--accent); color:#fff; }
 @media (max-width:600px){ .lp-tab { padding:8px 9px; font-size:0.86em; } .lesson-plan-content { padding:26px 16px 18px; } }
+/* --- Material de apoyo y ajustes --- */
+.lp-attach-zone { display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; border:1.5px dashed var(--badge-border); border-radius:var(--radius-sm); padding:14px 12px; cursor:pointer; background:var(--bg-card); transition:var(--transition); font-size:.87rem; font-weight:600; }
+.lp-attach-zone:hover,.lp-attach-zone.dragging { border-color:var(--accent); background:var(--accent-soft); }
+.lp-attach-ico { font-size:1.2rem; }
+.lp-attach-hint { font-size:.76rem; font-weight:400; opacity:.7; }
+.lp-attach-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:9px; }
+.lp-attach-item { position:relative; display:flex; align-items:center; gap:7px; background:var(--bg-alt); border:1px solid var(--border); border-radius:10px; padding:6px 9px 6px 6px; font-size:.8rem; max-width:190px; }
+.lp-attach-thumb { width:34px; height:34px; border-radius:7px; object-fit:cover; flex-shrink:0; border:1px solid var(--border); }
+.lp-attach-doc { width:34px; height:34px; border-radius:7px; display:grid; place-items:center; background:var(--accent-soft); flex-shrink:0; font-size:1rem; }
+.lp-attach-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.lp-attach-item button { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1rem; padding:0 2px; line-height:1; border-radius:4px; flex-shrink:0; }
+.lp-attach-item button:hover { background:rgba(239,68,103,.14); }
+.lp-refine { margin-top:14px; background:var(--accent-soft); border:1px solid var(--badge-border); border-radius:var(--radius); padding:14px 15px; }
+.lp-refine h4 { margin:0 0 4px; color:var(--accent-strong); font-size:.98rem; }
+.lp-refine-help { margin:0 0 9px; font-size:.82rem; opacity:.8; line-height:1.45; }
+.lp-refine textarea { width:100%; box-sizing:border-box; border-radius:var(--radius-sm); border:1.5px solid var(--border); padding:10px 12px; font-family:inherit; font-size:.92rem; background:var(--bg-alt); color:var(--fg); resize:vertical; }
+.lp-refine textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3.5px var(--accent-soft); }
+.lp-refine-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:9px; }
+.lp-refine-actions .btn-ai { margin-left:auto; }
+.lp-refine-log { margin-top:10px; display:flex; flex-direction:column; gap:5px; }
+.lp-refine-log div { font-size:.79rem; opacity:.8; padding-left:16px; position:relative; line-height:1.4; }
+.lp-refine-log div::before { content:'✓'; position:absolute; left:0; color:var(--success); font-weight:700; }
+@media (max-width:600px){ .lp-refine-actions .btn-ai { margin-left:0; width:100%; } }
 /* --- Insignia "armada": toca la insignia y luego la celda (funciona en tablet/movil) --- */
 .badge.badge-armed { border-color:var(--success) !important; box-shadow:0 0 0 3px rgba(32,209,132,0.5); transform:translateY(-3px); }
 .badge-armed-hint { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:var(--accent-strong); color:#fff; padding:11px 20px; border-radius:999px; font-weight:700; z-index:2500; box-shadow:0 6px 22px rgba(0,0,0,0.28); font-size:0.95em; display:flex; align-items:center; gap:12px; max-width:92vw; }
@@ -1077,8 +1100,34 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
                 <input type="checkbox" id="lpUseClassData" style="width:auto;transform:scale(1.1);">
                 <label for="lpUseClassData" id="lpUseClassDataLabel" style="margin:0;cursor:pointer;">Tener en cuenta el rendimiento actual de mi salón</label>
             </div>
+
+            <!-- Material de apoyo del docente: fotos, páginas del libro, actividades -->
+            <div class="form-group">
+                <label id="lpAttachLabel">Material de apoyo (opcional):</label>
+                <div class="lp-attach-zone" id="lpAttachZone" role="button" tabindex="0">
+                    <span class="lp-attach-ico" aria-hidden="true">📎</span>
+                    <span id="lpAttachText">Arrastra fotos, páginas del libro o actividades — o pulsa para elegirlas</span>
+                    <span class="lp-attach-hint" id="lpAttachHint">Fotos (JPG, PNG), PDF, Word o texto · máx. 5</span>
+                </div>
+                <input type="file" id="lpAttachInput" accept="image/*,.pdf,.docx,.txt,.md" multiple style="display:none;">
+                <div id="lpAttachList" class="lp-attach-list"></div>
+            </div>
+
             <div id="lpGenStatus" class="lp-gen-status" style="display:none;"></div>
             <div id="lpResult" class="lp-result" style="display:none;"></div>
+
+            <!-- Ajustes sobre la planeación ya generada -->
+            <div id="lpRefineBlock" class="lp-refine" style="display:none;">
+                <h4 id="lpRefineTitle">✏️ ¿Quieres cambiar o añadir algo?</h4>
+                <p class="lp-refine-help" id="lpRefineHelp">Pídelo con tus palabras. Puedes adjuntar una foto de la actividad que quieres incluir.</p>
+                <textarea id="lpRefineInput" rows="2" placeholder="Ej: añade una actividad de speaking en parejas de 10 minutos"></textarea>
+                <div class="lp-refine-actions">
+                    <button type="button" class="btn-secondary" id="lpRefineAttachBtn" onclick="document.getElementById('lpAttachInput').click()">📎 <span id="lpRefineAttachText">Adjuntar</span></button>
+                    <button type="button" class="btn-secondary" id="lpUndoBtn" onclick="undoLessonPlanRevision()" style="display:none;">↩ <span id="lpUndoText">Deshacer</span></button>
+                    <button type="button" class="btn-ai" id="lpRefineBtn" onclick="refineLessonPlan()">✨ <span id="lpRefineBtnText">Aplicar cambios</span></button>
+                </div>
+                <div id="lpRefineLog" class="lp-refine-log"></div>
+            </div>
             <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;">
                 <button type="button" class="btn-secondary" onclick="closeLessonPlanModal()" id="lpCloseBtn">Cerrar</button>
                 <button type="button" class="btn-ai" id="lpGenerateBtn" onclick="generateLessonPlan()">✨ Generar planeación</button>
@@ -3308,7 +3357,16 @@ function updateNewFeaturesText(){
     setTxt('lpCloseBtn','Cerrar','Close');
     setTxt('lpGenerateBtn','✨ Generar planeación','✨ Generate lesson plan');
     setTxt('lpDownloadBtn','📄 Descargar Word','📄 Download Word');
+    setTxt('lpAttachLabel','Material de apoyo (opcional):','Support material (optional):');
+    setTxt('lpAttachText','Arrastra fotos, páginas del libro o actividades — o pulsa para elegirlas','Drag photos, book pages or activities — or click to choose them');
+    setTxt('lpAttachHint','Fotos (JPG, PNG), PDF, Word o texto · máx. 5','Photos (JPG, PNG), PDF, Word or text · max 5');
+    setTxt('lpRefineTitle','✏️ ¿Quieres cambiar o añadir algo?','✏️ Want to change or add something?');
+    setTxt('lpRefineHelp','Pídelo con tus palabras. Puedes adjuntar una foto de la actividad que quieres incluir.','Ask in your own words. You can attach a photo of the activity you want to include.');
+    setTxt('lpRefineAttachText','Adjuntar','Attach');
+    setTxt('lpUndoText','Deshacer','Undo');
+    setTxt('lpRefineBtnText','Aplicar cambios','Apply changes');
     const ph=(id,e,i)=>{const el=document.getElementById(id); if(el)el.placeholder=es?e:i;};
+    ph('lpRefineInput','Ej: añade una actividad de speaking en parejas de 10 minutos','E.g.: add a 10-minute paired speaking activity');
     ph('lpPasteName','Nombre de la planeación','Lesson plan name');
     ph('lpPasteText','Pega aquí el contenido de tu planeación...','Paste your lesson plan content here...');
     ph('lpTopic','Ej: Fracciones equivalentes','E.g.: Equivalent fractions');
@@ -3902,6 +3960,9 @@ window.openLessonPlanModal=function(){
     switchLessonPlanTab('mine');
     const res=document.getElementById('lpResult'); if(res){res.style.display='none';res.innerHTML='';}
     const dl=document.getElementById('lpDownloadBtn'); if(dl)dl.style.display='none';
+    const refino=document.getElementById('lpRefineBlock'); if(refino)refino.style.display='none';
+    const ri=document.getElementById('lpRefineInput'); if(ri)ri.value='';
+    lastGeneratedPlan=null; lpRevisions=[]; renderRefineLog(); clearLpAttachments();
     showModal('lessonPlanModal');
 };
 window.closeLessonPlanModal=function(){ hideModal('lessonPlanModal'); };
@@ -3975,15 +4036,81 @@ function parseAiJson(texto){
     if(ini>0||fin<s.length-1){ if(ini!==-1&&fin!==-1) s=s.slice(ini,fin+1); }
     return JSON.parse(s);
 }
-async function callGeminiJson(prompt){
+// Acepta varias partes: texto e imágenes. Gemini es multimodal, así que una foto
+// de la página del libro se envía tal cual y el modelo la lee.
+async function callGeminiJsonParts(parts){
     const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent?key='+encodeURIComponent(GEMINI_API_KEY),{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{ responseMimeType:'application/json', temperature:0.7 } })
+        body:JSON.stringify({ contents:[{parts}], generationConfig:{ responseMimeType:'application/json', temperature:0.7 } })
     });
     const data=await res.json();
     const texto=data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if(!res.ok||data?.error||!texto) throw new Error(data?.error?.message||'La IA no devolvió respuesta');
     return parseAiJson(texto);
+}
+async function callGeminiJson(prompt){ return callGeminiJsonParts([{text:prompt}]); }
+
+// === MATERIAL DE APOYO DEL DOCENTE ===
+// Las imágenes viajan como inlineData (el modelo las mira); los documentos se
+// convierten a texto con el mismo extractor que ya usan las planeaciones subidas.
+let lpAttachments = [];
+const LP_ATTACH_MAX = 5;
+function renderLpAttachments(){
+    const box=document.getElementById('lpAttachList'); if(!box) return;
+    const es=currentLanguage==='es';
+    box.innerHTML=lpAttachments.map(a=>{
+        const vista=a.kind==='image'
+            ? `<img class="lp-attach-thumb" src="${escapeHtml(a.dataUrl)}" alt="">`
+            : `<span class="lp-attach-doc" aria-hidden="true">📄</span>`;
+        return `<div class="lp-attach-item">${vista}`
+            + `<span class="lp-attach-name" title="${escapeHtml(a.name)}">${escapeHtml(a.name)}</span>`
+            + `<button type="button" aria-label="${es?'Quitar ':'Remove '}${escapeHtml(a.name)}" onclick="removeLpAttachment('${a.id}')">×</button></div>`;
+    }).join('');
+}
+window.removeLpAttachment=function(id){ lpAttachments=lpAttachments.filter(a=>a.id!==id); renderLpAttachments(); };
+window.clearLpAttachments=function(){ lpAttachments=[]; renderLpAttachments(); };
+async function addLpAttachments(files){
+    const es=currentLanguage==='es';
+    const lista=[...files]; if(!lista.length) return;
+    const zona=document.getElementById('lpAttachZone');
+    const original=zona?zona.innerHTML:'';
+    for(const f of lista){
+        if(lpAttachments.length>=LP_ATTACH_MAX){
+            showNotification(es?`Máximo ${LP_ATTACH_MAX} archivos de apoyo`:`Maximum ${LP_ATTACH_MAX} support files`,'error');
+            break;
+        }
+        if(zona) zona.innerHTML=`<span>⏳ ${es?'Procesando':'Processing'} ${escapeHtml(f.name)}…</span>`;
+        try{
+            if((f.type||'').startsWith('image/')){
+                // 1400 px conserva legible el texto de una foto de un libro,
+                // sin enviar los 4-8 MB que pesa la foto original del móvil.
+                const dataUrl=await compressImageFile(f,1400,0.82);
+                lpAttachments.push({ id:'at'+Date.now()+Math.random().toString(36).slice(2,6),
+                    kind:'image', name:f.name, mime:'image/jpeg', dataUrl });
+            } else {
+                const texto=await extractTextFromFile(f);
+                if(!texto.trim()) throw new Error(es?'sin texto legible':'no readable text');
+                lpAttachments.push({ id:'at'+Date.now()+Math.random().toString(36).slice(2,6),
+                    kind:'text', name:f.name, text:texto.slice(0,12000) });
+            }
+        }catch(err){
+            console.error(err);
+            showNotification(`${f.name}: ${err.message||(es?'no se pudo leer':'could not be read')}`,'error');
+        }
+    }
+    if(zona) zona.innerHTML=original;
+    renderLpAttachments();
+}
+// Convierte los adjuntos en partes para la petición a Gemini.
+function lpAttachmentParts(){
+    const partes=[], textos=[];
+    lpAttachments.forEach(a=>{
+        if(a.kind==='image') partes.push({inlineData:{mimeType:a.mime, data:a.dataUrl.split(',')[1]}});
+        else textos.push(`--- ${a.name} ---\n${a.text}`);
+    });
+    if(textos.length) partes.unshift({text:'MATERIAL ADJUNTO POR EL DOCENTE (documentos):\n'+textos.join('\n\n')});
+    if(partes.length) partes.unshift({text:'El docente adjuntó el siguiente material de apoyo. Incorpóralo a la planeación de forma concreta: si es una actividad, intégrala en la secuencia; si es una página de libro, apóyate en su contenido.'});
+    return partes;
 }
 
 window.analyzeTeachingStyle=async function(){
@@ -4083,16 +4210,90 @@ window.generateLessonPlan=async function(){
               + '\n\nThe sequence must have 3 to 6 stages (at least opening, development, closing) whose times add up to the given duration. Be concrete and actionable. Write in English.')
             + '\n\nDATOS DE LA CLASE:\n'+JSON.stringify(datos)
             + estilo + contextoSalon;
-        const plan=await callGeminiJson(prompt);
+        const plan=await callGeminiJsonParts([{text:prompt}, ...lpAttachmentParts()]);
         plan.fecha=plan.fecha||datos.fecha;
         plan.titulo=plan.titulo||tema;
         lastGeneratedPlan=plan;
+        lpRevisions=[]; renderRefineLog();
         renderLessonPlanPreview(plan);
         if(dl) dl.style.display='';
-        showNotification(es?'Planeación lista. Revísala y descárgala en Word.':'Lesson plan ready. Review it and download as Word.','success');
+        const refino=document.getElementById('lpRefineBlock'); if(refino) refino.style.display='block';
+        clearLpAttachments();
+        showNotification(es?'Planeación lista. Revísala, pídele ajustes o descárgala en Word.':'Lesson plan ready. Review it, ask for changes or download as Word.','success');
     }catch(err){
         console.error(err);
         showNotification((es?'Error al generar: ':'Generation error: ')+(err.message||''),'error');
+    }finally{
+        if(btn) btn.disabled=false;
+        if(status){ status.style.display='none'; status.innerHTML=''; }
+    }
+};
+
+// === AJUSTES SOBRE LA PLANEACIÓN GENERADA ===
+// El docente pide cambios con sus palabras y puede adjuntar fotos de la actividad
+// que quiere incluir. Se guarda el historial para poder deshacer.
+let lpRevisions = [];
+function renderRefineLog(){
+    const log=document.getElementById('lpRefineLog'); if(!log) return;
+    log.innerHTML=lpRevisions.map(r=>`<div>${escapeHtml(r.instruccion)}</div>`).join('');
+    const undo=document.getElementById('lpUndoBtn');
+    if(undo) undo.style.display=lpRevisions.length?'':'none';
+}
+window.undoLessonPlanRevision=function(){
+    const es=currentLanguage==='es';
+    if(!lpRevisions.length) return;
+    const ultima=lpRevisions.pop();
+    lastGeneratedPlan=ultima.anterior;
+    renderLessonPlanPreview(lastGeneratedPlan);
+    renderRefineLog();
+    showNotification(es?'Cambio deshecho':'Change undone','info');
+};
+window.refineLessonPlan=async function(){
+    const es=currentLanguage==='es';
+    if(!hasApiKey()){ ensureAiKey(); return; }
+    if(!lastGeneratedPlan){ showNotification(es?'Primero genera una planeación':'Generate a lesson plan first','error'); return; }
+    const input=document.getElementById('lpRefineInput');
+    const instruccion=input?input.value.trim():'';
+    if(!instruccion && lpAttachments.length===0){
+        showNotification(es?'Escribe qué quieres cambiar o adjunta un material':'Describe the change or attach some material','error');
+        if(input) input.focus();
+        return;
+    }
+    const btn=document.getElementById('lpRefineBtn');
+    const status=document.getElementById('lpGenStatus');
+    if(btn) btn.disabled=true;
+    if(status){ status.style.display='block'; status.innerHTML=`<div class="ai-loading-spinner"></div><p>${es?'Aplicando tus cambios...':'Applying your changes...'}</p>`; }
+    try{
+        const esquema='{"titulo":string,"asignatura":string,"grado":string,"duracion":string,"fecha":string,'
+            + '"objetivoGeneral":string,"objetivosEspecificos":[string],"estandares":[string],"materiales":[string],'
+            + '"vocabularioClave":[string],'
+            + '"secuencia":[{"momento":string,"tiempo":string,"actividadDocente":string,"actividadEstudiante":string,"recursos":string}],'
+            + '"diferenciacion":{"apoyo":string,"extension":string},'
+            + '"evaluacion":{"formativa":string,"sumativa":string,"criterios":[string]},'
+            + '"tarea":string,"notasDocente":string}';
+        const prompt=(es
+            ? 'Eres un docente experto ajustando una planeación de clase que YA existe. Aplica exactamente lo que pide el docente y devuelve la planeación COMPLETA y actualizada.\n'
+              + 'Reglas: conserva sin cambios todo lo que el docente no haya pedido modificar; si añade una actividad, intégrala en la secuencia y ajusta los tiempos para que sigan sumando la duración total; mantén el mismo idioma y estilo.\n'
+              + 'Devuelve SOLO un objeto JSON válido con este esquema, sin texto adicional:\n'
+            : 'You are an expert teacher adjusting an EXISTING lesson plan. Apply exactly what the teacher asks and return the COMPLETE updated plan.\n'
+              + 'Rules: keep everything the teacher did not ask to change; if they add an activity, integrate it into the sequence and rebalance the times so they still add up to the total duration; keep the same language and style.\n'
+              + 'Return ONLY a valid JSON object with this schema, no extra text:\n')
+            + esquema
+            + '\n\nPLANEACIÓN ACTUAL:\n' + JSON.stringify(lastGeneratedPlan)
+            + '\n\nLO QUE PIDE EL DOCENTE:\n' + (instruccion || (es?'(sin texto: guíate por el material adjunto)':'(no text: follow the attached material)'));
+        const actualizado=await callGeminiJsonParts([{text:prompt}, ...lpAttachmentParts()]);
+        // Se guarda la versión anterior para poder deshacer.
+        lpRevisions.push({ instruccion: instruccion || (es?'Material adjunto incorporado':'Attached material added'), anterior: lastGeneratedPlan });
+        actualizado.fecha=actualizado.fecha||lastGeneratedPlan.fecha;
+        lastGeneratedPlan=actualizado;
+        renderLessonPlanPreview(actualizado);
+        renderRefineLog();
+        if(input) input.value='';
+        clearLpAttachments();
+        showNotification(es?'Cambios aplicados':'Changes applied','success');
+    }catch(err){
+        console.error(err);
+        showNotification((es?'No se pudieron aplicar los cambios: ':'Could not apply changes: ')+(err.message||''),'error');
     }finally{
         if(btn) btn.disabled=false;
         if(status){ status.style.display='none'; status.innerHTML=''; }
@@ -4168,12 +4369,24 @@ window.downloadLessonPlanDocx=async function(){
 (function(){
     const drop=document.getElementById('lpDropzone');
     const input=document.getElementById('lpFileInput');
-    if(!drop||!input) return;
-    drop.addEventListener('click',()=>input.click());
-    input.addEventListener('change',e=>{ handleLessonPlanFiles(e.target.files); input.value=''; });
-    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('dragging'); }));
-    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('dragging'); }));
-    drop.addEventListener('drop',e=>{ if(e.dataTransfer&&e.dataTransfer.files) handleLessonPlanFiles(e.dataTransfer.files); });
+    if(drop&&input){
+        drop.addEventListener('click',()=>input.click());
+        input.addEventListener('change',e=>{ handleLessonPlanFiles(e.target.files); input.value=''; });
+        ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('dragging'); }));
+        ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('dragging'); }));
+        drop.addEventListener('drop',e=>{ if(e.dataTransfer&&e.dataTransfer.files) handleLessonPlanFiles(e.dataTransfer.files); });
+    }
+    // Material de apoyo (fotos y documentos) para generar y para ajustar.
+    const zona=document.getElementById('lpAttachZone');
+    const attachInput=document.getElementById('lpAttachInput');
+    if(zona&&attachInput){
+        zona.addEventListener('click',()=>attachInput.click());
+        zona.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); attachInput.click(); } });
+        attachInput.addEventListener('change',e=>{ addLpAttachments(e.target.files); attachInput.value=''; });
+        ['dragenter','dragover'].forEach(ev=>zona.addEventListener(ev,e=>{ e.preventDefault(); zona.classList.add('dragging'); }));
+        ['dragleave','drop'].forEach(ev=>zona.addEventListener(ev,e=>{ e.preventDefault(); zona.classList.remove('dragging'); }));
+        zona.addEventListener('drop',e=>{ if(e.dataTransfer&&e.dataTransfer.files) addLpAttachments(e.dataTransfer.files); });
+    }
 })();
 
 // Enviar el chat con Enter (Shift+Enter = salto de línea)
