@@ -418,9 +418,20 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 @keyframes slideIn { from { transform:translateX(-20px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 .fade-enter { animation:fadeIn 0.35s ease; }
 /* ====== JUYU, LA MASCOTA ====== */
-.juyu-mascot { position:fixed; right:18px; bottom:18px; z-index:2600; display:flex; align-items:flex-end; gap:9px; pointer-events:none; }
+/* Anclado abajo-izquierda y colocado con transform: así se puede pasear
+   con aceleración por hardware sin recalcular el diseño de la página. */
+/* El contenedor mide exactamente lo que el botón: la burbuja va en posición
+   absoluta. Si ocupara sitio en el diseño, empujaría a JUYU fuera de pantalla
+   al colocarlo contra el borde derecho. */
+.juyu-mascot { position:fixed; left:0; bottom:0; z-index:2600; width:76px; pointer-events:none; transform:translate(calc(100vw - 94px), -14px); transition:transform 1.9s cubic-bezier(.45,.05,.35,1); }
+/* Con JUYU en la mitad izquierda, la burbuja se ancla al otro lado. */
+.juyu-mascot.on-left .juyu-bubble { right:auto; left:0; border-radius:16px 16px 16px 4px; transform-origin:0% 100%; }
+.juyu-mascot.facing-left .juyu-svg { transform:scaleX(-1); }
+.juyu-svg { display:block; transition:transform .4s ease; }
 .juyu-mascot.is-hidden { display:none; }
-.juyu-btn { position:relative; pointer-events:auto; width:76px; height:76px; padding:0; border:none; background:none; cursor:pointer; filter:drop-shadow(0 6px 14px rgba(31,35,64,.22)); transition:transform .22s cubic-bezier(.4,0,.2,1); order:2; }
+/* La altura sigue la proporción del dibujo (120x136); con un botón cuadrado
+   las patas se salían por abajo. */
+.juyu-btn { position:relative; pointer-events:auto; width:76px; height:86px; padding:0; border:none; background:none; cursor:pointer; filter:drop-shadow(0 6px 14px rgba(31,35,64,.22)); transition:transform .22s cubic-bezier(.4,0,.2,1); order:2; }
 /* Interrogación que aparece y desaparece: pista de que se le puede tocar. */
 .juyu-hint { position:absolute; top:-9px; right:-4px; width:27px; height:27px; border-radius:50%; background:var(--bg-header); color:#fff; font-family:'Montserrat',sans-serif; font-weight:800; font-size:.95rem; display:grid; place-items:center; box-shadow:0 3px 10px rgba(79,70,229,.45); border:2px solid var(--bg-alt); animation:juyuHint 3.2s ease-in-out infinite; transform-origin:center bottom; pointer-events:none; }
 @keyframes juyuHint {
@@ -435,6 +446,69 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 }
 /* Mientras el consejo está abierto la pista sobra. */
 .juyu-mascot.tip-open .juyu-hint { display:none; }
+/* La interrogación tampoco debe estorbar mientras JUYU hace sus cosas. */
+.juyu-mascot.busy .juyu-hint { display:none; }
+
+/* ---- Acciones de JUYU ---- */
+/* En reposo el hocico está cerrado y la pata trasera guardada. */
+.juyu-mouth { transform-origin:60px 66px; transform:scaleY(0); }
+.juyu-hind { transform-origin:32px 100px; opacity:0; }
+.juyu-leg-l,.juyu-leg-r { transform-origin:center; }
+
+/* Correr */
+.juyu-mascot.act-run .juyu-btn { animation:juyuBob .34s ease-in-out infinite; }
+@keyframes juyuBob { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-7px) rotate(-2deg); } }
+.juyu-mascot.act-run .juyu-leg-l { animation:juyuStepA .34s ease-in-out infinite; }
+.juyu-mascot.act-run .juyu-leg-r { animation:juyuStepB .34s ease-in-out infinite; }
+@keyframes juyuStepA { 0%,100%{ transform:translateX(0) translateY(0); } 50%{ transform:translateX(-7px) translateY(-4px); } }
+@keyframes juyuStepB { 0%,100%{ transform:translateX(0) translateY(-4px); } 50%{ transform:translateX(7px) translateY(0); } }
+.juyu-mascot.act-run .juyu-ear-l,.juyu-mascot.act-run .juyu-ear-r { animation:juyuEarFlap .34s ease-in-out infinite; }
+@keyframes juyuEarFlap { 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(-17deg); } }
+.juyu-mascot.act-run .juyu-tail { animation:juyuTail .3s ease-in-out infinite; }
+
+/* Ladrar */
+.juyu-mascot.act-bark .juyu-head { animation:juyuBarkHead .42s ease-in-out 4; }
+@keyframes juyuBarkHead { 0%,100%{ transform:rotate(0deg) translateY(0); } 40%{ transform:rotate(-7deg) translateY(-5px); } }
+.juyu-mascot.act-bark .juyu-mouth { animation:juyuBarkMouth .42s ease-in-out 4; }
+@keyframes juyuBarkMouth { 0%,100%{ transform:scaleY(0); } 40%{ transform:scaleY(1); } }
+.juyu-bark { position:absolute; top:-14px; left:-46px; background:#fff; color:var(--accent-strong); font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:.82rem; padding:5px 11px; border-radius:12px; box-shadow:0 4px 12px rgba(31,35,64,.24); opacity:0; pointer-events:none; white-space:nowrap; }
+.juyu-mascot.on-left .juyu-bark { left:auto; right:-46px; }
+.juyu-mascot.act-bark .juyu-bark { animation:juyuBarkPop 1.7s ease-out 1; }
+@keyframes juyuBarkPop { 0%{ opacity:0; transform:scale(.4) translateY(6px); } 12%{ opacity:1; transform:scale(1.12) translateY(-4px); } 22%{ transform:scale(1) translateY(0); } 72%{ opacity:1; } 100%{ opacity:0; transform:scale(.8) translateY(-10px); } }
+
+/* Rascarse */
+.juyu-mascot.act-scratch .juyu-hind { opacity:1; animation:juyuScratch .26s ease-in-out infinite; }
+@keyframes juyuScratch { 0%,100%{ transform:rotate(0deg) translateY(0); } 50%{ transform:rotate(-24deg) translateY(-8px); } }
+.juyu-mascot.act-scratch .juyu-head { animation:juyuScratchHead .52s ease-in-out infinite; }
+@keyframes juyuScratchHead { 0%,100%{ transform:rotate(-9deg); } 50%{ transform:rotate(-15deg); } }
+.juyu-mascot.act-scratch .juyu-btn { animation:juyuScratchBody .26s ease-in-out infinite; }
+@keyframes juyuScratchBody { 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(-2.5px); } }
+
+/* Jugar con la pelota */
+.juyu-ball { position:absolute; bottom:2px; left:-30px; width:24px; height:24px; border-radius:50%; background:radial-gradient(circle at 32% 30%, #fff 6%, #ef4467 8% 46%, #c92f4e 100%); box-shadow:0 3px 8px rgba(31,35,64,.3); opacity:0; pointer-events:none; }
+.juyu-ball::after { content:''; position:absolute; inset:0; border-radius:50%; border-top:3px solid rgba(255,255,255,.85); transform:rotate(28deg); }
+.juyu-mascot.on-left .juyu-ball { left:auto; right:-30px; }
+.juyu-mascot.act-ball .juyu-ball { animation:juyuBallPlay 1.15s cubic-bezier(.4,0,.6,1) infinite; }
+@keyframes juyuBallPlay {
+  0%   { opacity:1; transform:translate(0,0) rotate(0deg); }
+  35%  { opacity:1; transform:translate(-16px,-52px) rotate(-160deg); }
+  70%  { opacity:1; transform:translate(-2px,-6px) rotate(-300deg); }
+  85%  { opacity:1; transform:translate(-6px,-16px) rotate(-340deg); }
+  100% { opacity:1; transform:translate(0,0) rotate(-360deg); }
+}
+.juyu-mascot.act-ball .juyu-btn { animation:juyuBallBounce 1.15s ease-in-out infinite; }
+@keyframes juyuBallBounce { 0%,100%{ transform:translateY(0); } 35%{ transform:translateY(-11px); } 70%{ transform:translateY(0); } }
+.juyu-mascot.act-ball .juyu-paw { animation:juyuPaw .58s ease-in-out infinite; }
+.juyu-mascot.act-ball .juyu-tail { animation:juyuTail .4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion:reduce){
+  .juyu-mascot { transition:none; }
+  .juyu-mascot.act-run .juyu-btn,.juyu-mascot.act-run .juyu-leg-l,.juyu-mascot.act-run .juyu-leg-r,
+  .juyu-mascot.act-run .juyu-ear-l,.juyu-mascot.act-run .juyu-ear-r,
+  .juyu-mascot.act-bark .juyu-head,.juyu-mascot.act-bark .juyu-mouth,.juyu-mascot.act-bark .juyu-bark,
+  .juyu-mascot.act-scratch .juyu-hind,.juyu-mascot.act-scratch .juyu-head,.juyu-mascot.act-scratch .juyu-btn,
+  .juyu-mascot.act-ball .juyu-ball,.juyu-mascot.act-ball .juyu-btn,.juyu-mascot.act-ball .juyu-paw { animation:none; }
+}
 .juyu-btn:hover { transform:translateY(-5px) scale(1.05); }
 .juyu-btn:active { transform:translateY(-1px) scale(.98); }
 .juyu-btn:focus-visible { outline:3px solid var(--accent-strong); outline-offset:3px; border-radius:14px; }
@@ -454,7 +528,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .juyu-tongue { transform-origin:60px 68px; animation:juyuTongue 2.2s ease-in-out infinite; }
 @keyframes juyuTongue { 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(1.4); } }
 /* Burbuja de consejo */
-.juyu-bubble { pointer-events:auto; order:1; position:relative; max-width:255px; background:var(--bg-alt); border:1px solid var(--border); border-radius:16px 16px 4px 16px; box-shadow:var(--shadow-lg); padding:13px 15px 13px 14px; font-size:.85rem; line-height:1.5; color:var(--fg); margin-bottom:14px; opacity:0; transform:translateY(8px) scale(.94); transition:var(--transition); visibility:hidden; transform-origin:100% 100%; }
+.juyu-bubble { pointer-events:auto; position:absolute; bottom:calc(100% + 12px); right:0; width:max-content; max-width:255px; background:var(--bg-alt); border:1px solid var(--border); border-radius:16px 16px 4px 16px; box-shadow:var(--shadow-lg); padding:13px 15px 13px 14px; font-size:.85rem; line-height:1.5; color:var(--fg); opacity:0; transform:translateY(8px) scale(.94); transition:var(--transition); visibility:hidden; transform-origin:100% 100%; }
 .juyu-bubble.show { opacity:1; transform:translateY(0) scale(1); visibility:visible; }
 .juyu-bubble p { margin:0; padding-right:12px; }
 .juyu-bubble b { color:var(--accent-strong); }
@@ -463,9 +537,11 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .juyu-badge { position:absolute; top:2px; right:2px; width:15px; height:15px; border-radius:50%; background:var(--danger); border:2px solid var(--bg-alt); animation:juyuPulse 2s ease-in-out infinite; }
 @keyframes juyuPulse { 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.18); opacity:.75; } }
 @media (max-width:600px){
-  .juyu-mascot { right:10px; bottom:10px; }
-  .juyu-btn { width:58px; height:58px; }
+  .juyu-mascot { width:58px; transform:translate(calc(100vw - 76px), -14px); }
+  .juyu-btn { width:58px; height:66px; }
   .juyu-bubble { max-width:190px; font-size:.79rem; padding:11px 13px; }
+  .juyu-bark { font-size:.74rem; left:-38px; padding:4px 9px; }
+  .juyu-ball { width:19px; height:19px; left:-24px; }
 }
 @media (prefers-reduced-motion:reduce){
   .juyu-tail,.juyu-head,.juyu-eye,.juyu-paw,.juyu-ear-l,.juyu-ear-r,.juyu-tongue,.juyu-badge { animation:none; }
@@ -753,6 +829,8 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
     </div>
     <button type="button" class="juyu-btn" id="juyuBtn" onclick="toggleJuyuTip()" aria-label="JUYU: consejos">
         <span class="juyu-hint" id="juyuHint" aria-hidden="true">?</span>
+        <span class="juyu-bark" id="juyuBark" aria-hidden="true">¡Guau!</span>
+        <span class="juyu-ball" id="juyuBall" aria-hidden="true"></span>
         <span class="juyu-svg" id="juyuSvg"></span>
     </button>
 </div>
@@ -1549,8 +1627,9 @@ ILLUS.juyu = `<svg viewBox="0 0 120 136" aria-hidden="true">
   <g class="juyu-tail"><path d="M90 104c11-3 18-13 15-22" stroke="#c89159" stroke-width="9" fill="none" stroke-linecap="round"/></g>
   <ellipse cx="60" cy="106" rx="29" ry="25" fill="#e9be86"/>
   <ellipse cx="60" cy="112" rx="17" ry="17" fill="#f7e0c0"/>
-  <ellipse cx="41" cy="128" rx="11" ry="7" fill="#f7e0c0"/>
-  <ellipse cx="79" cy="128" rx="11" ry="7" fill="#f7e0c0"/>
+  <ellipse class="juyu-leg-l" cx="41" cy="128" rx="11" ry="7" fill="#f7e0c0"/>
+  <ellipse class="juyu-leg-r" cx="79" cy="128" rx="11" ry="7" fill="#f7e0c0"/>
+  <g class="juyu-hind"><ellipse cx="26" cy="104" rx="7" ry="12" fill="#e9be86" transform="rotate(-18 26 104)"/></g>
   <g class="juyu-paw"><ellipse cx="93" cy="92" rx="9" ry="11" fill="#f7e0c0" transform="rotate(24 93 92)"/></g>
   <rect x="40" y="86" width="40" height="9" rx="4.5" fill="var(--accent)"/>
   <circle cx="60" cy="97" r="6" fill="#fbbf24"/>
@@ -1566,6 +1645,7 @@ ILLUS.juyu = `<svg viewBox="0 0 120 136" aria-hidden="true">
     <circle cx="72.8" cy="44" r="1.9" fill="#fff"/>
     <ellipse cx="60" cy="57" rx="6.5" ry="5" fill="#3d2b25"/>
     <path d="M60 62v4M60 66q-5 5-9 1M60 66q5 5 9 1" stroke="#3d2b25" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <ellipse class="juyu-mouth" cx="60" cy="71" rx="8" ry="7" fill="#8d3b4a"/>
     <path class="juyu-tongue" d="M55 70h10a5 5 0 0 1-10 0Z" fill="#f9788f"/>
   </g>
 </svg>`;
@@ -1879,6 +1959,9 @@ window.toggleJuyuTip=function(){
     if(b.classList.contains('show')){ b.classList.remove('show'); m?.classList.remove('tip-open'); return; }
     const es=currentLanguage==='es';
     t.innerHTML=JUYU_TIPS[es?'es':'en'][juyuContext()]||'';
+    // Se interrumpe lo que estuviera haciendo: el consejo debe leerse quieto.
+    clearTimeout(_juyuAccionTimer);
+    m?.classList.remove('act-run','act-bark','act-scratch','act-ball','busy','facing-left');
     b.classList.add('show'); m?.classList.add('tip-open');
     document.getElementById('juyuBtn')?.querySelector('.juyu-badge')?.remove();
     clearTimeout(window._juyuTimer);
@@ -1898,6 +1981,90 @@ window.showJuyuAgain=function(){
     try{ localStorage.removeItem('learnersTrackHideJuyu'); }catch(e){}
     showNotification(currentLanguage==='es'?'¡JUYU volvió! 🐾':'JUYU is back! 🐾','success');
 };
+// === VIDA PROPIA DE JUYU ===
+// Cada minuto elige una acción, la hace unos segundos y vuelve al reposo.
+// Ese reposo entre acciones es la pausa: sin ella agotaría la vista.
+const JUYU_CICLO_MS = 60000;   // cambia de acción cada minuto
+const JUYU_PRIMERA_MS = 15000; // la primera antes, para que se descubra
+let _juyuVidaTimer=null, _juyuAccionTimer=null, _juyuPos=0;
+
+function juyuSpots(){
+    const w=window.innerWidth, h=window.innerHeight;
+    const chico=window.matchMedia('(max-width:600px)').matches;
+    const size=chico?58:76, m=14;
+    const der=Math.max(m, w-size-m-4);
+    // En pantallas estrechas se queda abajo: arriba estorbaría los controles.
+    if(chico) return [{x:der,y:m},{x:Math.round(w*0.5),y:m},{x:m,y:m}];
+    return [
+        {x:der,y:m},
+        {x:Math.round(w*0.66),y:m},
+        {x:Math.round(w*0.34),y:m},
+        {x:m,y:m},
+        {x:m,y:Math.round(h*0.3)},
+        {x:der,y:Math.round(h*0.32)}
+    ];
+}
+function juyuMoverA(indice){
+    const m=document.getElementById('juyuMascot'); if(!m) return;
+    const spots=juyuSpots();
+    const destino=spots[indice%spots.length];
+    const anterior=spots[_juyuPos%spots.length];
+    // Se gira hacia donde camina.
+    m.classList.toggle('facing-left', destino.x < anterior.x-8);
+    m.style.transform=`translate(${destino.x}px, ${-destino.y}px)`;
+    m.classList.toggle('on-left', destino.x < window.innerWidth/2);
+    _juyuPos=indice%spots.length;
+}
+function juyuPuedeActuar(){
+    const m=document.getElementById('juyuMascot');
+    if(!m || m.classList.contains('is-hidden')) return false;
+    if(document.hidden) return false;                                    // pestaña en segundo plano
+    if(document.getElementById('juyuBubble')?.classList.contains('show')) return false;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    return true;
+}
+function juyuHayModalAbierto(){
+    return [...document.querySelectorAll('.modal')].some(x=>x.style.display==='flex')
+        || document.getElementById('statisticsPage')?.classList.contains('show');
+}
+function juyuAccion(nombre,duracion){
+    const m=document.getElementById('juyuMascot'); if(!m) return;
+    clearTimeout(_juyuAccionTimer);
+    m.classList.remove('act-run','act-bark','act-scratch','act-ball');
+    void m.offsetWidth;                                                  // reinicia las animaciones
+    m.classList.add('act-'+nombre,'busy');
+    _juyuAccionTimer=setTimeout(()=>{
+        m.classList.remove('act-'+nombre,'busy');
+        m.classList.remove('facing-left');                               // vuelve a mirar al frente
+    },duracion);
+}
+window.juyuDoAction=function(nombre){
+    if(nombre==='run'){
+        // Con un modal abierto no se pasea: taparía lo que el docente está usando.
+        if(juyuHayModalAbierto()){ juyuAccion('bark',1800); return; }
+        const spots=juyuSpots();
+        let destino=_juyuPos;
+        while(spots.length>1 && destino===_juyuPos) destino=Math.floor(Math.random()*spots.length);
+        juyuAccion('run',2100);
+        juyuMoverA(destino);
+    }
+    else if(nombre==='bark')    juyuAccion('bark',1800);
+    else if(nombre==='scratch') juyuAccion('scratch',2600);
+    else if(nombre==='ball')    juyuAccion('ball',3600);
+};
+function juyuVida(){
+    clearTimeout(_juyuVidaTimer);
+    _juyuVidaTimer=setTimeout(function ciclo(){
+        if(juyuPuedeActuar()){
+            const acciones=['run','ball','bark','scratch','run','ball'];
+            juyuDoAction(acciones[Math.floor(Math.random()*acciones.length)]);
+        }
+        _juyuVidaTimer=setTimeout(ciclo,JUYU_CICLO_MS);
+    },JUYU_PRIMERA_MS);
+}
+// Al cambiar el tamaño de la ventana JUYU podría quedar fuera de la pantalla.
+window.addEventListener('resize',()=>{ clearTimeout(window._juyuResize); window._juyuResize=setTimeout(()=>juyuMoverA(_juyuPos),250); });
+
 function initJuyu(){
     const svg=document.getElementById('juyuSvg');
     if(svg && !svg.dataset.filled){ svg.innerHTML=ILLUS.juyu; svg.dataset.filled='1'; }
@@ -1914,6 +2081,8 @@ function initJuyu(){
             localStorage.setItem('learnersTrackJuyuSeen','1');
         }
     }catch(e){}
+    juyuMoverA(0);   // posición inicial: esquina inferior derecha
+    juyuVida();
 }
 
 // Coloca las ilustraciones fijas de los modales una sola vez.
