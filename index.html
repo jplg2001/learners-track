@@ -450,6 +450,9 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .podium-name { font-weight:700; font-size:clamp(.78rem,1.25vw,1.15rem); text-align:center; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .pn-sub { font-weight:400; opacity:.7; font-size:.82em; }
 .podium-more { font-size:clamp(.65rem,1vw,.85rem); opacity:.72; font-style:italic; }
+.podium-spot.vacio { opacity:.42; }
+.podium-spot.vacio .podium-face { background:rgba(255,255,255,.35); color:rgba(59,47,143,.6); }
+.podium-spot.vacio .podium-name { font-style:italic; font-weight:600; }
 .podium-count { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.1rem,2.2vw,1.9rem); color:#ffd166; margin-bottom:2px; }
 .podium-sub { font-size:clamp(.65rem,1vw,.85rem); opacity:.7; margin-bottom:6px; }
 /* Cuadro con el salón completo */
@@ -2132,8 +2135,8 @@ window.showJuyuAgain=function(){
 };
 // === MODO PROYECTOR ===
 // Pantalla para el tablero del salón: lo que la clase ve, no el docente.
-let _projPanel=0, _projTimer=null;
-const PROJ_PANELES=2, PROJ_ROTACION_MS=12000;
+let _projPanel=0;
+const PROJ_PANELES=2;
 
 function iniciales(nombre){
     return String(nombre||'?').trim().split(/\s+/).slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?';
@@ -2214,12 +2217,20 @@ function renderProjPanel(){
             const minPodio = niveles.length ? niveles[niveles.length-1].total : Infinity;
             body.innerHTML=`<h2 class="proj-title">${titulo}</h2>`
                 + `<div class="proj-podium">`
+                // Siempre se dibujan los tres escalones. Si no hay tantas cantidades
+                // distintas —muy común al premiar por grupos, donde todos empatan—
+                // el escalón aparece vacío en vez de desaparecer.
                 + visual.map((n,i)=>n?`<div class="podium-spot ${clases[i]}">`
                     + `<div class="podium-medal">${medallas[medIdx[i]]}</div>`
                     + `<div class="podium-face">${n.total}</div>`
                     + (n.miembros.length>1?`<div class="podium-tie">${n.miembros.length} ${es?'empatados':'tied'}</div>`:'')
                     + `<div class="podium-names">${nombresDelNivel(n)}</div>`
-                    + `<div class="podium-block"></div></div>`:'').join('')
+                    + `<div class="podium-block"></div></div>`
+                  :`<div class="podium-spot ${clases[i]} vacio">`
+                    + `<div class="podium-medal">${medallas[medIdx[i]]}</div>`
+                    + `<div class="podium-face">—</div>`
+                    + `<div class="podium-names"><div class="podium-name">${es?'Sin ocupar':'Vacant'}</div></div>`
+                    + `<div class="podium-block"></div></div>`).join('')
                 + `</div>`
                 // Debajo, el salón entero con su puesto y su cantidad de insignias.
                 + `<div class="proj-full">`
@@ -2253,12 +2264,10 @@ function renderProjPanel(){
     if(dots) dots.innerHTML=Array.from({length:PROJ_PANELES},(_,i)=>
         `<button type="button" class="proj-dot${i===_projPanel?' active':''}" onclick="projGoTo(${i})" aria-label="Panel ${i+1}"></button>`).join('');
 }
-window.projGoTo=function(i){ _projPanel=((i%PROJ_PANELES)+PROJ_PANELES)%PROJ_PANELES; renderProjPanel(); reiniciarRotacionProj(); };
+window.projGoTo=function(i){ _projPanel=((i%PROJ_PANELES)+PROJ_PANELES)%PROJ_PANELES; renderProjPanel(); };
 window.projPanel=function(delta){ projGoTo(_projPanel+delta); };
-function reiniciarRotacionProj(){
-    clearInterval(_projTimer);
-    _projTimer=setInterval(()=>{ _projPanel=(_projPanel+1)%PROJ_PANELES; renderProjPanel(); },PROJ_ROTACION_MS);
-}
+// El panel ya NO rota solo: se queda donde el docente lo deje y solo cambia
+// con las flechas, los puntos o el teclado.
 window.openProjector=function(){
     const es=currentLanguage==='es';
     if((currentStudents||[]).length===0){
@@ -2267,12 +2276,11 @@ window.openProjector=function(){
     }
     const c=document.getElementById('projClass');
     if(c) c.textContent=(document.getElementById('className')?.value||'')+(userProfile.school?' · '+userProfile.school:'');
-    _projPanel=0; renderProjPanel(); reiniciarRotacionProj();
+    _projPanel=0; renderProjPanel();
     const p=document.getElementById('projectorMode');
     p.classList.add('show'); p.setAttribute('aria-hidden','false');
 };
 window.closeProjector=function(){
-    clearInterval(_projTimer);
     const p=document.getElementById('projectorMode');
     p.classList.remove('show'); p.setAttribute('aria-hidden','true');
     if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
