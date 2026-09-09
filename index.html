@@ -434,7 +434,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .proj-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.14); color:#fff; font-size:1.25rem; cursor:pointer; transition:var(--transition); backdrop-filter:blur(6px); }
 .proj-btn:hover { background:rgba(255,255,255,.3); transform:translateY(-2px); }
 .proj-close:hover { background:#ef4467; border-color:#ef4467; }
-.proj-body { position:relative; z-index:2; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 clamp(16px,4vw,60px) 10px; overflow:hidden; }
+.proj-body { position:relative; z-index:2; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 clamp(16px,4vw,60px) 10px; overflow-y:auto; }
 .proj-title { font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(1.8rem,4.4vw,3.6rem); margin:0 0 clamp(14px,2.4vh,34px); text-align:center; text-shadow:0 4px 18px rgba(0,0,0,.3); animation:projIn .5s ease both; }
 @keyframes projIn { from{ opacity:0; transform:translateY(-16px); } to{ opacity:1; transform:none; } }
 /* Podio */
@@ -442,11 +442,25 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .podium-spot { display:flex; flex-direction:column; align-items:center; flex:1; max-width:250px; animation:podiumRise .65s cubic-bezier(.34,1.4,.5,1) both; }
 .podium-spot:nth-child(1){ animation-delay:.22s; } .podium-spot:nth-child(2){ animation-delay:.06s; } .podium-spot:nth-child(3){ animation-delay:.38s; }
 @keyframes podiumRise { from{ opacity:0; transform:translateY(48px) scale(.9); } to{ opacity:1; transform:none; } }
-.podium-medal { font-size:clamp(1.8rem,3.6vw,3rem); line-height:1; margin-bottom:4px; }
-.podium-face { width:clamp(52px,7vw,96px); height:clamp(52px,7vw,96px); border-radius:50%; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.2rem,2.6vw,2.2rem); color:#3b2f8f; background:#fff; border:4px solid rgba(255,255,255,.65); box-shadow:0 8px 22px rgba(0,0,0,.28); margin-bottom:8px; }
-.podium-name { font-weight:700; font-size:clamp(.85rem,1.5vw,1.35rem); text-align:center; margin-bottom:4px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.podium-medal { font-size:clamp(1.6rem,3.2vw,2.6rem); line-height:1; margin-bottom:3px; }
+/* El círculo lleva el puntaje: con empates ya no puede llevar una sola inicial. */
+.podium-face { width:clamp(48px,6.2vw,84px); height:clamp(48px,6.2vw,84px); border-radius:50%; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.3rem,2.6vw,2.3rem); color:#3b2f8f; background:#fff; border:4px solid rgba(255,255,255,.65); box-shadow:0 8px 22px rgba(0,0,0,.28); margin-bottom:6px; }
+.podium-tie { font-size:clamp(.62rem,.95vw,.82rem); background:rgba(255,209,102,.24); border:1px solid rgba(255,209,102,.5); color:#ffe9b8; border-radius:999px; padding:2px 9px; margin-bottom:6px; font-weight:700; }
+.podium-names { display:flex; flex-direction:column; gap:2px; width:100%; margin-bottom:8px; }
+.podium-name { font-weight:700; font-size:clamp(.78rem,1.25vw,1.15rem); text-align:center; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pn-sub { font-weight:400; opacity:.7; font-size:.82em; }
+.podium-more { font-size:clamp(.65rem,1vw,.85rem); opacity:.72; font-style:italic; }
 .podium-count { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.1rem,2.2vw,1.9rem); color:#ffd166; margin-bottom:2px; }
 .podium-sub { font-size:clamp(.65rem,1vw,.85rem); opacity:.7; margin-bottom:6px; }
+/* Cuadro con el salón completo */
+.proj-full { width:100%; max-width:1100px; margin-top:clamp(12px,2.2vh,26px); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:16px; padding:clamp(10px,1.4vw,18px); }
+.proj-full-title { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(.9rem,1.5vw,1.3rem); margin-bottom:9px; opacity:.9; }
+.proj-full-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:5px 14px; max-height:30vh; overflow-y:auto; }
+.pf-row { display:flex; align-items:center; gap:9px; padding:5px 10px; border-radius:9px; background:rgba(255,255,255,.07); font-size:clamp(.75rem,1.15vw,1rem); }
+.pf-row.pf-top { background:rgba(255,209,102,.16); border:1px solid rgba(255,209,102,.32); }
+.pf-pos { opacity:.7; font-weight:700; min-width:2.1em; }
+.pf-name { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-num { font-family:'Baloo 2',sans-serif; font-weight:800; color:#ffd166; min-width:1.4em; text-align:right; }
 .group-size-box { display:flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; font-size:.85rem; font-weight:600; color:var(--fg); cursor:pointer; }
 .group-size-box input { width:58px; padding:5px 7px; border-radius:7px; border:1px solid var(--border); font-family:inherit; font-size:.92rem; background:var(--bg-alt); color:var(--fg); }
 .podium-block { width:100%; border-radius:14px 14px 0 0; background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.14)); border:1px solid rgba(255,255,255,.3); border-bottom:none; }
@@ -2137,6 +2151,19 @@ function rankingInsignias(){
         .map(s=>({nombre:s.name||'', total:countStudentBadges(s)}))
         .sort((a,b)=>b.total-a.total || a.nombre.localeCompare(b.nombre));
 }
+// Agrupa por puntaje: quienes empatan comparten puesto.
+// Numeración deportiva: si tres empatan en el 1º, el siguiente puesto es el 4º.
+function nivelesDeRanking(lista){
+    const niveles=[];
+    lista.forEach(x=>{
+        const ultimo=niveles[niveles.length-1];
+        if(ultimo && ultimo.total===x.total) ultimo.miembros.push(x);
+        else niveles.push({ total:x.total, miembros:[x] });
+    });
+    let puesto=1;
+    niveles.forEach(n=>{ n.puesto=puesto; puesto+=n.miembros.length; });
+    return niveles;
+}
 function renderProjPanel(){
     const body=document.getElementById('projBody'); if(!body) return;
     const es=currentLanguage==='es';
@@ -2144,44 +2171,63 @@ function renderProjPanel(){
     // individual en la cuadrícula y en notas.
     const porGrupos = (viewMode==='rows');
     if(_projPanel===0){
-        const orden = porGrupos
+        // Lista completa: incluye a quienes aún no tienen insignias.
+        const todos = porGrupos
             ? gruposDelSalon().map(g=>({
                 nombre:g.nombre,
                 // Como la insignia la reciben todos, el marcador justo del grupo
                 // es lo que le toca a cada integrante, no la suma bruta.
                 total: g.miembros.length ? Math.round(g.total/g.miembros.length*10)/10 : 0,
-                sub: `${g.miembros.length} ${es?'integrantes':'members'}`
-              })).filter(x=>x.total>0).sort((a,b)=>b.total-a.total)
-            : rankingInsignias().filter(x=>x.total>0);
-        if(orden.length===0){
+                sub: `${g.miembros.length} ${es?'int.':'mem.'}`
+              })).sort((a,b)=>b.total-a.total || a.nombre.localeCompare(b.nombre))
+            : rankingInsignias();
+        const conInsignias = todos.filter(x=>x.total>0);
+        if(conInsignias.length===0){
             body.innerHTML=`<div class="proj-empty">${illo('student','pe-illo')}`
                 + `<p>${es?'Todavía no hay insignias otorgadas esta semana. ¡Empecemos!':'No badges awarded yet. Let us get started!'}</p></div>`;
         } else {
-            const podio=orden.slice(0,3);
-            const resto=orden.slice(3,15);
+            // Los tres primeros PUESTOS, no los tres primeros nombres: si varios
+            // empatan en el primero, todos comparten ese escalón del podio.
+            const niveles = nivelesDeRanking(conInsignias).slice(0,3);
             const medallas=['🥇','🥈','🥉'];
             // El orden visual del podio es 2º, 1º, 3º
-            const visual=[podio[1],podio[0],podio[2]];
+            const visual=[niveles[1],niveles[0],niveles[2]];
             const clases=['p2','p1','p3'], medIdx=[1,0,2];
             const titulo = porGrupos
                 ? (es?'🏆 Ranking por grupos':'🏆 Group ranking')
                 : (es?'🏆 Ranking de insignias':'🏆 Badge ranking');
-            const cara = x => porGrupos ? String(x.nombre.match(/\d+/)||'?') : iniciales(x.nombre);
+            const MAX_EN_PODIO=5;
+            const nombresDelNivel = n => {
+                const visibles=n.miembros.slice(0,MAX_EN_PODIO);
+                const sobran=n.miembros.length-visibles.length;
+                return visibles.map(x=>`<div class="podium-name">${escapeHtml(x.nombre)}`
+                        + (x.sub?` <span class="pn-sub">${escapeHtml(x.sub)}</span>`:'')
+                        + `</div>`).join('')
+                    + (sobran>0?`<div class="podium-more">+${sobran} ${es?'más':'more'}</div>`:'');
+            };
+            const nivelesTodos = nivelesDeRanking(todos);
+            // Se destaca a quien está en el podio, que con empates puede llegar
+            // más allá del puesto 3: si tres empatan en el 1º, el 3er escalón es el 6º.
+            const minPodio = niveles.length ? niveles[niveles.length-1].total : Infinity;
             body.innerHTML=`<h2 class="proj-title">${titulo}</h2>`
                 + `<div class="proj-podium">`
-                + visual.map((x,i)=>x?`<div class="podium-spot ${clases[i]}">`
+                + visual.map((n,i)=>n?`<div class="podium-spot ${clases[i]}">`
                     + `<div class="podium-medal">${medallas[medIdx[i]]}</div>`
-                    + `<div class="podium-face" style="background:${colorNombre(x.nombre)}">${escapeHtml(cara(x))}</div>`
-                    + `<div class="podium-name">${escapeHtml(x.nombre)}</div>`
-                    + `<div class="podium-count">${x.total}</div>`
-                    + (x.sub?`<div class="podium-sub">${escapeHtml(x.sub)}</div>`:'')
+                    + `<div class="podium-face">${n.total}</div>`
+                    + (n.miembros.length>1?`<div class="podium-tie">${n.miembros.length} ${es?'empatados':'tied'}</div>`:'')
+                    + `<div class="podium-names">${nombresDelNivel(n)}</div>`
                     + `<div class="podium-block"></div></div>`:'').join('')
                 + `</div>`
-                + (resto.length?`<div class="proj-rest">`
-                    + resto.map((x,i)=>`<div class="proj-row"><span class="pr-pos">${i+4}</span>`
-                        + `<span class="pr-name">${escapeHtml(x.nombre)}</span>`
-                        + `<span class="pr-num">${x.total}</span></div>`).join('')
-                    + `</div>`:'');
+                // Debajo, el salón entero con su puesto y su cantidad de insignias.
+                + `<div class="proj-full">`
+                + `<div class="proj-full-title">${es?'Todo el salón':'Whole class'}</div>`
+                + `<div class="proj-full-grid">`
+                + nivelesTodos.map(n=>n.miembros.map(x=>
+                    `<div class="pf-row${(n.total>0&&n.total>=minPodio)?' pf-top':''}">`
+                    + `<span class="pf-pos">${n.puesto}º</span>`
+                    + `<span class="pf-name">${escapeHtml(x.nombre)}</span>`
+                    + `<span class="pf-num">${x.total}</span></div>`).join('')).join('')
+                + `</div></div>`;
         }
     } else {
         const ci=celdaDeHoy();
