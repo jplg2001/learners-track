@@ -423,6 +423,52 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .slide-in { animation:slideIn 0.5s ease; }
 @keyframes slideIn { from { transform:translateX(-20px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 .fade-enter { animation:fadeIn 0.35s ease; }
+/* ====== MODO PROYECTOR ====== */
+/* Pensado para verse desde el fondo del salón: todo grande y con mucho contraste. */
+.projector { display:none; position:fixed; inset:0; z-index:5000; background:linear-gradient(150deg,#3b2f8f 0%,#4f46e5 40%,#7c3aed 100%); color:#fff; overflow:hidden; flex-direction:column; }
+.projector.show { display:flex; animation:fadeIn .3s ease; }
+.projector::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 15% 10%, rgba(255,255,255,.16), transparent 45%), radial-gradient(circle at 85% 90%, rgba(255,255,255,.1), transparent 40%); pointer-events:none; }
+.proj-bar { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 28px 8px; }
+.proj-class { font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(1.2rem,2.4vw,2rem); opacity:.95; }
+.proj-actions { display:flex; gap:9px; }
+.proj-btn { width:46px; height:46px; border-radius:12px; border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.14); color:#fff; font-size:1.25rem; cursor:pointer; transition:var(--transition); backdrop-filter:blur(6px); }
+.proj-btn:hover { background:rgba(255,255,255,.3); transform:translateY(-2px); }
+.proj-close:hover { background:#ef4467; border-color:#ef4467; }
+.proj-body { position:relative; z-index:2; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 clamp(16px,4vw,60px) 10px; overflow:hidden; }
+.proj-title { font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(1.8rem,4.4vw,3.6rem); margin:0 0 clamp(14px,2.4vh,34px); text-align:center; text-shadow:0 4px 18px rgba(0,0,0,.3); animation:projIn .5s ease both; }
+@keyframes projIn { from{ opacity:0; transform:translateY(-16px); } to{ opacity:1; transform:none; } }
+/* Podio */
+.proj-podium { display:flex; align-items:flex-end; justify-content:center; gap:clamp(10px,2.4vw,34px); width:100%; max-width:960px; }
+.podium-spot { display:flex; flex-direction:column; align-items:center; flex:1; max-width:250px; animation:podiumRise .65s cubic-bezier(.34,1.4,.5,1) both; }
+.podium-spot:nth-child(1){ animation-delay:.22s; } .podium-spot:nth-child(2){ animation-delay:.06s; } .podium-spot:nth-child(3){ animation-delay:.38s; }
+@keyframes podiumRise { from{ opacity:0; transform:translateY(48px) scale(.9); } to{ opacity:1; transform:none; } }
+.podium-medal { font-size:clamp(1.8rem,3.6vw,3rem); line-height:1; margin-bottom:4px; }
+.podium-face { width:clamp(52px,7vw,96px); height:clamp(52px,7vw,96px); border-radius:50%; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.2rem,2.6vw,2.2rem); color:#3b2f8f; background:#fff; border:4px solid rgba(255,255,255,.65); box-shadow:0 8px 22px rgba(0,0,0,.28); margin-bottom:8px; }
+.podium-name { font-weight:700; font-size:clamp(.85rem,1.5vw,1.35rem); text-align:center; margin-bottom:4px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.podium-count { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.1rem,2.2vw,1.9rem); color:#ffd166; margin-bottom:8px; }
+.podium-block { width:100%; border-radius:14px 14px 0 0; background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.14)); border:1px solid rgba(255,255,255,.3); border-bottom:none; }
+.podium-spot.p1 .podium-block { height:clamp(80px,15vh,170px); }
+.podium-spot.p2 .podium-block { height:clamp(56px,11vh,124px); }
+.podium-spot.p3 .podium-block { height:clamp(40px,8vh,94px); }
+/* Resto del salón */
+.proj-rest { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px 18px; width:100%; max-width:1000px; margin-top:clamp(14px,3vh,30px); }
+.proj-row { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.11); border:1px solid rgba(255,255,255,.16); border-radius:11px; padding:8px 13px; font-size:clamp(.8rem,1.3vw,1.1rem); }
+.proj-row .pr-pos { opacity:.65; font-weight:700; min-width:1.6em; }
+.proj-row .pr-name { flex:1; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.proj-row .pr-num { font-family:'Baloo 2',sans-serif; font-weight:800; color:#ffd166; }
+/* Insignias de hoy */
+.proj-today { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:clamp(10px,1.6vw,18px); width:100%; max-width:1100px; max-height:64vh; overflow-y:auto; }
+.today-card { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); border-radius:16px; padding:clamp(12px,1.6vw,18px); animation:podiumRise .5s cubic-bezier(.34,1.3,.5,1) both; }
+.today-card h4 { margin:0 0 8px; font-size:clamp(1rem,1.7vw,1.4rem); font-weight:700; }
+.today-badges { display:flex; flex-wrap:wrap; gap:7px; }
+.today-badge { background:rgba(255,255,255,.9); color:#3b2f8f; border-radius:999px; padding:5px 12px; font-weight:700; font-size:clamp(.75rem,1.1vw,.95rem); }
+.proj-empty { text-align:center; font-size:clamp(1rem,2vw,1.5rem); opacity:.85; max-width:620px; }
+.proj-empty .pe-illo { width:clamp(140px,20vw,240px); margin:0 auto 18px; }
+.proj-dots { position:relative; z-index:2; display:flex; justify-content:center; gap:9px; padding:10px 0 22px; }
+.proj-dot { width:11px; height:11px; border-radius:50%; background:rgba(255,255,255,.32); border:none; cursor:pointer; padding:0; transition:var(--transition); }
+.proj-dot.active { background:#ffd166; transform:scale(1.25); }
+@media (prefers-reduced-motion:reduce){ .proj-title,.podium-spot,.today-card { animation:none; } }
+
 /* ====== JUYU, LA MASCOTA ====== */
 /* Anclado abajo-izquierda y colocado con transform: así se puede pasear
    con aceleración por hardware sin recalcular el diseño de la página. */
@@ -434,6 +480,15 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .juyu-mascot.on-left .juyu-bubble { right:auto; left:0; border-radius:16px 16px 16px 4px; transform-origin:0% 100%; }
 .juyu-mascot.facing-left .juyu-svg { transform:scaleX(-1); }
 .juyu-svg { display:block; transition:transform .4s ease; }
+/* Arrastrable: se coge y se suelta donde uno quiera. */
+.juyu-btn { touch-action:none; }
+.juyu-mascot.dragging { transition:none !important; cursor:grabbing; }
+.juyu-mascot.dragging .juyu-btn { transform:scale(1.12) rotate(-4deg); filter:drop-shadow(0 12px 22px rgba(31,35,64,.4)); cursor:grabbing; }
+.juyu-mascot.dragging .juyu-hint,.juyu-mascot.dragging .juyu-bubble { display:none; }
+.juyu-mascot.pinned .juyu-btn::after { content:'📌'; position:absolute; bottom:-2px; left:-6px; font-size:.8rem; opacity:.85; }
+.juyu-tip-hint { display:inline-block; margin-top:6px; font-size:.78rem; opacity:.7; font-style:italic; }
+.juyu-free-btn { margin-top:9px; background:var(--accent-soft); border:1px solid var(--badge-border); color:var(--accent-strong); border-radius:9px; padding:6px 11px; font-family:inherit; font-weight:700; font-size:.8rem; cursor:pointer; transition:var(--transition); }
+.juyu-free-btn:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 .juyu-mascot.is-hidden { display:none; }
 /* La altura sigue la proporción del dibujo (120x136); con un botón cuadrado
    las patas se salían por abajo. */
@@ -1054,6 +1109,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
                 </div>
                 <button class="side-btn" onclick="openImportModal()"><span class="sb-ico green">📋</span><span id="importStudentsBtnText">Import list</span></button>
                 <button class="side-btn" onclick="goToStatisticsPage()"><span class="sb-ico blue">📊</span><span id="statisticsBtnText">Course Statistics</span></button>
+                <button class="side-btn" onclick="openProjector()"><span class="sb-ico violet">📺</span><span id="projectorBtnText">Modo proyector</span></button>
                 <button class="side-btn" id="exportPdfBtn"><span class="sb-ico slate">📄</span><span id="exportPdfBtnText">Export Full Report PDF</span></button>
             </div>
 
@@ -1104,6 +1160,20 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
         </section>
     </div>
 </div>
+
+<!-- ====== MODO PROYECTOR ====== -->
+<section id="projectorMode" class="projector" aria-hidden="true">
+    <div class="proj-bar">
+        <div class="proj-class" id="projClass"></div>
+        <div class="proj-actions">
+            <button type="button" class="proj-btn" onclick="projPanel(-1)" aria-label="Anterior">‹</button>
+            <button type="button" class="proj-btn" id="projFsBtn" onclick="toggleProjectorFullscreen()" aria-label="Pantalla completa">⛶</button>
+            <button type="button" class="proj-btn proj-close" onclick="closeProjector()" aria-label="Salir">✕</button>
+        </div>
+    </div>
+    <div class="proj-body" id="projBody"></div>
+    <div class="proj-dots" id="projDots"></div>
+</section>
 
 <!-- Statistics Page -->
 <section id="statisticsPage">
@@ -1999,9 +2069,17 @@ window.toggleJuyuTip=function(){
     const b=document.getElementById('juyuBubble'), t=document.getElementById('juyuText');
     const m=document.getElementById('juyuMascot');
     if(!b||!t) return;
+    // Tras arrastrarlo, el clic de cierre no debe abrir el consejo.
+    if(document.getElementById('juyuBtn')?.dataset.suppressClick) return;
     if(b.classList.contains('show')){ b.classList.remove('show'); m?.classList.remove('tip-open'); return; }
     const es=currentLanguage==='es';
-    t.innerHTML=JUYU_TIPS[es?'es':'en'][juyuContext()]||'';
+    t.innerHTML=(JUYU_TIPS[es?'es':'en'][juyuContext()]||'')
+        + `<br><span class="juyu-tip-hint">${es
+            ? 'Puedes arrastrarme a donde quieras.'
+            : 'You can drag me anywhere you like.'}</span>`
+        + (_juyuFijado
+            ? `<br><button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
+            : '');
     // Se interrumpe lo que estuviera haciendo: el consejo debe leerse quieto.
     clearTimeout(_juyuAccionTimer);
     m?.classList.remove('act-run','act-bark','act-scratch','act-ball','busy','facing-left');
@@ -2024,6 +2102,112 @@ window.showJuyuAgain=function(){
     try{ localStorage.removeItem('learnersTrackHideJuyu'); }catch(e){}
     showNotification(currentLanguage==='es'?'¡JUYU volvió! 🐾':'JUYU is back! 🐾','success');
 };
+// === MODO PROYECTOR ===
+// Pantalla para el tablero del salón: lo que la clase ve, no el docente.
+let _projPanel=0, _projTimer=null;
+const PROJ_PANELES=2, PROJ_ROTACION_MS=12000;
+
+function iniciales(nombre){
+    return String(nombre||'?').trim().split(/\s+/).slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?';
+}
+function colorNombre(nombre){
+    let h=0; for(let i=0;i<String(nombre).length;i++) h=(h*31+nombre.charCodeAt(i))%360;
+    return `hsl(${h},68%,88%)`;
+}
+// Índice de columna del día de hoy dentro de la semana activa (lunes..viernes).
+function celdaDeHoy(){
+    const dia=new Date().getDay();               // 0 domingo … 6 sábado
+    if(dia<1||dia>5) return null;                // fin de semana: no hay columna
+    const semana=Math.max(1,gridWeeks);
+    return (semana-1)*weekDays.length + (dia-1);
+}
+function rankingInsignias(){
+    return (currentStudents||[])
+        .map(s=>({nombre:s.name||'', total:countStudentBadges(s)}))
+        .sort((a,b)=>b.total-a.total || a.nombre.localeCompare(b.nombre));
+}
+function renderProjPanel(){
+    const body=document.getElementById('projBody'); if(!body) return;
+    const es=currentLanguage==='es';
+    if(_projPanel===0){
+        const orden=rankingInsignias().filter(x=>x.total>0);
+        if(orden.length===0){
+            body.innerHTML=`<div class="proj-empty">${illo('student','pe-illo')}`
+                + `<p>${es?'Todavía no hay insignias otorgadas esta semana. ¡Empecemos!':'No badges awarded yet. Let us get started!'}</p></div>`;
+        } else {
+            const podio=orden.slice(0,3);
+            const resto=orden.slice(3,15);
+            const medallas=['🥇','🥈','🥉'];
+            // El orden visual del podio es 2º, 1º, 3º
+            const visual=[podio[1],podio[0],podio[2]];
+            const clases=['p2','p1','p3'], medIdx=[1,0,2];
+            body.innerHTML=`<h2 class="proj-title">🏆 ${es?'Ranking de insignias':'Badge ranking'}</h2>`
+                + `<div class="proj-podium">`
+                + visual.map((x,i)=>x?`<div class="podium-spot ${clases[i]}">`
+                    + `<div class="podium-medal">${medallas[medIdx[i]]}</div>`
+                    + `<div class="podium-face" style="background:${colorNombre(x.nombre)}">${escapeHtml(iniciales(x.nombre))}</div>`
+                    + `<div class="podium-name">${escapeHtml(x.nombre)}</div>`
+                    + `<div class="podium-count">${x.total}</div>`
+                    + `<div class="podium-block"></div></div>`:'').join('')
+                + `</div>`
+                + (resto.length?`<div class="proj-rest">`
+                    + resto.map((x,i)=>`<div class="proj-row"><span class="pr-pos">${i+4}</span>`
+                        + `<span class="pr-name">${escapeHtml(x.nombre)}</span>`
+                        + `<span class="pr-num">${x.total}</span></div>`).join('')
+                    + `</div>`:'');
+        }
+    } else {
+        const ci=celdaDeHoy();
+        const dias=es?['Lunes','Martes','Miércoles','Jueves','Viernes']:['Monday','Tuesday','Wednesday','Thursday','Friday'];
+        const nombreDia = ci===null ? '' : dias[ci % weekDays.length];
+        const conHoy=(currentStudents||[])
+            .map(s=>({nombre:s.name||'', insignias: ci===null?[]:((s.gridBadges&&s.gridBadges[ci])||[])}))
+            .filter(x=>x.insignias.length>0);
+        body.innerHTML=`<h2 class="proj-title">✨ ${es?'Insignias de hoy':'Today’s badges'}${nombreDia?` · ${nombreDia}`:''}</h2>`
+            + (conHoy.length
+                ? `<div class="proj-today">` + conHoy.map((x,i)=>`<div class="today-card" style="animation-delay:${(i*0.06).toFixed(2)}s">`
+                    + `<h4>${escapeHtml(x.nombre)}</h4><div class="today-badges">`
+                    + x.insignias.map(b=>`<span class="today-badge">${escapeHtml((b.icon||'🏅')+' '+(b.name||''))}</span>`).join('')
+                    + `</div></div>`).join('') + `</div>`
+                : `<div class="proj-empty">${illo('speech','pe-illo')}<p>${
+                    ci===null ? (es?'Hoy no hay clase. ¡Nos vemos el lunes!':'No class today. See you Monday!')
+                              : (es?'Aún no se han otorgado insignias hoy.':'No badges awarded today yet.')}</p></div>`);
+    }
+    const dots=document.getElementById('projDots');
+    if(dots) dots.innerHTML=Array.from({length:PROJ_PANELES},(_,i)=>
+        `<button type="button" class="proj-dot${i===_projPanel?' active':''}" onclick="projGoTo(${i})" aria-label="Panel ${i+1}"></button>`).join('');
+}
+window.projGoTo=function(i){ _projPanel=((i%PROJ_PANELES)+PROJ_PANELES)%PROJ_PANELES; renderProjPanel(); reiniciarRotacionProj(); };
+window.projPanel=function(delta){ projGoTo(_projPanel+delta); };
+function reiniciarRotacionProj(){
+    clearInterval(_projTimer);
+    _projTimer=setInterval(()=>{ _projPanel=(_projPanel+1)%PROJ_PANELES; renderProjPanel(); },PROJ_ROTACION_MS);
+}
+window.openProjector=function(){
+    const es=currentLanguage==='es';
+    if((currentStudents||[]).length===0){
+        showNotification(es?'Añade estudiantes para usar el modo proyector':'Add students to use projector mode','error');
+        return;
+    }
+    const c=document.getElementById('projClass');
+    if(c) c.textContent=(document.getElementById('className')?.value||'')+(userProfile.school?' · '+userProfile.school:'');
+    _projPanel=0; renderProjPanel(); reiniciarRotacionProj();
+    const p=document.getElementById('projectorMode');
+    p.classList.add('show'); p.setAttribute('aria-hidden','false');
+};
+window.closeProjector=function(){
+    clearInterval(_projTimer);
+    const p=document.getElementById('projectorMode');
+    p.classList.remove('show'); p.setAttribute('aria-hidden','true');
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+};
+window.toggleProjectorFullscreen=function(){
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    else document.documentElement.requestFullscreen().catch(()=>{
+        showNotification(currentLanguage==='es'?'Tu navegador no permitió la pantalla completa':'Your browser blocked fullscreen','info');
+    });
+};
+
 // === VIDA PROPIA DE JUYU ===
 // Cada minuto elige una acción, la hace unos segundos y vuelve al reposo.
 // Ese reposo entre acciones es la pausa: sin ella agotaría la vista.
@@ -2049,16 +2233,88 @@ function juyuSpots(){
         {x:der,y:Math.round(h*0.32)}
     ];
 }
-function juyuMoverA(indice){
+let _juyuXY={x:0,y:14};
+// Coloca a JUYU en unas coordenadas concretas, sin salirse de la pantalla.
+function juyuColocar(x,y,girar){
     const m=document.getElementById('juyuMascot'); if(!m) return;
+    const btn=document.getElementById('juyuBtn');
+    const w=btn?btn.offsetWidth:76, h=btn?btn.offsetHeight:86;
+    x=Math.max(4, Math.min(x, window.innerWidth-w-4));
+    y=Math.max(4, Math.min(y, window.innerHeight-h-4));
+    if(girar) m.classList.toggle('facing-left', x < _juyuXY.x-8);
+    _juyuXY={x,y};
+    m.style.transform=`translate(${x}px, ${-y}px)`;
+    m.classList.toggle('on-left', x < window.innerWidth/2);
+}
+function juyuMoverA(indice){
+    // Si el docente lo colocó a mano, se respeta su sitio.
+    if(_juyuFijado){ juyuColocar(_juyuXY.x,_juyuXY.y,false); return; }
     const spots=juyuSpots();
     const destino=spots[indice%spots.length];
-    const anterior=spots[_juyuPos%spots.length];
-    // Se gira hacia donde camina.
-    m.classList.toggle('facing-left', destino.x < anterior.x-8);
-    m.style.transform=`translate(${destino.x}px, ${-destino.y}px)`;
-    m.classList.toggle('on-left', destino.x < window.innerWidth/2);
+    juyuColocar(destino.x,destino.y,true);
     _juyuPos=indice%spots.length;
+}
+// --- Arrastrar a JUYU donde uno quiera ---
+let _juyuFijado=false, _juyuDrag=null;
+function guardarPosJuyu(){
+    try{ localStorage.setItem('learnersTrackJuyuPos',JSON.stringify({x:_juyuXY.x,y:_juyuXY.y})); }catch(e){}
+}
+function cargarPosJuyu(){
+    try{
+        const g=JSON.parse(localStorage.getItem('learnersTrackJuyuPos')||'null');
+        if(g&&typeof g.x==='number'&&typeof g.y==='number'){ _juyuFijado=true; juyuColocar(g.x,g.y,false); return true; }
+    }catch(e){}
+    return false;
+}
+window.soltarJuyu=function(){
+    _juyuFijado=false;
+    try{ localStorage.removeItem('learnersTrackJuyuPos'); }catch(e){}
+    document.getElementById('juyuMascot')?.classList.remove('pinned');
+    juyuMoverA(0);
+    showNotification(currentLanguage==='es'?'JUYU vuelve a pasear solo 🐾':'JUYU roams freely again 🐾','success');
+};
+function initJuyuDrag(){
+    const m=document.getElementById('juyuMascot'), btn=document.getElementById('juyuBtn');
+    if(!m||!btn||btn.dataset.dragReady) return;
+    btn.dataset.dragReady='1';
+    btn.addEventListener('pointerdown',e=>{
+        if(e.button!==undefined&&e.button!==0) return;
+        _juyuDrag={ px:e.clientX, py:e.clientY, ox:_juyuXY.x, oy:_juyuXY.y, movido:false };
+        // La transición se quita ya: si se espera al primer movimiento, ese
+        // primer tramo se va animando 1,9 s y el arrastre arranca con retraso.
+        m.style.transition='none';
+        try{ btn.setPointerCapture(e.pointerId); }catch(err){}
+    });
+    btn.addEventListener('pointermove',e=>{
+        if(!_juyuDrag) return;
+        const dx=e.clientX-_juyuDrag.px, dy=e.clientY-_juyuDrag.py;
+        if(!_juyuDrag.movido && Math.hypot(dx,dy)>6){
+            _juyuDrag.movido=true;
+            m.classList.add('dragging','busy');
+            m.classList.remove('act-run','act-bark','act-scratch','act-ball');
+        }
+        if(_juyuDrag.movido) juyuColocar(_juyuDrag.ox+dx, _juyuDrag.oy-dy, false);
+    });
+    const terminar=e=>{
+        if(!_juyuDrag) return;
+        const movido=_juyuDrag.movido;
+        _juyuDrag=null;
+        m.classList.remove('dragging','busy');
+        m.style.transition='';
+        if(movido){
+            _juyuFijado=true;
+            m.classList.add('pinned');
+            guardarPosJuyu();
+            // Se traga el clic para no abrir el consejo justo al soltarlo.
+            btn.dataset.suppressClick='1';
+            setTimeout(()=>{ delete btn.dataset.suppressClick; },80);
+            showNotification(currentLanguage==='es'
+                ? 'JUYU se queda aquí. Para que vuelva a pasear, tócalo y pulsa «Que pasee».'
+                : 'JUYU stays here. Tap him and press “Let him roam” to free him.','info');
+        }
+    };
+    btn.addEventListener('pointerup',terminar);
+    btn.addEventListener('pointercancel',terminar);
 }
 function juyuPuedeActuar(){
     const m=document.getElementById('juyuMascot');
@@ -2087,6 +2343,15 @@ window.juyuDoAction=function(nombre){
     if(nombre==='run'){
         // Con un modal abierto no se pasea: taparía lo que el docente está usando.
         if(juyuHayModalAbierto()){ juyuAccion('bark',1800); return; }
+        // Si lo colocaste tú, no se va: da una carrerita y vuelve a su sitio.
+        if(_juyuFijado){
+            const origen={..._juyuXY};
+            const haciaIzq = origen.x > window.innerWidth/2;
+            juyuAccion('run',2400);
+            juyuColocar(origen.x + (haciaIzq?-72:72), origen.y, true);
+            setTimeout(()=>juyuColocar(origen.x,origen.y,true),1200);
+            return;
+        }
         const spots=juyuSpots();
         let destino=_juyuPos;
         while(spots.length>1 && destino===_juyuPos) destino=Math.floor(Math.random()*spots.length);
@@ -2131,9 +2396,14 @@ function initJuyu(){
             localStorage.setItem('learnersTrackJuyuSeen','1');
         }
     }catch(e){}
+    initJuyuDrag();
     // Solo se recoloca la primera vez: si no, cualquier cambio de idioma
     // devolvería a JUYU a la esquina en mitad de un paseo.
-    if(!_juyuArrancado) juyuMoverA(0);
+    if(!_juyuArrancado){
+        // Si el docente ya lo había colocado a mano, se respeta su sitio.
+        if(cargarPosJuyu()) document.getElementById('juyuMascot')?.classList.add('pinned');
+        else juyuMoverA(0);
+    }
     juyuVida();
 }
 
@@ -3847,6 +4117,7 @@ function updateNewFeaturesText(){
     const sch=document.querySelector('#sideClassHeading span'); if(sch)sch.textContent=es?'Aula':'Classroom';
     const sah=document.querySelector('#sideAiHeading span'); if(sah)sah.textContent=es?'Inteligencia artificial':'Artificial intelligence';
     setTxt('statisticsBtnText','Estadísticas del curso','Course statistics');
+    setTxt('projectorBtnText','Modo proyector','Projector mode');
     setTxt('exportPdfBtnText','Reporte completo en PDF','Full report PDF');
     setTxt('aiAnalysisBtnText','Analizar salón con IA','AI classroom analysis');
     setTxt('aiChatBtnText','Asistente IA','AI assistant');
@@ -4015,7 +4286,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const bcMin=document.getElementById('bulkCertMinGrade');
     if(bcMin){ bcMin.addEventListener('input',renderBulkCertPreview); bcMin.addEventListener('change',renderBulkCertPreview); }
     document.addEventListener('keydown',e=>{
+        const proj=document.getElementById('projectorMode');
+        const enProyector=proj&&proj.classList.contains('show');
+        // Flechas para pasar de panel mientras se proyecta.
+        if(enProyector&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){ projPanel(e.key==='ArrowRight'?1:-1); return; }
         if(e.key!=='Escape')return;
+        if(enProyector){ closeProjector(); return; }
         // Primero se cancela la insignia activa; si no hay ninguna, se cierran los modales.
         if(armedBadge){ disarmBadge(); return; }
         document.querySelectorAll('.modal').forEach(m=>{ if(m.style.display==='flex') hideModal(m.id); });
