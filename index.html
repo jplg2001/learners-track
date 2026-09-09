@@ -445,7 +445,10 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .podium-medal { font-size:clamp(1.8rem,3.6vw,3rem); line-height:1; margin-bottom:4px; }
 .podium-face { width:clamp(52px,7vw,96px); height:clamp(52px,7vw,96px); border-radius:50%; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.2rem,2.6vw,2.2rem); color:#3b2f8f; background:#fff; border:4px solid rgba(255,255,255,.65); box-shadow:0 8px 22px rgba(0,0,0,.28); margin-bottom:8px; }
 .podium-name { font-weight:700; font-size:clamp(.85rem,1.5vw,1.35rem); text-align:center; margin-bottom:4px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.podium-count { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.1rem,2.2vw,1.9rem); color:#ffd166; margin-bottom:8px; }
+.podium-count { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.1rem,2.2vw,1.9rem); color:#ffd166; margin-bottom:2px; }
+.podium-sub { font-size:clamp(.65rem,1vw,.85rem); opacity:.7; margin-bottom:6px; }
+.group-size-box { display:flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; font-size:.85rem; font-weight:600; color:var(--fg); cursor:pointer; }
+.group-size-box input { width:58px; padding:5px 7px; border-radius:7px; border:1px solid var(--border); font-family:inherit; font-size:.92rem; background:var(--bg-alt); color:var(--fg); }
 .podium-block { width:100%; border-radius:14px 14px 0 0; background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.14)); border:1px solid rgba(255,255,255,.3); border-bottom:none; }
 .podium-spot.p1 .podium-block { height:clamp(80px,15vh,170px); }
 .podium-spot.p2 .podium-block { height:clamp(56px,11vh,124px); }
@@ -1136,6 +1139,10 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div id="weekControls" class="week-controls">
                 <button class="add-week-btn" id="addWeekBtn">+ Add Week</button>
                 <button class="remove-week-btn" id="removeWeekBtn">- Remove Week</button>
+                <label class="group-size-box" id="groupSizeBox">
+                    <span id="groupSizeLabel">👥 Integrantes por grupo:</span>
+                    <input type="number" id="groupSizeInput" min="2" max="12" step="1" value="7">
+                </label>
             </div>
             <div id="scoresControls" class="notes-controls" style="display:none;">
                 <button class="add-note-col-btn" id="addNoteColBtn">+ Add Score Column</button>
@@ -1532,7 +1539,11 @@ const defaultBadges = [
 let weekDays = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
 let gridWeeks = 1;
 let weekTitles = ["Week 1"];
-const STUDENTS_PER_ROW = 7;
+// === GRUPOS ===
+// La vista de "Filas semanales" es en realidad la de GRUPOS: cada fila es un
+// grupo de trabajo. Una insignia otorgada a un integrante la reciben todos.
+let groupSize = 7;
+const GROUP_SIZE_MIN = 2, GROUP_SIZE_MAX = 12;
 let noteColumns = ["Evaluation 1","Evaluation 2"];
 // === PUNTOS POR INSIGNIA ===
 // Todas las insignias valen lo mismo, se agreguen las que se agreguen. Los puntos
@@ -1829,8 +1840,8 @@ function formatBytes(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.
 const translations = {
     en: {
         appTitle:"Learners Track", userWelcome:"User:", profileBtn:"👤 Profile", logoutBtn:"🚪 Logout",
-        headerDescription:"<b>Tip:</b> tap a badge, then tap a cell to award it — works on tablets. You can also drag it. Hold <b>Shift</b> to award it to the whole row.",
-        viewLabel:"View:", weeklyRows:"Weekly Rows", weeklyGrid:"Weekly Grid", scores:"SCORES",
+        headerDescription:"<b>Tip:</b> in <b>Groups</b>, a badge goes to the whole group. In <b>Individual</b>, only to that student. Hold <b>Shift</b> to award it to one member only.",
+        viewLabel:"View:", weeklyRows:"Groups", weeklyGrid:"Individual", scores:"SCORES",
         export:"📥 Export", exportViewPdf:"📄 Current View PDF", exportViewExcel:"📊 Current View Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Badges PDF",
         exportBadgesExcel:"📊 Badges Excel", exportStatsPdf:"📄 Statistics PDF", exportStatsExcel:"📊 Statistics Excel",
@@ -1876,8 +1887,8 @@ const translations = {
     },
     es: {
         appTitle:"Learners Track", userWelcome:"Usuario:", profileBtn:"👤 Perfil", logoutBtn:"🚪 Cerrar Sesión",
-        headerDescription:"<b>Consejo:</b> toca una insignia y luego la celda para otorgarla — funciona en tablet. También puedes arrastrarla. Mantén <b>Shift</b> para otorgarla a toda la fila.",
-        viewLabel:"Vista:", weeklyRows:"Filas semanales", weeklyGrid:"Cuadrícula semanal", scores:"SCORES",
+        headerDescription:"<b>Consejo:</b> en <b>Grupos</b> la insignia la recibe todo el grupo. En <b>Individual</b>, solo ese estudiante. Mantén <b>Shift</b> para dársela a uno solo del grupo.",
+        viewLabel:"Vista:", weeklyRows:"Grupos", weeklyGrid:"Individual", scores:"SCORES",
         export:"📥 Exportar", exportViewPdf:"📄 Vista Actual PDF", exportViewExcel:"📊 Vista Actual Excel",
         exportScoresPdf:"📄 Scores PDF", exportScoresExcel:"📊 Scores Excel", exportBadgesPdf:"📄 Insignias PDF",
         exportBadgesExcel:"📊 Insignias Excel", exportStatsPdf:"📄 Estadísticas PDF", exportStatsExcel:"📊 Estadísticas Excel",
@@ -2035,8 +2046,8 @@ const JUYU_TIPS = {
   es: {
     login:   '¡Guau! Soy <b>JUYU</b> 🐾 Entra con tu correo y te ayudo a llevar el seguimiento de tu clase de inglés.',
     setup:   '¡Bienvenido! Elige tu grado y, si quieres, sube el logo de tu colegio. Puedes cambiarlo después.',
-    rows:    'Toca una insignia y luego una celda para otorgarla. Mantén <b>Shift</b> para dársela a toda la fila.',
-    grid:    'En la cuadrícula ves la semana completa. Usa <b>+ Añadir semana</b> para llevar todo el periodo.',
+    rows:    'Aquí la insignia es del GRUPO: se la llevan todos sus integrantes. Con <b>Shift</b> se la das a uno solo.',
+    grid:    'Vista individual: la insignia va solo a ese estudiante. Aquí el ranking del proyector es persona a persona.',
     scores:  'Aquí van las notas. Activa <b>Sumar puntos de insignias</b> y el esfuerzo se refleja en el promedio.',
     stats:   'Estas gráficas te dicen quién va bien y quién necesita apoyo. Puedes exportarlas en PDF.',
     lesson:  'Sube tus planeaciones y aprendo tu estilo. Luego te preparo la siguiente clase en Word.',
@@ -2046,8 +2057,8 @@ const JUYU_TIPS = {
   en: {
     login:   'Woof! I am <b>JUYU</b> 🐾 Sign in with your email and I will help you track your English class.',
     setup:   'Welcome! Pick your grade and, if you like, upload your school logo. You can change it later.',
-    rows:    'Tap a badge, then a cell to award it. Hold <b>Shift</b> to give it to the whole row.',
-    grid:    'The grid shows the full week. Use <b>+ Add week</b> to cover the whole term.',
+    rows:    'Here a badge belongs to the GROUP: every member gets it. Hold <b>Shift</b> to give it to just one.',
+    grid:    'Individual view: the badge goes only to that student. Here the projector ranking is per person.',
     scores:  'Scores go here. Turn on <b>Add badge points</b> and effort shows up in the average.',
     stats:   'These charts show who is doing well and who needs support. You can export them as PDF.',
     lesson:  'Upload your lesson plans and I learn your style. Then I draft the next class in Word.',
@@ -2129,8 +2140,19 @@ function rankingInsignias(){
 function renderProjPanel(){
     const body=document.getElementById('projBody'); if(!body) return;
     const es=currentLanguage==='es';
+    // El ranking sigue a la vista activa: por grupos en la vista de grupos,
+    // individual en la cuadrícula y en notas.
+    const porGrupos = (viewMode==='rows');
     if(_projPanel===0){
-        const orden=rankingInsignias().filter(x=>x.total>0);
+        const orden = porGrupos
+            ? gruposDelSalon().map(g=>({
+                nombre:g.nombre,
+                // Como la insignia la reciben todos, el marcador justo del grupo
+                // es lo que le toca a cada integrante, no la suma bruta.
+                total: g.miembros.length ? Math.round(g.total/g.miembros.length*10)/10 : 0,
+                sub: `${g.miembros.length} ${es?'integrantes':'members'}`
+              })).filter(x=>x.total>0).sort((a,b)=>b.total-a.total)
+            : rankingInsignias().filter(x=>x.total>0);
         if(orden.length===0){
             body.innerHTML=`<div class="proj-empty">${illo('student','pe-illo')}`
                 + `<p>${es?'Todavía no hay insignias otorgadas esta semana. ¡Empecemos!':'No badges awarded yet. Let us get started!'}</p></div>`;
@@ -2141,13 +2163,18 @@ function renderProjPanel(){
             // El orden visual del podio es 2º, 1º, 3º
             const visual=[podio[1],podio[0],podio[2]];
             const clases=['p2','p1','p3'], medIdx=[1,0,2];
-            body.innerHTML=`<h2 class="proj-title">🏆 ${es?'Ranking de insignias':'Badge ranking'}</h2>`
+            const titulo = porGrupos
+                ? (es?'🏆 Ranking por grupos':'🏆 Group ranking')
+                : (es?'🏆 Ranking de insignias':'🏆 Badge ranking');
+            const cara = x => porGrupos ? String(x.nombre.match(/\d+/)||'?') : iniciales(x.nombre);
+            body.innerHTML=`<h2 class="proj-title">${titulo}</h2>`
                 + `<div class="proj-podium">`
                 + visual.map((x,i)=>x?`<div class="podium-spot ${clases[i]}">`
                     + `<div class="podium-medal">${medallas[medIdx[i]]}</div>`
-                    + `<div class="podium-face" style="background:${colorNombre(x.nombre)}">${escapeHtml(iniciales(x.nombre))}</div>`
+                    + `<div class="podium-face" style="background:${colorNombre(x.nombre)}">${escapeHtml(cara(x))}</div>`
                     + `<div class="podium-name">${escapeHtml(x.nombre)}</div>`
                     + `<div class="podium-count">${x.total}</div>`
+                    + (x.sub?`<div class="podium-sub">${escapeHtml(x.sub)}</div>`:'')
                     + `<div class="podium-block"></div></div>`:'').join('')
                 + `</div>`
                 + (resto.length?`<div class="proj-rest">`
@@ -2702,6 +2729,7 @@ function saveUserProfile() {
     currentUser.classrooms=classrooms; currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles;
     currentUser.noteColumns=noteColumns; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
+    currentUser.groupSize=groupSize;
     currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
     saveUsers(); updateUIWithProfile();
     if(window.FIREBASE_ON) scheduleCloudPush();
@@ -2730,6 +2758,7 @@ function saveData() {
     currentUser.classrooms=classrooms; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles; currentUser.noteColumns=noteColumns;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
+    currentUser.groupSize=groupSize;
     currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
     saveUsers();
     if(window.FIREBASE_ON) scheduleCloudPush();
@@ -2811,6 +2840,7 @@ function setViewMode(m) {
     const wc=document.getElementById('weekControls'),sc=document.getElementById('scoresControls');
     if(m==='scores'){if(wc)wc.style.display='none';if(sc)sc.style.display='flex';}
     else{if(wc)wc.style.display='flex';if(sc)sc.style.display='none';}
+    syncGroupSizeControl();
     renderCurrentView();
 }
 
@@ -2835,6 +2865,23 @@ window.deleteStudent=function(sid) {
     if(i!==-1){c.students.splice(i,1);c.students.forEach((s,j)=>s.id=j+1);saveData();loadActiveClassroom();}
 };
 function updateNoteButtons() { const a=document.getElementById('addNoteColBtn'),r=document.getElementById('removeNoteColBtn'); if(a)a.disabled=noteColumns.length>=10; if(r)r.disabled=noteColumns.length<=1; syncBadgePointsControls(); }
+// El control de tamaño de grupo solo tiene sentido en la vista de grupos.
+function syncGroupSizeControl(){
+    const box=document.getElementById('groupSizeBox'), inp=document.getElementById('groupSizeInput');
+    if(box) box.style.display = (viewMode==='rows') ? '' : 'none';
+    if(inp) inp.value=groupSize;
+}
+window.setGroupSize=function(raw){
+    const es=currentLanguage==='es';
+    const v=parseInt(raw,10);
+    if(isNaN(v)||v<GROUP_SIZE_MIN||v>GROUP_SIZE_MAX){
+        showNotification(es?`Entre ${GROUP_SIZE_MIN} y ${GROUP_SIZE_MAX} integrantes`:`Between ${GROUP_SIZE_MIN} and ${GROUP_SIZE_MAX} members`,'error');
+        syncGroupSizeControl(); return;
+    }
+    groupSize=v; saveData(); syncGroupSizeControl(); renderCurrentView();
+    const n=Math.ceil((currentStudents||[]).length/groupSize);
+    showNotification(es?`${n} grupo(s) de hasta ${v} integrantes`:`${n} group(s) of up to ${v} members`,'info');
+};
 // Refleja el estado actual en los controles de puntos por insignia.
 function syncBadgePointsControls(){
     const chk=document.getElementById('badgePointsEnabledInput');
@@ -3105,12 +3152,12 @@ function renderClassroomRows() {
         const sd=document.createElement('div');
         const title=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;
         sd.innerHTML=`<input class="week-title-editable" value="${escapeHtml(title)}" readonly aria-label="${currentLanguage==='es'?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
-        const filas=Math.ceil(currentStudents.length/STUDENTS_PER_ROW);
+        const filas=Math.ceil(currentStudents.length/groupSize);
         for(let f=0;f<filas;f++){
             const table=document.createElement('table'); table.className='student-grid-table';
-            table.innerHTML=`<thead><tr><th>${currentLanguage==='es'?'Fila':'Row'} ${f+1}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr></thead>`;
+            table.innerHTML=`<thead><tr><th>${currentLanguage==='es'?'Grupo':'Group'} ${f+1}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr></thead>`;
             const tbody=document.createElement('tbody');
-            for(let s=f*STUDENTS_PER_ROW;s<Math.min((f+1)*STUDENTS_PER_ROW,currentStudents.length);s++){
+            for(let s=f*groupSize;s<Math.min((f+1)*groupSize,currentStudents.length);s++){
                 const st=currentStudents[s];
                 const tr=document.createElement('tr');
                 tr.innerHTML=studentNameCellHtml(st);
@@ -3122,7 +3169,7 @@ function renderClassroomRows() {
         g.appendChild(sd);
     }
     const ac=document.createElement('div'); ac.className='week-controls';
-    ac.innerHTML=`<span>${currentLanguage==='es'?'Añadir estudiante en:':'Add student in:'}</span>${Array.from({length:Math.ceil(currentStudents.length/STUDENTS_PER_ROW)+1},(_,i)=>`<button class="add-student-btn" onclick="addStudentAt(${i*STUDENTS_PER_ROW})">${currentLanguage==='es'?'Fila':'Row'} ${i+1}</button>`).join('')}`;
+    ac.innerHTML=`<span>${currentLanguage==='es'?'Añadir estudiante en:':'Add student in:'}</span>${Array.from({length:Math.ceil(currentStudents.length/groupSize)+1},(_,i)=>`<button class="add-student-btn" onclick="addStudentAt(${i*groupSize})">${currentLanguage==='es'?'Grupo':'Group'} ${i+1}</button>`).join('')}`;
     g.appendChild(ac);
     attachDragAndDropListeners();
 }
@@ -3168,12 +3215,12 @@ function renderClassroomScores() {
 }
 
 // === DRAG & DROP ===
-// Aplica la insignia a la celda. Con Shift (o Ctrl) se aplica a toda la fila.
-// Antes, en la vista de filas SIEMPRE se aplicaba a los 7 estudiantes de la fila,
-// asi que era imposible premiar a uno solo y era facil hacerlo sin querer.
-function awardBadgeToCell(td, badge, wholeRow){
+// En la vista de GRUPOS la insignia es del grupo: la reciben todos sus integrantes.
+// En la CUADRÍCULA, que es la vista individual, va solo a ese estudiante.
+// Con Shift (o Ctrl) se hace la excepción: premiar a uno solo dentro del grupo.
+function awardBadgeToCell(td, badge, soloUno){
     const sid=parseInt(td.dataset.studentId), ci=parseInt(td.dataset.cellIdx), ri=parseInt(td.dataset.row);
-    if(wholeRow && viewMode==="rows" && !isNaN(ri)) applyBadgeToRow(ri,ci,badge);
+    if(viewMode==="rows" && !isNaN(ri) && !soloUno) applyBadgeToRow(ri,ci,badge);
     else addGridBadgeToCell(sid,ci,badge);
 }
 function attachDragAndDropListeners() {
@@ -3200,10 +3247,33 @@ function attachDragAndDropListeners() {
     if(armedBadge) document.querySelectorAll('.student-grid-table td[data-student-id]').forEach(td=>td.classList.add('badge-target'));
 }
 function applyBadgeToRow(ri,ci,badge){
-    const si=ri*STUDENTS_PER_ROW; const ei=Math.min(si+STUDENTS_PER_ROW,currentStudents.length);
-    let up=false;
-    for(let i=si;i<ei;i++){const s=currentStudents[i];if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){s.gridBadges[ci].push(badge);up=true;}}
-    if(up){saveData();renderCurrentView();updateStats();}
+    const es=currentLanguage==='es';
+    const si=ri*groupSize; const ei=Math.min(si+groupSize,currentStudents.length);
+    let cuantos=0;
+    for(let i=si;i<ei;i++){const s=currentStudents[i];if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){s.gridBadges[ci].push(badge);cuantos++;}}
+    if(cuantos){
+        saveData();renderCurrentView();updateStats();
+        // Se avisa de que fue al grupo entero, no a una sola persona.
+        showNotification(es
+            ? `🏅 ${escapeHtml(badge.name)} para el Grupo ${ri+1} · ${cuantos} integrante(s)`
+            : `🏅 ${escapeHtml(badge.name)} for Group ${ri+1} · ${cuantos} member(s)`,'success');
+    }
+}
+// Nombre e integrantes de cada grupo, tal como se ven en la vista de grupos.
+function gruposDelSalon(){
+    const es=currentLanguage==='es';
+    const total=(currentStudents||[]).length;
+    const grupos=[];
+    for(let g=0; g*groupSize<total; g++){
+        const miembros=currentStudents.slice(g*groupSize,(g+1)*groupSize);
+        grupos.push({
+            indice:g,
+            nombre:(es?'Grupo ':'Group ')+(g+1),
+            miembros,
+            total:miembros.reduce((a,s)=>a+countStudentBadges(s),0)
+        });
+    }
+    return grupos;
 }
 window.updateStudentNameGrid=function(sid,val){const s=currentStudents.find(x=>x.id===sid);if(s){s.name=val.trim();saveData();updateStats();}};
 function addGridBadgeToCell(sid,ci,badge){const s=currentStudents.find(x=>x.id===sid);if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){s.gridBadges[ci].push(badge);saveData();renderCurrentView();updateStats();}}
@@ -3663,6 +3733,7 @@ async function handleLogin(event){
             noteColumns=user.noteColumns||["Evaluation 1","Evaluation 2"];
             badgePointsEnabled=!!user.badgePointsEnabled;
             badgePointValue=(typeof user.badgePointValue==='number')?user.badgePointValue:0.2;
+            groupSize=(typeof user.groupSize==="number")?user.groupSize:7;
             lessonPlans=Array.isArray(user.lessonPlans)?user.lessonPlans:[];
             teachingStyleProfile=user.teachingStyleProfile||null;
             updateUIWithProfile(); hideProfileSetup(); loadActiveClassroom();
@@ -4118,6 +4189,8 @@ function updateNewFeaturesText(){
     const sah=document.querySelector('#sideAiHeading span'); if(sah)sah.textContent=es?'Inteligencia artificial':'Artificial intelligence';
     setTxt('statisticsBtnText','Estadísticas del curso','Course statistics');
     setTxt('projectorBtnText','Modo proyector','Projector mode');
+    setTxt('groupSizeLabel','👥 Integrantes por grupo:','👥 Members per group:');
+    syncGroupSizeControl();
     setTxt('exportPdfBtnText','Reporte completo en PDF','Full report PDF');
     setTxt('aiAnalysisBtnText','Analizar salón con IA','AI classroom analysis');
     setTxt('aiChatBtnText','Asistente IA','AI assistant');
@@ -4282,6 +4355,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(bpEnabled) bpEnabled.addEventListener('change',function(){ setBadgePointsEnabled(this.checked); });
     const bpValue=document.getElementById('badgePointValueInput');
     if(bpValue) bpValue.addEventListener('change',function(){ setBadgePointValue(this.value); });
+    const gsInput=document.getElementById('groupSizeInput');
+    if(gsInput) gsInput.addEventListener('change',function(){ setGroupSize(this.value); });
     // La lista de aprobados se recalcula mientras se ajusta la nota mínima.
     const bcMin=document.getElementById('bulkCertMinGrade');
     if(bcMin){ bcMin.addEventListener('input',renderBulkCertPreview); bcMin.addEventListener('change',renderBulkCertPreview); }
@@ -5355,6 +5430,7 @@ function loadUserFromCloud(uid,email){
     };
     badgePointsEnabled=currentUser.badgePointsEnabled;
     badgePointValue=currentUser.badgePointValue;
+    groupSize=(typeof d.groupSize==="number")?d.groupSize:7;
     lessonPlans=Array.isArray(d.lessonPlans)?d.lessonPlans:[];
     teachingStyleProfile=d.teachingStyleProfile||null;
     userProfile.name=currentUser.name||'Teacher'; userProfile.email=currentUser.email; userProfile.avatar=currentUser.avatar;
@@ -5380,7 +5456,7 @@ function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_clou
 function pushToCloud(){
   try{
     const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile };
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
     // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
