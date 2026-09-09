@@ -1174,7 +1174,10 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
                     <span class="badge-points-help" id="badgePointsHelp">Los puntos se suman a la nota más baja; si llega a 5.0, pasan a la siguiente.</span>
                 </div>
             </div>
-            <div style="margin:6px 0 12px;"><input type="search" id="studentSearchInput" name="lt-student-search" autocomplete="off" autocapitalize="off" placeholder="🔎 Search student..." style="width:100%;max-width:340px;padding:8px 12px;border-radius:8px;border:1px solid #c9d8f6;box-sizing:border-box;font-family:inherit;"></div>
+            <!-- readonly de arranque: es lo único que impide de verdad que el gestor
+                 de contraseñas de Chrome meta aquí el correo del docente. Se quita
+                 en cuanto se toca el campo. -->
+            <div style="margin:6px 0 12px;"><input type="search" id="studentSearchInput" name="lt-buscar-alumno" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true" readonly placeholder="🔎 Search student..." style="width:100%;max-width:340px;padding:8px 12px;border-radius:8px;border:1px solid #c9d8f6;box-sizing:border-box;font-family:inherit;"></div>
             <div id="classroomRowsView" class="table-scroll"></div>
             <div id="classroomGridView" class="table-scroll" style="display:none;"></div>
             <div id="classroomScoresView" class="table-scroll" style="display:none;"></div>
@@ -2867,7 +2870,7 @@ function loadActiveClassroom() {
         if(!s.notes||s.notes.length!==noteColumns.length){const old=s.notes||[];s.notes=Array.from({length:noteColumns.length},(_,i)=>old[i]||"");}
     });
     const cn=document.getElementById('className'); if(cn)cn.value=c.name;
-    const _ss=document.getElementById('studentSearchInput'); if(_ss)_ss.value='';
+    limpiarBusquedaAlumno();
     renderBadges(); renderCurrentView(); updateStats(); updateWeekButtons(); updateNoteButtons();
 }
 const cnEl=document.getElementById('className');
@@ -3727,6 +3730,19 @@ function showProfileSetup(){
 function hideProfileSetup(){
     document.getElementById('profileSetupContainer').style.display='none';
     document.getElementById('mainContainer').style.display='flex';
+    limpiarBusquedaAlumno();
+}
+// El gestor de contraseñas rellena con retraso, después de mostrar la app, así que
+// no basta con vaciar el campo una vez: se repasa durante los primeros segundos.
+function limpiarBusquedaAlumno(){
+    const vaciar=()=>{
+        const ss=document.getElementById('studentSearchInput');
+        if(!ss) return;
+        if(ss.value){ ss.value=''; if(typeof filterStudents==='function') filterStudents(); }
+        if(document.activeElement!==ss) ss.setAttribute('readonly','readonly');
+    };
+    vaciar();
+    [150,600,1500].forEach(ms=>setTimeout(vaciar,ms));
 }
 
 // === LOGIN & REGISTER ===
@@ -4393,7 +4409,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(lb)lb.addEventListener('click',logout);
     if(epb)epb.addEventListener('click',exportToPDF);
     const addWeekBtn=document.getElementById('addWeekBtn'); if(addWeekBtn) addWeekBtn.addEventListener('click',window.addWeek);
-    const ssInput=document.getElementById('studentSearchInput'); if(ssInput) ssInput.addEventListener('input',filterStudents);
+    const ssInput=document.getElementById('studentSearchInput');
+    if(ssInput){
+        ssInput.addEventListener('input',filterStudents);
+        // Al tocarlo se libera para poder escribir; el navegador ya no lo autocompleta.
+        const liberar=()=>ssInput.removeAttribute('readonly');
+        ssInput.addEventListener('focus',liberar);
+        ssInput.addEventListener('pointerdown',liberar);
+    }
     const removeWeekBtn=document.getElementById('removeWeekBtn'); if(removeWeekBtn) removeWeekBtn.addEventListener('click',window.removeWeek);
     const addNoteColBtn=document.getElementById('addNoteColBtn'); if(addNoteColBtn) addNoteColBtn.addEventListener('click',window.addNoteColumn);
     const removeNoteColBtn=document.getElementById('removeNoteColBtn'); if(removeNoteColBtn) removeNoteColBtn.addEventListener('click',window.removeNoteColumn);
