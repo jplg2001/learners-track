@@ -388,6 +388,65 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
 /* Boton opcional dentro de un aviso, para deshacer lo que se acaba de hacer. */
 .notification-action { margin-left:14px; font:inherit; font-weight:700; color:inherit; background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.55); border-radius:7px; padding:3px 11px; cursor:pointer; transition:background .15s; }
 .notification-action:hover { background:rgba(255,255,255,.4); }
+/* === CONTROL POR CELULAR === */
+.remote-btn.conectado { background:rgba(32,209,132,.18); border-color:var(--success); color:var(--success); }
+.remote-modal { max-width:430px; text-align:center; }
+.remote-modal h3 { margin:0 0 10px; font-size:1.25rem; }
+.remote-help { font-size:.88rem; color:var(--fg-muted); line-height:1.45; margin:0 0 16px; }
+/* El QR se dibuja siempre sobre blanco: en modo oscuro deja de leerse. */
+.remote-qr-box { display:flex; justify-content:center; }
+#remoteQr { display:inline-flex; padding:14px; background:#fff; border-radius:14px; box-shadow:var(--shadow-sm); }
+#remoteQr img,#remoteQr canvas { display:block; }
+.remote-qr-fail { font-size:.85rem; color:var(--danger); padding:14px; }
+.remote-status { margin:14px 0 6px; font-size:.9rem; font-weight:700; }
+.remote-status.estado-conectado { color:var(--success); }
+.remote-status.estado-reglas,.remote-status.estado-error { color:var(--danger); }
+.remote-url { font-size:.72rem; color:var(--fg-muted); word-break:break-all; margin:0 0 14px; }
+.remote-modal-actions { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
+.remote-rules { margin-top:16px; text-align:left; border:1px solid var(--border); border-radius:12px; padding:11px 13px; }
+.remote-rules.resaltado { border-color:var(--danger); background:rgba(239,68,103,.06); }
+.remote-rules summary { cursor:pointer; font-weight:700; font-size:.87rem; }
+.remote-rules p { font-size:.83rem; color:var(--fg-muted); line-height:1.45; }
+.remote-rules pre { background:var(--bg-alt); border:1px solid var(--border); border-radius:9px; padding:10px; font-size:.76rem; overflow-x:auto; white-space:pre; }
+
+/* La pantalla del mando ocupa el celular entero y tapa la plataforma. */
+body.modo-control > *:not(#remoteScreen):not(.notification) { display:none !important; }
+.remote-screen { position:fixed; inset:0; z-index:4000; display:flex; flex-direction:column; background:var(--bg-gradient,var(--bg)); color:var(--fg); font-family:inherit; }
+.remote-top { flex:0 0 auto; padding:12px 13px 9px; background:var(--bg-card); border-bottom:1px solid var(--border); }
+.remote-top-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.remote-brand { font-size:1rem; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.remote-exit { font-family:inherit; font-size:.82rem; font-weight:700; color:var(--fg-muted); background:var(--bg-alt); border:1px solid var(--border); border-radius:9px; padding:7px 13px; cursor:pointer; }
+.remote-chip-row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:6px; }
+.remote-chip { font-family:inherit; font-size:.82rem; font-weight:700; color:var(--fg-muted); background:var(--bg-alt); border:1px solid var(--border); border-radius:999px; padding:7px 14px; cursor:pointer; }
+.remote-chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+.remote-chip.dia { padding:7px 11px; }
+.remote-select { font-family:inherit; font-size:.82rem; font-weight:700; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:9px; padding:6px 9px; }
+.remote-body { flex:1 1 auto; overflow-y:auto; padding:12px 13px 6px; -webkit-overflow-scrolling:touch; }
+.remote-section-title { font-size:.72rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--fg-muted); margin:0 0 7px; }
+.remote-students { display:flex; flex-direction:column; gap:7px; }
+.remote-student { display:flex; align-items:stretch; gap:6px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:5px; }
+.remote-student.sel { border-color:var(--accent); box-shadow:0 0 0 2px rgba(99,102,241,.22); }
+.remote-student.ausente .remote-name { opacity:.55; text-decoration:line-through; }
+.remote-name { flex:1 1 auto; min-width:0; text-align:left; font-family:inherit; font-size:.94rem; font-weight:700; color:inherit; background:none; border:none; padding:11px 9px; border-radius:9px; cursor:pointer; overflow-wrap:break-word; }
+.remote-att { flex:0 0 auto; width:46px; font-size:1.05rem; font-weight:800; font-family:inherit; border-radius:10px; border:1px solid var(--border); background:var(--bg-alt); color:var(--fg-muted); cursor:pointer; }
+.remote-att.si.on { background:var(--success); border-color:var(--success); color:#fff; }
+.remote-att.no.on { background:var(--danger); border-color:var(--danger); color:#fff; }
+.remote-bottom { flex:0 0 auto; padding:10px 13px 14px; background:var(--bg-card); border-top:1px solid var(--border); }
+.remote-selected { font-size:.88rem; margin-bottom:9px; min-height:1.2em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.remote-selected span { color:var(--fg-muted); }
+.remote-badges { display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:7px; }
+.remote-badge { display:flex; align-items:center; gap:6px; text-align:left; font-family:inherit; font-size:.78rem; font-weight:700; color:inherit; background:var(--bg-alt); border:1px solid var(--border); border-radius:11px; padding:10px 9px; cursor:pointer; }
+.remote-badge:active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.remote-badge-ico { flex:0 0 auto; font-size:1.05rem; }
+.remote-badge-ico img { width:1.15em; height:1.15em; display:block; }
+.remote-badge-txt { flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.remote-extra { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.remote-mini { flex:1 1 auto; min-width:44px; font-size:1rem; font-family:inherit; padding:10px 0; border-radius:10px; border:1px solid var(--border); background:var(--bg-alt); color:var(--fg); cursor:pointer; }
+.remote-vacio { font-size:.85rem; color:var(--fg-muted); padding:12px 2px; }
+/* Fila que el mando acaba de senalar en el computador. */
+tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
+@keyframes filaRemota { 0%,60%{ background:rgba(99,102,241,.24); } 100%{ background:transparent; } }
+@media (prefers-reduced-motion:reduce){ tr.fila-remota td { animation:none; } }
 .cert-btn-inline { color:var(--accent); font-size:1em; margin-left:8px; cursor:pointer; background:none; border:none; }
 .average-cell { background:#f8f9fa; font-weight:bold; border-left:2px solid var(--accent); }
 .score-high { color:var(--success); }
@@ -1151,6 +1210,7 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
             <button id="languageToggleApp" type="button" class="lang-switch" title="Español / English" aria-label="Cambiar idioma"><span aria-hidden="true">🌐</span><span id="languageToggleAppText">ES</span></button>
             <button id="profileBtn" type="button" class="profile-btn">👤 Profile</button>
             <button id="themeToggleBtn" type="button" class="theme-toggle-btn" title="Tema claro / oscuro" aria-label="Cambiar tema claro u oscuro">🌙</button>
+            <button id="remoteBtn" type="button" class="profile-btn remote-btn" title="Controlar desde el celular" aria-label="Controlar desde el celular" onclick="abrirControlMovil()">📱 <span id="remoteBtnText">Celular</span></button>
             <button id="logoutBtn" type="button" class="profile-btn">🚪 Logout</button>
         </div>
         </div>
@@ -1316,6 +1376,51 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
     </div>
 </div>
 
+<!-- Codigo QR para emparejar el celular como mando -->
+<div class="modal" id="remoteModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content remote-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarModalControl()">&times;</button>
+    <h3 id="remoteModalTitle">📱 Control desde el celular</h3>
+    <p class="remote-help" id="remoteModalHelp">Apunta la cámara de tu celular al código. Se abrirá la plataforma como un mando: podrás pasar lista, dar insignias y moverte por la clase sin volver al computador.</p>
+    <div class="remote-qr-box"><div id="remoteQr"></div></div>
+    <div class="remote-status" id="remoteStatus">…</div>
+    <p class="remote-url" id="remoteUrl"></p>
+    <div class="remote-modal-actions">
+      <button class="btn-secondary" type="button" id="remoteCopyBtn" onclick="copiarEnlaceControl()">🔗 <span id="remoteCopyText">Copiar enlace</span></button>
+      <button class="btn-secondary" type="button" id="remoteStopBtn" onclick="desconectarControl()">⏹ <span id="remoteStopText">Desconectar</span></button>
+    </div>
+    <details class="remote-rules" id="remoteRules">
+      <summary id="remoteRulesTitle">¿No conecta? Falta una regla en Firebase</summary>
+      <p id="remoteRulesHelp">El celular y el computador se hablan por un documento propio de tu cuenta. Añade este bloque en Firebase → Firestore → Reglas, junto al que ya tienes, y pulsa Publicar:</p>
+      <pre id="remoteRulesCode">match /remotes/{uid} {
+  allow read, write: if request.auth != null &amp;&amp; request.auth.uid == uid;
+}</pre>
+      <button class="btn-secondary" type="button" onclick="copiarReglaControl()">📋 <span id="remoteRulesCopyText">Copiar la regla</span></button>
+    </details>
+  </div>
+</div>
+
+<!-- Pantalla del mando: es lo unico que se ve en el celular -->
+<div id="remoteScreen" class="remote-screen" style="display:none;">
+  <header class="remote-top">
+    <div class="remote-top-row">
+      <span class="remote-brand">📱 <b id="remoteRoomName">…</b></span>
+      <button class="remote-exit" type="button" onclick="salirModoControl()" id="remoteExitBtn">Salir</button>
+    </div>
+    <div class="remote-chip-row" id="remoteViewRow"></div>
+    <div class="remote-chip-row" id="remoteDayRow"></div>
+  </header>
+  <div class="remote-body">
+    <div class="remote-section-title" id="remoteStudentsTitle">Estudiantes</div>
+    <div id="remoteStudents" class="remote-students"></div>
+  </div>
+  <footer class="remote-bottom">
+    <div class="remote-selected" id="remoteSelected"></div>
+    <div class="remote-section-title" id="remoteBadgesTitle">Insignias</div>
+    <div id="remoteBadges" class="remote-badges"></div>
+    <div class="remote-extra" id="remoteExtra"></div>
+  </footer>
+</div>
 <div class="modal" id="certificateModal" style="display:none;" aria-hidden="true">
     <div class="modal-content">
         <button class="modal-close-btn" onclick="closeCertificateModal()">&times;</button>
@@ -1952,6 +2057,7 @@ const translations = {
         addWeekBtn:"+ Add Week", removeWeekBtn:"- Remove Week", addNoteColBtn:"+ Add Score Column",
         clearAllWeeksBtn:"Clear all cells",
         attendanceLabel:"📋 Attendance:",
+        remoteBtn:"Phone",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -2001,6 +2107,7 @@ const translations = {
         addWeekBtn:"+ Añadir semana", removeWeekBtn:"- Quitar semana", addNoteColBtn:"+ Añadir Columna de Score",
         clearAllWeeksBtn:"Limpiar todas las casillas",
         attendanceLabel:"📋 Asistencia:",
+        remoteBtn:"Celular",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2077,6 +2184,7 @@ function updateUIText() {
         ['addWeekBtn','textContent',t.addWeekBtn],['removeWeekBtn','textContent',t.removeWeekBtn],
         ['clearAllWeeksText','textContent',t.clearAllWeeksBtn],
         ['attendanceLabel','textContent',t.attendanceLabel],
+        ['remoteBtnText','textContent',t.remoteBtn],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -2863,6 +2971,8 @@ async function authenticateUser(email,password) {
 
 // === LOGOUT ===
 function logout() {
+    // Se corta el mando: al salir de la cuenta nadie debe seguir mandando ordenes.
+    if(typeof desconectarControl==="function"){ try{ desconectarControl(); }catch(e){} }
     if(window.FIREBASE_ON){ try{ firebase.auth().signOut(); }catch(e){} }
     currentUser=null; selectedGrade=null; institutionLogo=null; profilePhoto=null;
     classrooms=[]; activeClassroomIndex=0; gridWeeks=1; weekTitles=["Week 1"]; noteColumns=["Evaluation 1","Evaluation 2"];
@@ -3402,7 +3512,7 @@ function studentNameCellHtml(s,opts){
     const est=(s.attendance||{})[attendanceDate]||'';
     // El nombre va en un bloque editable, no en una casilla de una sola linea:
     // asi se lee entero aunque sean tres apellidos, y se sigue pudiendo corregir.
-    return `<td class="student-name-cell${est==='p'?' celda-presente':(est==='a'?' celda-ausente':'')}">`
+    return `<td class="student-name-cell${est==='p'?' celda-presente':(est==='a'?' celda-ausente':'')}" data-name-for="${s.id}">`
         + `<div class="name-row">`
         + `<div class="student-name-text" contenteditable="true" spellcheck="false" role="textbox" aria-label="${es?'Nombre del estudiante':'Student name'}" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" onblur="guardarNombreAlumno(${s.id},this)">${safeName}</div>`
         + asistencia
@@ -5776,10 +5886,374 @@ function loadUserFromCloud(uid,email){
       classrooms=[]; activeClassroomIndex=0; updateUIWithProfile(); showProfileSetup();
     }
     hideAppLoader();
+    revisarModoControl();
     showNotification(translations[currentLanguage].loginSuccess,'success');
   }).catch(err=>{ console.error(err); hideAppLoader(); showNotification((currentLanguage==='es'?'Error al cargar datos de la nube: ':'Error loading cloud data: ')+fbErr(err),'error'); });
 }
 
+
+// === CONTROL DESDE EL CELULAR =============================================
+// Una pagina web no puede mover el raton del computador ni pulsar fuera de si
+// misma: eso lo prohibe el navegador. Lo que si puede es recibir ordenes y
+// ejecutarlas dentro de la propia plataforma, que es lo que hace este mando.
+//
+// El canal es un documento pequeno de Firestore, "remotes/{uid}". Las dos
+// pantallas entran con la MISMA cuenta, asi que nadie mas puede escribir ahi.
+const REMOTE_COL='remotes';
+const REMOTE_QR_URL='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+let _remoteSesion=null;      // id que genera el computador y viaja en el QR
+let _remoteUnsub=null;       // listener del computador
+let _remoteUltima=null;      // ultima orden ya ejecutada, para no repetirla
+let _remoteConectado=false;
+let _remotePedido=null;      // id leido de la direccion: esta pantalla es el mando
+let _remoteDia=0;            // dia elegido en el mando (0..4)
+let _remoteSemana=1;
+let _remoteAlumno=null;      // alumno seleccionado en el mando
+
+function remoteRef(){
+    try{
+        const u=window.FIREBASE_ON&&firebase.auth().currentUser;
+        if(!u||!db) return null;
+        return db.collection(REMOTE_COL).doc(u.uid);
+    }catch(e){ return null; }
+}
+function remoteId(){
+    try{ const a=new Uint8Array(16); crypto.getRandomValues(a);
+         return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+    catch(e){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+}
+function remoteEsPermiso(err){ return !!(err && (err.code==='permission-denied' || /permission/i.test(err.message||''))); }
+function remoteAvisarFallo(err){
+    console.error('control movil',err);
+    const es=currentLanguage==='es';
+    const cajaReglas=document.getElementById('remoteRules');
+    if(remoteEsPermiso(err)){
+        if(cajaReglas){ cajaReglas.open=true; cajaReglas.classList.add('resaltado'); }
+        remotePintarEstado('reglas');
+    }else{
+        remotePintarEstado('error');
+        showNotification((es?'No se pudo abrir el control: ':'Could not open the remote: ')+((err&&err.message)||''),'error');
+    }
+}
+function remotePintarEstado(estado){
+    const el=document.getElementById('remoteStatus');
+    const es=currentLanguage==='es';
+    const textos={
+        esperando: es?'⏳ Esperando a que escanees el código…':'⏳ Waiting for you to scan the code…',
+        conectado: es?'✅ Celular conectado':'✅ Phone connected',
+        reglas:    es?'🔒 Falta la regla de Firebase (abajo te digo cuál)':'🔒 A Firebase rule is missing (see below)',
+        error:     es?'⚠️ No se pudo abrir el control':'⚠️ Could not open the remote',
+        apagado:   es?'⏹ Control desconectado':'⏹ Remote disconnected'
+    };
+    if(el){ el.textContent=textos[estado]||''; el.className='remote-status estado-'+estado; }
+    const btn=document.getElementById('remoteBtn');
+    if(btn) btn.classList.toggle('conectado', estado==='conectado');
+}
+// --- Lado computador -------------------------------------------------------
+window.abrirControlMovil=async function(){
+    const es=currentLanguage==='es';
+    if(!window.FIREBASE_ON || !remoteRef()){
+        showNotification(es?'El control por celular necesita la nube: entra con tu correo y contraseña'
+                           :'The phone remote needs cloud mode: sign in with your email','info');
+        return;
+    }
+    showModal('remoteModal');
+    remoteTraducirModal();
+    _remoteSesion=remoteId(); _remoteConectado=false; _remoteUltima=null;
+    const url=location.origin+location.pathname+'?remote='+_remoteSesion;
+    const cajaUrl=document.getElementById('remoteUrl');
+    if(cajaUrl){ cajaUrl.textContent=url; cajaUrl.dataset.url=url; }
+    remotePintarEstado('esperando');
+    try{
+        await remoteRef().set({ host:_remoteSesion, hostAt:Date.now(), cmd:null, hello:null },{merge:true});
+        remoteEscuchar();
+        await remoteDibujarQR(url);
+    }catch(err){ remoteAvisarFallo(err); }
+};
+async function remoteDibujarQR(url){
+    const caja=document.getElementById('remoteQr'); if(!caja) return;
+    caja.innerHTML='';
+    try{
+        await loadScriptOnce(REMOTE_QR_URL,'QRCode');
+        new QRCode(caja,{ text:url, width:212, height:212, correctLevel:QRCode.CorrectLevel.M });
+    }catch(e){
+        const es=currentLanguage==='es';
+        caja.textContent = es?'No se pudo dibujar el código. Copia el enlace y ábrelo en el celular.'
+                             :'Could not draw the code. Copy the link and open it on your phone.';
+        caja.className='remote-qr-fail';
+    }
+}
+function remoteEscuchar(){
+    if(_remoteUnsub){ try{_remoteUnsub();}catch(e){} _remoteUnsub=null; }
+    const ref=remoteRef(); if(!ref) return;
+    _remoteUnsub=ref.onSnapshot(snap=>{
+        const d=(snap && snap.data())||{};
+        if(d.hello && d.hello.session===_remoteSesion && !_remoteConectado) remoteMarcarConectado();
+        const c=d.cmd;
+        if(!c || c.session!==_remoteSesion || c.id===_remoteUltima) return;
+        _remoteUltima=c.id;
+        if(!_remoteConectado) remoteMarcarConectado();
+        remoteEjecutar(c);
+    }, err=>remoteAvisarFallo(err));
+}
+function remoteMarcarConectado(){
+    _remoteConectado=true;
+    remotePintarEstado('conectado');
+    showNotification(currentLanguage==='es'?'📱 Celular conectado como control':'📱 Phone connected as a remote','success');
+}
+window.desconectarControl=function(){
+    if(_remoteUnsub){ try{_remoteUnsub();}catch(e){} _remoteUnsub=null; }
+    const ref=remoteRef();
+    if(ref) ref.set({ host:null, cmd:null, hello:null },{merge:true}).catch(()=>{});
+    _remoteSesion=null; _remoteConectado=false;
+    remotePintarEstado('apagado');
+};
+window.cerrarModalControl=function(){ hideModal('remoteModal'); };
+window.copiarEnlaceControl=function(){
+    const el=document.getElementById('remoteUrl'); if(!el) return;
+    const es=currentLanguage==='es';
+    const texto=el.dataset.url||el.textContent||'';
+    if(!navigator.clipboard){ showNotification(es?'Copia el enlace a mano':'Copy the link manually','info'); return; }
+    navigator.clipboard.writeText(texto)
+        .then(()=>showNotification(es?'Enlace copiado':'Link copied','success'))
+        .catch(()=>showNotification(es?'Copia el enlace a mano':'Copy the link manually','info'));
+};
+window.copiarReglaControl=function(){
+    const el=document.getElementById('remoteRulesCode'); if(!el) return;
+    const es=currentLanguage==='es';
+    if(!navigator.clipboard){ showNotification(es?'Cópiala a mano desde el recuadro':'Copy it manually from the box','info'); return; }
+    navigator.clipboard.writeText(el.textContent||'')
+        .then(()=>showNotification(es?'Regla copiada':'Rule copied','success'))
+        .catch(()=>showNotification(es?'Cópiala a mano desde el recuadro':'Copy it manually from the box','info'));
+};
+// Ejecuta en el computador lo que se pulso en el celular.
+function remoteEjecutar(c){
+    const p=c.args||{};
+    try{
+        switch(c.action){
+            case 'view':
+                if(typeof setViewMode==='function') setViewMode(p.modo);
+                break;
+            case 'focus':
+                remoteEnfocarAlumno(p.studentId);
+                break;
+            case 'badge': {
+                const b=(currentBadges||[]).find(x=>String(x.id)===String(p.badgeId)); if(!b) return;
+                const idx=(currentStudents||[]).findIndex(s=>s.id===p.studentId); if(idx<0) return;
+                const ci=(typeof p.ci==='number' && p.ci>=0)?p.ci:0;
+                if(viewMode==='rows' && !p.soloUno) applyBadgeToRow(Math.floor(idx/groupSize), ci, b);
+                else addGridBadgeToCell(p.studentId, ci, b);
+                remoteEnfocarAlumno(p.studentId);
+                break;
+            }
+            case 'att': {
+                const sel='.att-group[data-student-id="'+p.studentId+'"] .'+(p.estado==='p'?'att-yes':'att-no');
+                const btn=document.querySelector(sel);
+                if(btn) btn.click(); else marcarAsistencia(p.studentId,p.estado,null);
+                remoteEnfocarAlumno(p.studentId);
+                break;
+            }
+            case 'proj':
+                if(p.que==='abrir' && typeof openProjector==='function') openProjector();
+                else if(p.que==='cerrar' && typeof closeProjector==='function') closeProjector();
+                else if(p.que==='mover' && typeof projPanel==='function') projPanel(p.delta||1);
+                break;
+            case 'scroll':
+                window.scrollBy({ top:(p.dir||1)*Math.round(window.innerHeight*0.72), behavior:'smooth' });
+                break;
+            case 'ping': break;
+        }
+    }catch(e){ console.error('orden remota',e); }
+}
+// Lleva la fila del alumno al centro y la resalta un momento: es el "ir
+// cambiando entre los estudiantes" mientras se pasa lista de pie.
+function remoteEnfocarAlumno(sid){
+    const celda=document.querySelector('.student-name-cell[data-name-for="'+sid+'"]');
+    const fila=celda?celda.closest('tr'):null;
+    if(!fila) return;
+    try{ fila.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){ fila.scrollIntoView(); }
+    fila.classList.remove('fila-remota'); void fila.offsetWidth; fila.classList.add('fila-remota');
+    setTimeout(()=>fila.classList.remove('fila-remota'),1800);
+}
+// --- Lado celular ----------------------------------------------------------
+// El celular carga la misma plataforma y los mismos datos (es la misma cuenta),
+// pero en vez de la parrilla muestra el mando. Solo manda ordenes; quien las
+// ejecuta y guarda es el computador.
+function remoteLeerPeticion(){
+    try{
+        const p=new URLSearchParams(location.search).get('remote');
+        if(p && /^[a-z0-9]{8,64}$/i.test(p)) _remotePedido=p;
+    }catch(e){}
+}
+remoteLeerPeticion();
+function revisarModoControl(){
+    if(!_remotePedido) return;
+    entrarModoControl();
+}
+async function entrarModoControl(){
+    const es=currentLanguage==='es';
+    const ref=remoteRef();
+    if(!ref){ showNotification(es?'Entra con tu correo para usar el control':'Sign in with your email to use the remote','info'); return; }
+    // Se comprueba que el computador siga esperando ESTE codigo.
+    try{
+        const doc=await ref.get();
+        const d=(doc && doc.data())||{};
+        if(d.host!==_remotePedido){
+            showNotification(es?'Ese código ya no sirve. Vuelve a abrir el QR en el computador.'
+                               :'That code is no longer valid. Open the QR again on the computer.','error');
+            _remotePedido=null;
+            return;
+        }
+        await ref.set({ hello:{ session:_remotePedido, at:Date.now() } },{merge:true});
+    }catch(err){
+        showNotification(remoteEsPermiso(err)
+            ? (es?'Falta la regla de Firebase para "remotes". Mírala en el computador, en 📱 Celular.'
+                 :'The Firebase rule for "remotes" is missing. See it on the computer, under 📱 Phone.')
+            : (es?'No se pudo conectar el control':'Could not connect the remote'),'error');
+        return;
+    }
+    document.body.classList.add('modo-control');
+    const pantalla=document.getElementById('remoteScreen'); if(pantalla) pantalla.style.display='flex';
+    _remoteSemana=gridWeeks||1;
+    _remoteDia=remoteDiaDeHoy();
+    _remoteAlumno=(currentStudents&&currentStudents[0])?currentStudents[0].id:null;
+    pintarMando();
+}
+window.salirModoControl=function(){
+    _remotePedido=null;
+    document.body.classList.remove('modo-control');
+    const pantalla=document.getElementById('remoteScreen'); if(pantalla) pantalla.style.display='none';
+    try{ history.replaceState(null,'',location.origin+location.pathname); }catch(e){}
+};
+// Lunes a viernes; el fin de semana se queda en el viernes.
+function remoteDiaDeHoy(){
+    const d=new Date().getDay();
+    if(d===0||d===6) return 4;
+    return d-1;
+}
+async function enviarOrden(action,args){
+    const ref=remoteRef(); if(!ref||!_remotePedido) return;
+    if(navigator.vibrate){ try{ navigator.vibrate(12); }catch(e){} }
+    try{
+        await ref.set({ cmd:{ session:_remotePedido, id:remoteId(), action:action, args:args||{}, at:Date.now() } },{merge:true});
+    }catch(err){
+        const es=currentLanguage==='es';
+        showNotification(es?'No llegó la orden al computador':'The command did not reach the computer','error');
+    }
+}
+function pintarMando(){
+    const es=currentLanguage==='es';
+    const salon=(classrooms[activeClassroomIndex]||{}).name||(es?'Salón':'Classroom');
+    const nom=document.getElementById('remoteRoomName'); if(nom) nom.textContent=salon;
+    const salir=document.getElementById('remoteExitBtn'); if(salir) salir.textContent=es?'Salir':'Exit';
+    const tSt=document.getElementById('remoteStudentsTitle'); if(tSt) tSt.textContent=es?'Estudiantes':'Students';
+    const tBg=document.getElementById('remoteBadgesTitle'); if(tBg) tBg.textContent=es?'Insignias':'Badges';
+
+    // Vistas
+    const vistas=[['rows',es?'Grupos':'Groups'],['grid',es?'Individual':'Individual'],['scores','Scores']];
+    const filaV=document.getElementById('remoteViewRow');
+    if(filaV) filaV.innerHTML=vistas.map(v=>
+        `<button type="button" class="remote-chip${viewMode===v[0]?' on':''}" onclick="mandoVista('${v[0]}')">${escapeHtml(v[1])}</button>`).join('');
+
+    // Dia al que van las insignias
+    const filaD=document.getElementById('remoteDayRow');
+    if(filaD){
+        const semanas=gridWeeks>1
+            ? `<select class="remote-select" onchange="mandoSemana(this.value)">`
+              + Array.from({length:gridWeeks},(_,i)=>`<option value="${i+1}"${_remoteSemana===i+1?' selected':''}>${escapeHtml(weekTitles[i]||((es?'Semana ':'Week ')+(i+1)))}</option>`).join('')
+              + `</select>`
+            : '';
+        filaD.innerHTML = semanas + weekDays.map((d,i)=>
+            `<button type="button" class="remote-chip dia${_remoteDia===i?' on':''}" onclick="mandoDia(${i})">${escapeHtml(d.slice(0,3))}</button>`).join('');
+    }
+
+    // Insignias
+    const cajaB=document.getElementById('remoteBadges');
+    if(cajaB) cajaB.innerHTML=(currentBadges||[]).map(b=>{
+        const ic = b.image ? `<img src="${escapeHtml(b.image)}" alt="">` : escapeHtml(b.icon||'🏅');
+        return `<button type="button" class="remote-badge" onclick="mandoInsignia('${escapeHtml(String(b.id))}')">`
+             + `<span class="remote-badge-ico">${ic}</span><span class="remote-badge-txt">${escapeHtml(b.name||'')}</span></button>`;
+    }).join('') || `<p class="remote-vacio">${es?'Este salón no tiene insignias':'This classroom has no badges'}</p>`;
+
+    // Extras: proyector y desplazamiento
+    const extra=document.getElementById('remoteExtra');
+    if(extra) extra.innerHTML=
+        `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:-1})">▲</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:1})">▼</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'abrir'})">📽️</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:-1})">⟨</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:1})">⟩</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'cerrar'})">✖</button>`;
+
+    pintarAlumnosMando();
+}
+function pintarAlumnosMando(){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('remoteStudents'); if(!caja) return;
+    caja.innerHTML=(currentStudents||[]).map(s=>{
+        const est=(s.attendance||{})[attendanceDate]||'';
+        const sel=_remoteAlumno===s.id?' sel':'';
+        return `<div class="remote-student${sel}${est==='a'?' ausente':''}" data-id="${s.id}">`
+            + `<button type="button" class="remote-name" onclick="mandoElegir(${s.id})">${escapeHtml(s.name||'')}</button>`
+            + `<button type="button" class="remote-att si${est==='p'?' on':''}" onclick="mandoAsistencia(${s.id},'p')" aria-label="${es?'Presente':'Present'}">&#10003;</button>`
+            + `<button type="button" class="remote-att no${est==='a'?' on':''}" onclick="mandoAsistencia(${s.id},'a')" aria-label="${es?'Ausente':'Absent'}">&#10007;</button>`
+            + `</div>`;
+    }).join('') || `<p class="remote-vacio">${es?'Este salón no tiene estudiantes':'This classroom has no students'}</p>`;
+    pintarSeleccionMando();
+}
+function pintarSeleccionMando(){
+    const el=document.getElementById('remoteSelected'); if(!el) return;
+    const es=currentLanguage==='es';
+    const s=(currentStudents||[]).find(x=>x.id===_remoteAlumno);
+    const dia=weekDays[_remoteDia]||'';
+    el.innerHTML = s
+        ? `<b>${escapeHtml(s.name||'')}</b> <span>· ${escapeHtml(dia)}</span>`
+        : `<span>${es?'Toca un estudiante para elegirlo':'Tap a student to select them'}</span>`;
+}
+window.mandoVista=function(modo){ viewMode=modo; enviarOrden('view',{modo:modo}); pintarMando(); };
+window.mandoDia=function(i){ _remoteDia=i; pintarMando(); };
+window.mandoSemana=function(v){ _remoteSemana=parseInt(v)||1; pintarSeleccionMando(); };
+window.mandoElegir=function(sid){
+    _remoteAlumno=sid;
+    enviarOrden('focus',{studentId:sid});
+    pintarAlumnosMando();
+};
+window.mandoInsignia=function(bid){
+    const es=currentLanguage==='es';
+    if(!_remoteAlumno){ showNotification(es?'Elige primero un estudiante':'Pick a student first','info'); return; }
+    const ci=(_remoteSemana-1)*weekDays.length+_remoteDia;
+    enviarOrden('badge',{ badgeId:bid, studentId:_remoteAlumno, ci:ci });
+    const b=(currentBadges||[]).find(x=>String(x.id)===String(bid));
+    const s=(currentStudents||[]).find(x=>x.id===_remoteAlumno);
+    if(b&&s){
+        // El celular no guarda nada: solo refleja lo que acaba de pedir.
+        if(Array.isArray(s.gridBadges[ci]) && !s.gridBadges[ci].find(x=>x.id===b.id)) s.gridBadges[ci].push(b);
+        showNotification(`🏅 ${b.name} → ${s.name}`,'success');
+    }
+};
+window.mandoAsistencia=function(sid,estado){
+    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s) return;
+    if(!s.attendance||typeof s.attendance!=='object') s.attendance={};
+    if((s.attendance[attendanceDate]||'')===estado) delete s.attendance[attendanceDate];
+    else s.attendance[attendanceDate]=estado;
+    enviarOrden('att',{studentId:sid,estado:estado});
+    _remoteAlumno=sid;
+    pintarAlumnosMando();
+};
+function remoteTraducirModal(){
+    const es=currentLanguage==='es';
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('remoteModalTitle', es?'📱 Control desde el celular':'📱 Phone remote');
+    t('remoteModalHelp', es?'Apunta la cámara de tu celular al código. Se abrirá la plataforma como un mando: podrás pasar lista, dar insignias y moverte por la clase sin volver al computador.'
+                           :'Point your phone camera at the code. The platform opens as a remote: take attendance, award badges and move around the class without going back to the computer.');
+    t('remoteCopyText', es?'Copiar enlace':'Copy link');
+    t('remoteStopText', es?'Desconectar':'Disconnect');
+    t('remoteRulesTitle', es?'¿No conecta? Falta una regla en Firebase':'Not connecting? A Firebase rule is missing');
+    t('remoteRulesHelp', es?'El celular y el computador se hablan por un documento propio de tu cuenta. Añade este bloque en Firebase → Firestore → Reglas, junto al que ya tienes, y pulsa Publicar:'
+                           :'The phone and the computer talk through a document of your own account. Add this block in Firebase → Firestore → Rules, next to the one you already have, and press Publish:');
+    t('remoteRulesCopyText', es?'Copiar la regla':'Copy the rule');
+    t('remoteBtnText', es?'Celular':'Phone');
+}
 let _cloudTimer=null;
 function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_cloudTimer); _cloudTimer=setTimeout(pushToCloud,1200); }
 function pushToCloud(){
