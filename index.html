@@ -345,8 +345,16 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .grid-badge:hover .remove-grid-badge { opacity:1; }
 .grid-badge .remove-grid-badge:hover { opacity:1; background:rgba(239,68,103,.16); }
 .student-grid-table td.drag-over { background:#d6e6ff; border:2px dashed var(--accent); transition:background 0.15s; }
-.week-title-editable { background:none; border:none; font-size:1.2em; font-weight:bold; color:var(--accent); width:110px; text-align:left; }
+.week-title-editable { background:none; border:none; font-size:1.2em; font-weight:bold; color:var(--accent); width:auto; min-width:80px; max-width:320px; text-align:left; }
 .week-title-editable:focus { outline:2px solid var(--accent-strong); }
+/* Titulo de la semana y su escoba, en la misma linea. */
+.week-head { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:3px; }
+.clear-week-btn,.clear-badges-btn { font-family:inherit; font-size:.8rem; font-weight:600; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; cursor:pointer; transition:var(--transition); }
+.clear-week-btn:hover,.clear-badges-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(239,68,103,.08); transform:translateY(-1px); }
+.clear-badges-btn { font-size:.88rem; padding:8px 15px; }
+/* Boton opcional dentro de un aviso, para deshacer lo que se acaba de hacer. */
+.notification-action { margin-left:14px; font:inherit; font-weight:700; color:inherit; background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.55); border-radius:7px; padding:3px 11px; cursor:pointer; transition:background .15s; }
+.notification-action:hover { background:rgba(255,255,255,.4); }
 .cert-btn-inline { color:var(--accent); font-size:1em; margin-left:8px; cursor:pointer; background:none; border:none; }
 .average-cell { background:#f8f9fa; font-weight:bold; border-left:2px solid var(--accent); }
 .score-high { color:var(--success); }
@@ -1181,6 +1189,7 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
             <div id="weekControls" class="week-controls">
                 <button class="add-week-btn" id="addWeekBtn">+ Add Week</button>
                 <button class="remove-week-btn" id="removeWeekBtn">- Remove Week</button>
+                <button class="clear-badges-btn" id="clearAllWeeksBtn" type="button" onclick="limpiarInsignias()">🧹 <span id="clearAllWeeksText">Clear all cells</span></button>
                 <label class="group-size-box" id="groupSizeBox">
                     <span id="groupSizeLabel">👥 Integrantes por grupo:</span>
                     <input type="number" id="groupSizeInput" min="2" max="12" step="1" value="7">
@@ -1897,6 +1906,7 @@ const translations = {
         statisticsBtn:"📊 Course Statistics", statsTitle:"📊 Statistics", studentsLabel:"Students:",
         badgesAwardedLabel:"Badges awarded:", avgBadgesLabel:"Avg badges/student:", commentsLabel:"Comments written:",
         addWeekBtn:"+ Add Week", removeWeekBtn:"- Remove Week", addNoteColBtn:"+ Add Score Column",
+        clearAllWeeksBtn:"Clear all cells",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -1944,6 +1954,7 @@ const translations = {
         statisticsBtn:"📊 Estadísticas del curso", statsTitle:"📊 Estadísticas", studentsLabel:"Estudiantes:",
         badgesAwardedLabel:"Insignias otorgadas:", avgBadgesLabel:"Promedio insignias/estudiante:", commentsLabel:"Comentarios escritos:",
         addWeekBtn:"+ Añadir semana", removeWeekBtn:"- Quitar semana", addNoteColBtn:"+ Añadir Columna de Score",
+        clearAllWeeksBtn:"Limpiar todas las casillas",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2018,6 +2029,7 @@ function updateUIText() {
         ['studentsLabel','textContent',t.studentsLabel],['badgesAwardedLabel','textContent',t.badgesAwardedLabel],
         ['avgBadgesLabel','textContent',t.avgBadgesLabel],['commentsLabel','textContent',t.commentsLabel],
         ['addWeekBtn','textContent',t.addWeekBtn],['removeWeekBtn','textContent',t.removeWeekBtn],
+        ['clearAllWeeksText','textContent',t.clearAllWeeksBtn],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -2595,13 +2607,31 @@ function applyHeaderTipPreference(){
 }
 
 // === NOTIFICATIONS ===
-function showNotification(message,type='info') {
+// El tercer parametro es opcional: {texto, onClick} anade un boton al aviso y
+// lo deja mas tiempo en pantalla. Se usa para ofrecer "Deshacer".
+function showNotification(message,type='info',accion) {
     const n = document.createElement('div');
     n.className = `notification notification-${type}`;
     n.textContent = message;
+    let duracion = 3000;
+    if(accion && accion.texto && typeof accion.onClick==='function'){
+        const b=document.createElement('button');
+        b.type='button'; b.className='notification-action'; b.textContent=accion.texto;
+        // El aviso se retira en cuanto se pulsa: la copia de seguridad es de un
+        // momento concreto y volver a aplicarla mas tarde pisaria lo nuevo.
+        b.onclick=()=>{
+            if(b.disabled) return;
+            b.disabled=true;
+            n.classList.remove('show');
+            setTimeout(()=>{ if(n.parentNode) n.parentNode.removeChild(n); },300);
+            accion.onClick();
+        };
+        n.appendChild(b);
+        duracion = 9000;
+    }
     document.body.appendChild(n);
     setTimeout(()=>n.classList.add('show'),100);
-    setTimeout(()=>{ n.classList.remove('show'); setTimeout(()=>{if(n.parentNode)n.parentNode.removeChild(n);},300); },3000);
+    setTimeout(()=>{ n.classList.remove('show'); setTimeout(()=>{if(n.parentNode)n.parentNode.removeChild(n);},300); },duracion);
 }
 
 // === TOGGLE EXPORT ===
@@ -3168,6 +3198,58 @@ function renderCurrentView() {
     else{sv.style.display='block';renderClassroomScores();}
     filterStudents();
 }
+// Cabecera de cada semana: el titulo editable y la escoba que la vacia.
+function weekHeaderHtml(w){
+    const es=currentLanguage==='es';
+    const title=weekTitles[w-1]||((es?"Semana ":"Week ")+w);
+    return `<div class="week-head">`
+        + `<input class="week-title-editable" size="${Math.max(9,Math.min(28,(title||'').length+1))}" value="${escapeHtml(title)}" readonly aria-label="${es?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`
+        + `<button class="clear-week-btn" type="button" title="${es?'Quitar todas las insignias de esta semana':'Remove every badge from this week'}" onclick="limpiarInsignias(${w})">🧹 ${es?'Limpiar casillas':'Clear cells'}</button>`
+        + `</div>`;
+}
+// Vacia las casillas de insignias. Con un numero de semana limpia solo esa;
+// sin argumento, todas. Las notas y los nombres no se tocan.
+window.limpiarInsignias=function(w){
+    const es=currentLanguage==='es';
+    const dias=weekDays.length;
+    const unaSemana = typeof w==='number' && w>=1;
+    const ini = unaSemana ? (w-1)*dias : 0;
+    const fin = unaSemana ? ini+dias : gridWeeks*dias;
+    const nombre = unaSemana
+        ? (weekTitles[w-1]||((es?"Semana ":"Week ")+w))
+        : (es?'todas las semanas':'every week');
+    let cuantas=0;
+    currentStudents.forEach(s=>{
+        for(let ci=ini;ci<fin;ci++){ const c=s.gridBadges[ci]; if(Array.isArray(c)) cuantas+=c.length; }
+    });
+    if(!cuantas){
+        showNotification(es?`No hay insignias que quitar en ${nombre}`:`There are no badges to remove in ${nombre}`,'info');
+        return;
+    }
+    const pregunta = es
+        ? `Se van a quitar ${cuantas} insignia(s) de ${nombre}, en todo el salón.\n\nLas notas y los nombres no se tocan.\n\n¿Continuar?`
+        : `This will remove ${cuantas} badge(s) from ${nombre}, for the whole class.\n\nScores and names are left untouched.\n\nContinue?`;
+    if(!confirm(pregunta)) return;
+    // Copia de seguridad para poder deshacer desde el propio aviso.
+    const copia=currentStudents.map(s=>({
+        id:s.id,
+        celdas:s.gridBadges.slice(ini,fin).map(c=>Array.isArray(c)?c.slice():[])
+    }));
+    currentStudents.forEach(s=>{ for(let ci=ini;ci<fin;ci++) s.gridBadges[ci]=[]; });
+    saveData(); renderCurrentView(); updateStats();
+    showNotification(
+        es?`🧹 ${cuantas} insignia(s) quitadas de ${nombre}`:`🧹 ${cuantas} badge(s) removed from ${nombre}`,
+        'success',
+        { texto: es?'Deshacer':'Undo', onClick(){
+            copia.forEach(r=>{
+                const s=currentStudents.find(x=>x.id===r.id); if(!s) return;
+                r.celdas.forEach((c,k)=>{ if(ini+k < s.gridBadges.length) s.gridBadges[ini+k]=c; });
+            });
+            saveData(); renderCurrentView(); updateStats();
+            showNotification(es?'Insignias restauradas':'Badges restored','info');
+        }}
+    );
+};
 function renderCellBadges(student,ci) {
     const b=student.gridBadges[ci]||[]; if(!Array.isArray(b))return '';
     const es=currentLanguage==='es';
@@ -3219,8 +3301,7 @@ function renderClassroomGrid() {
     if(currentStudents.length===0){gc.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const wb=document.createElement('div');
-        const title=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;
-        wb.innerHTML=`<input class="week-title-editable" value="${escapeHtml(title)}" readonly aria-label="${currentLanguage==='es'?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
+        wb.innerHTML=weekHeaderHtml(w);
         const table=document.createElement('table'); table.className='student-grid-table';
         const thead=document.createElement('thead');
         thead.innerHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr>`;
@@ -3241,8 +3322,7 @@ function renderClassroomRows() {
     if(currentStudents.length===0){g.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const sd=document.createElement('div');
-        const title=weekTitles[w-1]||(currentLanguage==='es'?"Semana ":"Week ")+w;
-        sd.innerHTML=`<input class="week-title-editable" value="${escapeHtml(title)}" readonly aria-label="${currentLanguage==='es'?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`;
+        sd.innerHTML=weekHeaderHtml(w);
         const filas=Math.ceil(currentStudents.length/groupSize);
         for(let f=0;f<filas;f++){
             const table=document.createElement('table'); table.className='student-grid-table';
