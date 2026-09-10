@@ -314,18 +314,51 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
    el resto por igual; si no cabe en pantalla, la tabla se desliza a lo ancho. */
 .student-grid-table { table-layout:fixed; min-width:1020px; }
 .student-grid-table th:first-child,.student-grid-table td:first-child { box-sizing:border-box; width:290px; }
-/* Los tres botones de la fila se aprietan un poco para dejarle mas sitio al
-   nombre; el nombre completo sigue disponible al pasar el raton por encima. */
-.student-grid-table .student-name-cell { padding:6px 8px; gap:4px; }
-.student-grid-table .student-name-cell input { font-size:.84rem; }
+/* Los botones de ficha, certificado y borrar se aprietan un poco: el sitio de
+   la columna es para el nombre. */
 .student-grid-table .student-name-cell .actions { gap:1px; }
 .student-grid-table .cert-btn-inline,.student-grid-table .delete-student-btn { font-size:.95rem; padding:0 3px; margin-left:0; }
 .student-grid-table td[data-cell-idx] { padding:6px; vertical-align:top; }
 .student-grid-table tbody tr:hover td,.notes-table tbody tr:hover td { background:var(--bg-card); }
-.student-grid-table .student-name-cell,.notes-table .student-name-cell { background:var(--bg-card); color:var(--fg); font-weight:600; text-align:left; padding:7px 9px; display:flex; align-items:center; gap:6px; justify-content:space-between; }
-.student-name-cell input { background:transparent; border:1px solid transparent; color:inherit; font:inherit; padding:2px 5px; border-radius:4px; flex:1 1 auto; min-width:0; width:100%; box-sizing:border-box; }
-.student-name-cell input:hover,.student-name-cell input:focus { background:var(--bg-alt); border-color:var(--accent); outline:none; }
-.student-name-cell .actions { display:flex; gap:5px; flex-shrink:0; }
+/* La celda pasa a dos lineas: arriba el nombre con el chulito y la equis,
+   debajo los botones de ficha, certificado y borrar. */
+.student-grid-table .student-name-cell,.notes-table .student-name-cell { background:var(--bg-card); color:var(--fg); font-weight:600; text-align:left; padding:7px 9px; display:flex; flex-direction:column; align-items:stretch; gap:3px; justify-content:flex-start; }
+.student-name-cell .actions { display:flex; gap:5px; flex-shrink:0; justify-content:flex-end; }
+/* El nombre ocupa las lineas que necesite en vez de esconderse dentro de una
+   casilla de una sola linea: se lee entero sin tener que desplazarlo. */
+.student-name-text { flex:1 1 auto; min-width:0; font-size:.86rem; font-weight:600; line-height:1.28; padding:3px 5px; border:1px solid transparent; border-radius:5px; overflow-wrap:break-word; cursor:text; }
+.student-name-text:hover { background:var(--bg-alt); border-color:var(--border); }
+.student-name-text:focus { background:var(--bg-alt); border-color:var(--accent); outline:none; }
+.name-row { display:flex; align-items:flex-start; gap:6px; width:100%; }
+/* Pasar lista: el chulito y la equis, al lado del nombre. */
+.att-group { display:flex; gap:3px; flex:0 0 auto; }
+.att-btn { position:relative; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:700; font-family:inherit; line-height:1; border-radius:8px; border:1px solid var(--border); background:var(--bg-alt); color:var(--fg-muted); cursor:pointer; transition:background .15s, color .15s, border-color .15s, transform .12s; }
+.att-btn:hover { transform:translateY(-1px); }
+.att-yes:hover { border-color:var(--success); color:var(--success); }
+.att-no:hover { border-color:var(--danger); color:var(--danger); }
+.att-yes.on { background:var(--success); border-color:var(--success); color:#fff; }
+.att-no.on { background:var(--danger); border-color:var(--danger); color:#fff; }
+.att-btn.att-anim { animation:attLatido .45s ease; }
+@keyframes attLatido { 0%{transform:scale(1);} 35%{transform:scale(1.35);} 65%{transform:scale(.92);} 100%{transform:scale(1);} }
+/* Globo que sube y se desvanece al marcar. */
+.att-pop { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); font-size:1.1rem; font-weight:800; pointer-events:none; animation:attSube .85s ease-out forwards; }
+.att-pop-si { color:var(--success); }
+.att-pop-no { color:var(--danger); }
+@keyframes attSube { 0%{opacity:0; transform:translate(-50%,4px) scale(.6);} 25%{opacity:1; transform:translate(-50%,-6px) scale(1.15);} 100%{opacity:0; transform:translate(-50%,-26px) scale(1);} }
+/* Marca permanente en la casilla del nombre, para ver la lista de un vistazo. */
+.student-name-cell.celda-presente { box-shadow:inset 3px 0 0 var(--success); }
+.student-name-cell.celda-ausente { box-shadow:inset 3px 0 0 var(--danger); }
+.student-name-cell.celda-ausente .student-name-text { opacity:.62; text-decoration:line-through; text-decoration-thickness:1px; }
+/* Destello de la fila entera al pasar lista. */
+tr.flash-si td { animation:flashSi .8s ease-out; }
+tr.flash-no td { animation:flashNo .8s ease-out; }
+@keyframes flashSi { 0%{background:rgba(34,197,94,.32);} 100%{background:transparent;} }
+@keyframes flashNo { 0%{background:rgba(239,68,103,.28);} 100%{background:transparent;} }
+/* Selector de fecha y recuento, en la barra de arriba. */
+.att-box { display:flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; font-size:.85rem; font-weight:600; color:var(--fg-muted); }
+.att-box input[type="date"] { font-family:inherit; font-size:.85rem; font-weight:600; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:7px; padding:4px 7px; }
+.att-summary { font-weight:700; color:var(--accent-strong); white-space:nowrap; }
+@media (prefers-reduced-motion:reduce){ .att-btn.att-anim,.att-pop,tr.flash-si td,tr.flash-no td { animation:none; } .att-pop { display:none; } }
 .delete-student-btn { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2em; padding:0 5px; border-radius:4px; transition:background 0.2s; }
 .delete-student-btn:hover { background:rgba(255,107,107,0.1); }
 .notes-table .note-input { width:100%; border:1px solid #ccc; border-radius:4px; padding:4px; text-align:center; background:var(--bg-alt); color:var(--fg); font-family:inherit; box-sizing:border-box; }
@@ -442,9 +475,11 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .badge { width:60px; height:70px; padding:5px 3px; }
 .badge-icon { width:26px; height:26px; font-size:1.3em; }
 .badge-name { font-size:0.55em; }
-.student-grid-table { min-width:840px; }
-.student-grid-table th:first-child,.student-grid-table td:first-child { width:186px; }
+.student-grid-table { min-width:866px; }
+.student-grid-table th:first-child,.student-grid-table td:first-child { width:212px; }
 .grid-badge { font-size:.72rem; }
+.att-btn { width:32px; height:32px; font-size:1rem; }
+.att-box { width:100%; justify-content:flex-start; flex-wrap:wrap; }
 }
 .notification { position:fixed; top:20px; right:20px; padding:15px 20px; border-radius:8px; color:white; font-weight:600; z-index:3000; opacity:0; transform:translateY(-20px); transition:opacity 0.3s,transform 0.3s; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .notification.show { opacity:1; transform:translateY(0); }
@@ -1190,6 +1225,11 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
                 <button class="add-week-btn" id="addWeekBtn">+ Add Week</button>
                 <button class="remove-week-btn" id="removeWeekBtn">- Remove Week</button>
                 <button class="clear-badges-btn" id="clearAllWeeksBtn" type="button" onclick="limpiarInsignias()">🧹 <span id="clearAllWeeksText">Clear all cells</span></button>
+                <label class="att-box" id="attendanceBox">
+                    <span id="attendanceLabel">📋 Attendance:</span>
+                    <input type="date" id="attendanceDateInput" onchange="cambiarFechaAsistencia(this.value)">
+                    <span class="att-summary" id="attendanceSummary"></span>
+                </label>
                 <label class="group-size-box" id="groupSizeBox">
                     <span id="groupSizeLabel">👥 Integrantes por grupo:</span>
                     <input type="number" id="groupSizeInput" min="2" max="12" step="1" value="7">
@@ -1591,6 +1631,10 @@ const defaultBadges = [
     { id:6, name:'Responsibility', icon:'📋', image:'' }
 ];
 let weekDays = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+// Dia del que se esta pasando lista. Por defecto hoy; el docente puede cambiarlo
+// para registrar una clase anterior. Es estado de pantalla, no se guarda.
+function fechaISO(f){ const d=f||new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+let attendanceDate = fechaISO();
 let gridWeeks = 1;
 let weekTitles = ["Week 1"];
 // === GRUPOS ===
@@ -1907,6 +1951,7 @@ const translations = {
         badgesAwardedLabel:"Badges awarded:", avgBadgesLabel:"Avg badges/student:", commentsLabel:"Comments written:",
         addWeekBtn:"+ Add Week", removeWeekBtn:"- Remove Week", addNoteColBtn:"+ Add Score Column",
         clearAllWeeksBtn:"Clear all cells",
+        attendanceLabel:"📋 Attendance:",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -1955,6 +2000,7 @@ const translations = {
         badgesAwardedLabel:"Insignias otorgadas:", avgBadgesLabel:"Promedio insignias/estudiante:", commentsLabel:"Comentarios escritos:",
         addWeekBtn:"+ Añadir semana", removeWeekBtn:"- Quitar semana", addNoteColBtn:"+ Añadir Columna de Score",
         clearAllWeeksBtn:"Limpiar todas las casillas",
+        attendanceLabel:"📋 Asistencia:",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2000,7 +2046,7 @@ function createNewClassroomObject(name) {
     return { name, students:[], badges:defaultBadges.map(b=>({...b})) };
 }
 function createNewStudentObject(id,headers=[]) {
-    return { id, name:`Student ${id}`, badges:[], comment:'', gridBadges:Array.from({length:headers.length},()=>[]), notes:Array.from({length:noteColumns.length},()=>"") };
+    return { id, name:`Student ${id}`, badges:[], comment:'', gridBadges:Array.from({length:headers.length},()=>[]), notes:Array.from({length:noteColumns.length},()=>""), attendance:{} };
 }
 
 // === LANGUAGE ===
@@ -2030,6 +2076,7 @@ function updateUIText() {
         ['avgBadgesLabel','textContent',t.avgBadgesLabel],['commentsLabel','textContent',t.commentsLabel],
         ['addWeekBtn','textContent',t.addWeekBtn],['removeWeekBtn','textContent',t.removeWeekBtn],
         ['clearAllWeeksText','textContent',t.clearAllWeeksBtn],
+        ['attendanceLabel','textContent',t.attendanceLabel],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -2931,6 +2978,8 @@ function loadActiveClassroom() {
     currentStudents.forEach(s=>{
         if(!s.gridBadges||s.gridBadges.length!==headers.length){const old=s.gridBadges||[];s.gridBadges=Array.from({length:headers.length},(_,i)=>old[i]||[]);}
         if(!s.notes||s.notes.length!==noteColumns.length){const old=s.notes||[];s.notes=Array.from({length:noteColumns.length},(_,i)=>old[i]||"");}
+        // Los salones creados antes de la asistencia no traen este campo.
+        if(!s.attendance||typeof s.attendance!=="object") s.attendance={};
     });
     const cn=document.getElementById('className'); if(cn)cn.value=c.name;
     limpiarBusquedaAlumno();
@@ -3197,7 +3246,78 @@ function renderCurrentView() {
     else if(viewMode==="grid"){gv.style.display='block';renderClassroomGrid();}
     else{sv.style.display='block';renderClassroomScores();}
     filterStudents();
+    actualizarResumenAsistencia();
 }
+// === ASISTENCIA ===
+// El chulito y la equis viven al lado del nombre. Un segundo toque en el mismo
+// boton desmarca, por si el docente se equivoca al pasar lista.
+function attendanceButtonsHtml(s){
+    const es=currentLanguage==='es';
+    const est=(s.attendance||{})[attendanceDate]||'';
+    const nom=escapeHtml(s.name||'');
+    return `<div class="att-group" data-student-id="${s.id}" role="group" aria-label="${es?'Asistencia':'Attendance'}">`
+        + `<button class="att-btn att-yes${est==='p'?' on':''}" type="button" aria-pressed="${est==='p'}" title="${es?'Presente':'Present'}" aria-label="${es?'Presente: ':'Present: '}${nom}" onclick="marcarAsistencia(${s.id},'p',this)">&#10003;</button>`
+        + `<button class="att-btn att-no${est==='a'?' on':''}" type="button" aria-pressed="${est==='a'}" title="${es?'Ausente':'Absent'}" aria-label="${es?'Ausente: ':'Absent: '}${nom}" onclick="marcarAsistencia(${s.id},'a',this)">&#10007;</button>`
+        + `</div>`;
+}
+window.marcarAsistencia=function(sid,estado,btn){
+    const s=currentStudents.find(x=>x.id===sid); if(!s) return;
+    if(!s.attendance||typeof s.attendance!=='object') s.attendance={};
+    const actual=s.attendance[attendanceDate]||'';
+    if(actual===estado) delete s.attendance[attendanceDate];
+    else s.attendance[attendanceDate]=estado;
+    saveData();
+    // Se retocan solo los botones de ese alumno: volver a dibujar la parrilla
+    // entera en cada nombre de la lista se notaria, y cortaria la animacion.
+    sincronizarAsistencia(s);
+    if(s.attendance[attendanceDate]) animarAsistencia(btn,estado);
+    actualizarResumenAsistencia();
+};
+// El mismo alumno sale en la vista de grupos y en la individual: se ponen al dia
+// las dos, esten a la vista o no.
+function sincronizarAsistencia(s){
+    const est=(s.attendance||{})[attendanceDate]||'';
+    document.querySelectorAll(`.att-group[data-student-id="${s.id}"]`).forEach(g=>{
+        const si=g.querySelector('.att-yes'), no=g.querySelector('.att-no');
+        if(si){ si.classList.toggle('on',est==='p'); si.setAttribute('aria-pressed',est==='p'); }
+        if(no){ no.classList.toggle('on',est==='a'); no.setAttribute('aria-pressed',est==='a'); }
+        const celda=g.closest('td');
+        if(celda){ celda.classList.toggle('celda-presente',est==='p'); celda.classList.toggle('celda-ausente',est==='a'); }
+    });
+}
+function animarAsistencia(btn,estado){
+    if(!btn) return;
+    btn.classList.remove('att-anim'); void btn.offsetWidth; btn.classList.add('att-anim');
+    setTimeout(()=>btn.classList.remove('att-anim'),700);
+    // Globo que sube y se desvanece: confirma el registro sin tapar la lista.
+    const globo=document.createElement('span');
+    globo.className='att-pop '+(estado==='p'?'att-pop-si':'att-pop-no');
+    globo.textContent = estado==='p' ? '✓' : '✗';
+    btn.appendChild(globo);
+    setTimeout(()=>{ if(globo.parentNode) globo.parentNode.removeChild(globo); },900);
+    const fila=btn.closest('tr');
+    if(fila){
+        fila.classList.remove('flash-si','flash-no'); void fila.offsetWidth;
+        fila.classList.add(estado==='p'?'flash-si':'flash-no');
+        setTimeout(()=>fila.classList.remove('flash-si','flash-no'),800);
+    }
+}
+function actualizarResumenAsistencia(){
+    const el=document.getElementById('attendanceSummary');
+    const inp=document.getElementById('attendanceDateInput');
+    if(inp && inp.value!==attendanceDate) inp.value=attendanceDate;
+    if(!el) return;
+    const es=currentLanguage==='es';
+    let p=0,a=0;
+    (currentStudents||[]).forEach(s=>{ const e=(s.attendance||{})[attendanceDate]; if(e==='p')p++; else if(e==='a')a++; });
+    const faltan=(currentStudents||[]).length-p-a;
+    el.textContent = `✓ ${p} · ✗ ${a}` + (faltan>0 ? ` · ${faltan} ${es?'por llamar':'to call'}` : '');
+}
+window.cambiarFechaAsistencia=function(valor){
+    attendanceDate = valor || fechaISO();
+    renderCurrentView();
+    actualizarResumenAsistencia();
+};
 // Cabecera de cada semana: el titulo editable y la escoba que la vacia.
 function weekHeaderHtml(w){
     const es=currentLanguage==='es';
@@ -3277,14 +3397,32 @@ function studentNameCellHtml(s,opts){
     const safeName=escapeHtml(s.name||'');
     const certBtn = (opts&&opts.cert===false) ? '' :
         `<button class="cert-btn-inline" type="button" title="${es?'Certificado':'Certificate'}" aria-label="${es?'Certificado de ':'Certificate for '}${safeName}" onclick="openCertificateModalFromTable(${s.id},event)">📜</button>`;
-    return `<td class="student-name-cell">`
-        + `<input type="text" value="${safeName}" title="${safeName}" aria-label="${es?'Nombre del estudiante':'Student name'}" onchange="updateStudentNameGrid(${s.id},this.value)">`
+    // La asistencia solo tiene sentido en las parrillas de insignias, no en notas.
+    const asistencia = (opts&&opts.att===false) ? '' : attendanceButtonsHtml(s);
+    const est=(s.attendance||{})[attendanceDate]||'';
+    // El nombre va en un bloque editable, no en una casilla de una sola linea:
+    // asi se lee entero aunque sean tres apellidos, y se sigue pudiendo corregir.
+    return `<td class="student-name-cell${est==='p'?' celda-presente':(est==='a'?' celda-ausente':'')}">`
+        + `<div class="name-row">`
+        + `<div class="student-name-text" contenteditable="true" spellcheck="false" role="textbox" aria-label="${es?'Nombre del estudiante':'Student name'}" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" onblur="guardarNombreAlumno(${s.id},this)">${safeName}</div>`
+        + asistencia
+        + `</div>`
         + `<div class="actions">`
         + `<button class="cert-btn-inline" type="button" title="${es?'Ficha':'Report'}" aria-label="${es?'Ficha de ':'Report for '}${safeName}" onclick="openStudentReport(${s.id})">📋</button>`
         + certBtn
         + `<button class="delete-student-btn" type="button" title="${es?'Eliminar':'Delete'}" aria-label="${es?'Eliminar a ':'Delete '}${safeName}" onclick="deleteStudent(${s.id})">🗑️</button>`
         + `</div></td>`;
 }
+// Guarda el nombre al salir del bloque. Si lo dejan vacio se recupera el anterior:
+// una fila sin nombre no sirve de nada y estropea busquedas y certificados.
+window.guardarNombreAlumno=function(sid,el){
+    const s=currentStudents.find(x=>x.id===sid); if(!s||!el) return;
+    const nuevo=(el.textContent||'').replace(/\s+/g,' ').trim();
+    if(!nuevo){ el.textContent=s.name||''; return; }
+    el.textContent=nuevo;
+    if(nuevo===s.name) return;
+    s.name=nuevo; saveData(); updateStats();
+};
 // Estado vacio con boton para anadir el primer estudiante.
 function emptyClassroomHtml(){
     const es=currentLanguage==='es';
@@ -3357,7 +3495,7 @@ function renderClassroomScores() {
     const tbody=document.createElement('tbody');
     currentStudents.forEach(s=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=studentNameCellHtml(s,{cert:false});
+        tr.innerHTML=studentNameCellHtml(s,{cert:false,att:false});
         const bono = badgePointsEnabled ? computeBadgeBonus(s) : null;
         noteColumns.forEach((nc,i)=>{
             const raw=s.notes[i]||'';
@@ -4215,8 +4353,8 @@ function filterStudents(){
     document.querySelectorAll('#classroomRowsView table, #classroomGridView table, #classroomScoresView table').forEach(table=>{
         let visible=0;
         table.querySelectorAll('tbody tr').forEach(tr=>{
-            const cell=tr.querySelector('.student-name-cell input'); if(!cell)return;
-            const match=(!q||norm(cell.value).includes(q));
+            const cell=tr.querySelector('.student-name-text'); if(!cell)return;
+            const match=(!q||norm(cell.textContent).includes(q));
             tr.style.display=match?'':'none';
             if(match)visible++;
         });
