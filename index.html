@@ -309,9 +309,21 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .student-grid-table tbody tr:last-child td,.notes-table tbody tr:last-child td { border-bottom:none; }
 .student-grid-table th,.notes-table th { background:var(--surface-2); color:var(--fg); font-weight:700; font-size:.84rem; text-transform:uppercase; letter-spacing:.4px; border-bottom:2px solid var(--border); }
 .student-grid-table td,.notes-table td { min-width:55px; position:relative; background:var(--bg-alt); transition:background .18s; }
+/* Anchos fijos en la parrilla de insignias: la columna del nombre ya no se
+   encoge cuando una celda recibe muchas insignias. Los cinco dias se reparten
+   el resto por igual; si no cabe en pantalla, la tabla se desliza a lo ancho. */
+.student-grid-table { table-layout:fixed; min-width:1020px; }
+.student-grid-table th:first-child,.student-grid-table td:first-child { box-sizing:border-box; width:290px; }
+/* Los tres botones de la fila se aprietan un poco para dejarle mas sitio al
+   nombre; el nombre completo sigue disponible al pasar el raton por encima. */
+.student-grid-table .student-name-cell { padding:6px 8px; gap:4px; }
+.student-grid-table .student-name-cell input { font-size:.84rem; }
+.student-grid-table .student-name-cell .actions { gap:1px; }
+.student-grid-table .cert-btn-inline,.student-grid-table .delete-student-btn { font-size:.95rem; padding:0 3px; margin-left:0; }
+.student-grid-table td[data-cell-idx] { padding:6px; vertical-align:top; }
 .student-grid-table tbody tr:hover td,.notes-table tbody tr:hover td { background:var(--bg-card); }
 .student-grid-table .student-name-cell,.notes-table .student-name-cell { background:var(--bg-card); color:var(--fg); font-weight:600; text-align:left; padding:7px 9px; display:flex; align-items:center; gap:6px; justify-content:space-between; }
-.student-name-cell input { background:transparent; border:1px solid transparent; color:inherit; font:inherit; padding:2px 5px; border-radius:4px; flex-grow:1; box-sizing:border-box; }
+.student-name-cell input { background:transparent; border:1px solid transparent; color:inherit; font:inherit; padding:2px 5px; border-radius:4px; flex:1 1 auto; min-width:0; width:100%; box-sizing:border-box; }
 .student-name-cell input:hover,.student-name-cell input:focus { background:var(--bg-alt); border-color:var(--accent); outline:none; }
 .student-name-cell .actions { display:flex; gap:5px; flex-shrink:0; }
 .delete-student-btn { background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2em; padding:0 5px; border-radius:4px; transition:background 0.2s; }
@@ -319,9 +331,19 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .notes-table .note-input { width:100%; border:1px solid #ccc; border-radius:4px; padding:4px; text-align:center; background:var(--bg-alt); color:var(--fg); font-family:inherit; box-sizing:border-box; }
 .note-col-title { background:var(--bg-alt); color:var(--fg); border:1px solid rgba(0,0,0,0.1); font-weight:bold; width:100%; text-align:center; padding:4px; box-sizing:border-box; border-radius:4px; }
 .note-col-title:focus { outline:2px solid var(--accent-strong); background:#fff; }
-.grid-badge { display:inline-block; margin:2px 2px; padding:2px 6px; font-size:0.8rem; border-radius:6px; background:var(--badge-bg); border:1px solid var(--badge-border); cursor:pointer; position:relative; transition:box-shadow 0.2s; }
-.grid-badge:hover { box-shadow:0 2px 8px var(--badge-border,#4facfe); }
-.grid-badge .remove-grid-badge { margin-left:4px; color:var(--danger); cursor:pointer; font-weight:bold; position:absolute; right:-10px; top:-10px; background:var(--bg); border-radius:50%; padding:0px 4px; }
+/* Insignias apiladas una debajo de otra y todas del mismo ancho: por muchas
+   que se anadan, la celda se sigue viendo ordenada. La equis va dentro de la
+   pastilla, no flotando en la esquina, para que no se monte sobre la de al lado. */
+.cell-badges { display:flex; flex-direction:column; gap:4px; }
+.grid-badge { display:flex; align-items:center; gap:5px; width:100%; box-sizing:border-box; margin:0; padding:3px 5px 3px 7px; font-size:.78rem; line-height:1.3; border-radius:7px; background:var(--badge-bg); border:1px solid var(--badge-border); cursor:pointer; text-align:left; transition:box-shadow .2s, transform .15s; }
+.grid-badge:hover { box-shadow:0 2px 8px var(--badge-border,#4facfe); transform:translateY(-1px); }
+.grid-badge .badge-ico { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:1.15em; }
+/* El nombre se parte en dos lineas antes que recortarse: en clase hace falta
+   leer de que insignia se trata, no solo su icono. */
+.grid-badge .badge-txt { flex:1 1 auto; min-width:0; overflow-wrap:break-word; hyphens:auto; }
+.grid-badge .remove-grid-badge { flex:0 0 auto; position:static; margin:0; padding:0 3px; background:none; border-radius:4px; color:var(--danger); font-weight:700; font-size:.92rem; line-height:1; cursor:pointer; opacity:.5; transition:opacity .15s, background .15s; }
+.grid-badge:hover .remove-grid-badge { opacity:1; }
+.grid-badge .remove-grid-badge:hover { opacity:1; background:rgba(239,68,103,.16); }
 .student-grid-table td.drag-over { background:#d6e6ff; border:2px dashed var(--accent); transition:background 0.15s; }
 .week-title-editable { background:none; border:none; font-size:1.2em; font-weight:bold; color:var(--accent); width:110px; text-align:left; }
 .week-title-editable:focus { outline:2px solid var(--accent-strong); }
@@ -412,6 +434,9 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .badge { width:60px; height:70px; padding:5px 3px; }
 .badge-icon { width:26px; height:26px; font-size:1.3em; }
 .badge-name { font-size:0.55em; }
+.student-grid-table { min-width:840px; }
+.student-grid-table th:first-child,.student-grid-table td:first-child { width:186px; }
+.grid-badge { font-size:.72rem; }
 }
 .notification { position:fixed; top:20px; right:20px; padding:15px 20px; border-radius:8px; color:white; font-weight:600; z-index:3000; opacity:0; transform:translateY(-20px); transition:opacity 0.3s,transform 0.3s; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 .notification.show { opacity:1; transform:translateY(0); }
@@ -3146,14 +3171,23 @@ function renderCurrentView() {
 function renderCellBadges(student,ci) {
     const b=student.gridBadges[ci]||[]; if(!Array.isArray(b))return '';
     const es=currentLanguage==='es';
-    return b.map((bg,bi)=>{
+    // Cada insignia es una pastilla del ancho de la celda; se apilan en columna
+    // para que la celda no se desordene por muchas que se acumulen.
+    const chips = b.map((bg,bi)=>{
         if(!bg)return '';
         const safeName=escapeHtml(bg.name||'');
         const ic = bg.image&&bg.image.length>0
-            ? `<img src="${escapeHtml(bg.image)}" style="width:1em;height:1em;vertical-align:middle;" alt="${safeName}">`
+            ? `<img src="${escapeHtml(bg.image)}" style="width:1em;height:1em;display:block;" alt="">`
             : escapeHtml(bg.icon||'');
-        return `<span class="grid-badge">${ic} ${safeName} <span class="remove-grid-badge" role="button" tabindex="0" aria-label="${es?'Quitar ':'Remove '}${safeName}" onclick="removeGridBadge(${student.id},${ci},${bi})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();removeGridBadge(${student.id},${ci},${bi});}">×</span></span>`;
+        // El nombre completo queda en el title: la pastilla lo recorta con
+        // puntos suspensivos para que todas midan igual.
+        return `<span class="grid-badge" title="${safeName}">`
+            + `<span class="badge-ico" aria-hidden="true">${ic}</span>`
+            + `<span class="badge-txt">${safeName}</span>`
+            + `<span class="remove-grid-badge" role="button" tabindex="0" aria-label="${es?'Quitar ':'Remove '}${safeName}" onclick="removeGridBadge(${student.id},${ci},${bi})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();removeGridBadge(${student.id},${ci},${bi});}">&times;</span>`
+            + `</span>`;
     }).join('');
+    return chips ? `<div class="cell-badges">${chips}</div>` : '';
 }
 // Celda de nombre del estudiante, con el texto escapado en todos los casos.
 function studentNameCellHtml(s,opts){
@@ -3162,7 +3196,7 @@ function studentNameCellHtml(s,opts){
     const certBtn = (opts&&opts.cert===false) ? '' :
         `<button class="cert-btn-inline" type="button" title="${es?'Certificado':'Certificate'}" aria-label="${es?'Certificado de ':'Certificate for '}${safeName}" onclick="openCertificateModalFromTable(${s.id},event)">📜</button>`;
     return `<td class="student-name-cell">`
-        + `<input type="text" value="${safeName}" style="width:90%;" aria-label="${es?'Nombre del estudiante':'Student name'}" onchange="updateStudentNameGrid(${s.id},this.value)">`
+        + `<input type="text" value="${safeName}" title="${safeName}" aria-label="${es?'Nombre del estudiante':'Student name'}" onchange="updateStudentNameGrid(${s.id},this.value)">`
         + `<div class="actions">`
         + `<button class="cert-btn-inline" type="button" title="${es?'Ficha':'Report'}" aria-label="${es?'Ficha de ':'Report for '}${safeName}" onclick="openStudentReport(${s.id})">📋</button>`
         + certBtn
