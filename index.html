@@ -394,6 +394,18 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
 .week-title-editable:focus { outline:2px solid var(--accent-strong); }
 /* Titulo de la semana y su escoba, en la misma linea. */
 .week-head { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:3px; }
+/* Semanas plegables. El acordeon es de las pocas animaciones que cuestan layout
+   en cada cuadro, asi que va corta a proposito: 200 ms. */
+.week-body { overflow:hidden; transition:height 200ms var(--ease-out), opacity 200ms var(--ease-out); }
+.week-body.plegado { opacity:0; }
+.week-toggle { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; font-size:.92rem; line-height:1; color:var(--accent); background:var(--bg-card); border:1px solid var(--border); border-radius:9px; cursor:pointer; }
+.week-toggle .week-chevron { display:block; transition:transform 200ms var(--ease-out); }
+.week-toggle.cerrado .week-chevron { transform:rotate(-90deg); }
+@media (hover:hover) and (pointer:fine){ .week-toggle:hover { border-color:var(--accent); background:var(--bg-alt); } }
+/* Mientras se busca, las semanas se abren todas: si no, el alumno encontrado
+   queda escondido dentro de una semana plegada y parece que no existe. */
+.table-scroll.buscando .week-body { height:auto !important; opacity:1 !important; }
+@media (prefers-reduced-motion:reduce){ .week-body,.week-toggle .week-chevron { transition:none; } }
 .clear-week-btn,.clear-badges-btn { font-family:inherit; font-size:.8rem; font-weight:600; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; cursor:pointer; transition:var(--transition); }
 .clear-week-btn:hover,.clear-badges-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(239,68,103,.08); }
 /* El movimiento al pasar por encima solo donde hay raton de verdad: en una
@@ -3545,11 +3557,85 @@ window.cambiarFechaAsistencia=function(valor){
     renderCurrentView();
     actualizarResumenAsistencia();
 };
+
+// === PLEGAR Y DESPLEGAR SEMANAS =========================================
+// Con varias semanas abiertas hay que bajar mucho para llegar a la de hoy. La
+// flechita de cada titulo esconde esa semana y la vuelve a sacar. Se recuerda
+// entre visitas: es una decision del docente, no un estado pasajero.
+const SEMANAS_PLEGADAS_KEY='learnersTrackSemanasPlegadas';
+let _semanasPlegadas=(function(){
+    try{
+        const g=JSON.parse(localStorage.getItem(SEMANAS_PLEGADAS_KEY)||'[]');
+        return new Set(Array.isArray(g)?g.map(Number):[]);
+    }catch(e){ return new Set(); }
+})();
+function guardarSemanasPlegadas(){
+    try{ localStorage.setItem(SEMANAS_PLEGADAS_KEY, JSON.stringify(Array.from(_semanasPlegadas))); }catch(e){}
+}
+function semanaPlegada(w){ return _semanasPlegadas.has(Number(w)); }
+// Contenedor de las tablas de una semana. Si ya venia plegada, nace plegado y
+// sin animacion: la parrilla se redibuja entera cada vez que cae una insignia,
+// y no tiene sentido ver la semana cerrarse sola en cada toque.
+function cuerpoDeSemana(w){
+    const d=document.createElement('div');
+    d.className='week-body'+(semanaPlegada(w)?' plegado':'');
+    d.dataset.semana=w;
+    if(semanaPlegada(w)) d.style.height='0px';
+    return d;
+}
+function medirAbierto(el){
+    const previo=el.style.height;
+    el.style.height='auto';
+    const alto=el.getBoundingClientRect().height;
+    el.style.height=previo;
+    return alto;
+}
+window.alternarSemana=function(w){
+    w=Number(w);
+    const abrir=semanaPlegada(w);
+    if(abrir) _semanasPlegadas.delete(w); else _semanasPlegadas.add(w);
+    guardarSemanasPlegadas();
+    const suave=(typeof movimientoSuave==='function')?movimientoSuave():true;
+    // La misma semana existe en la vista de grupos y en la individual.
+    document.querySelectorAll(`.week-body[data-semana="${w}"]`).forEach(el=>{
+        if(!suave){
+            el.classList.toggle('plegado',!abrir);
+            el.style.height=abrir?'auto':'0px';
+            return;
+        }
+        const desde=el.getBoundingClientRect().height;
+        const hasta=abrir?medirAbierto(el):0;
+        el.style.height=desde+'px';
+        void el.offsetWidth;
+        el.classList.toggle('plegado',!abrir);
+        el.style.height=hasta+'px';
+        const fin=(ev)=>{
+            if(ev && ev.propertyName!=='height') return;
+            el.removeEventListener('transitionend',fin);
+            clearTimeout(el._plegarTimer);
+            // Al terminar se suelta la altura fija: si se anaden estudiantes,
+            // la semana abierta tiene que poder crecer sola.
+            if(!semanaPlegada(w)) el.style.height='auto';
+        };
+        el.addEventListener('transitionend',fin);
+        // Red de seguridad: si la transicion no llega a dispararse (otra
+        // pulsacion encima, una pestana en segundo plano), no se puede quedar
+        // la altura clavada en pixeles.
+        clearTimeout(el._plegarTimer);
+        el._plegarTimer=setTimeout(()=>fin(),320);
+    });
+    document.querySelectorAll(`.week-toggle[data-semana="${w}"]`).forEach(b=>{
+        b.setAttribute('aria-expanded', abrir?'true':'false');
+        b.classList.toggle('cerrado', !abrir);
+    });
+};
 // Cabecera de cada semana: el titulo editable y la escoba que la vacia.
 function weekHeaderHtml(w){
     const es=currentLanguage==='es';
     const title=weekTitles[w-1]||((es?"Semana ":"Week ")+w);
+    const plegada=semanaPlegada(w);
     return `<div class="week-head">`
+        + `<button class="week-toggle${plegada?' cerrado':''}" type="button" data-semana="${w}" aria-expanded="${plegada?'false':'true'}" title="${es?'Esconder o mostrar esta semana':'Hide or show this week'}" aria-label="${es?'Esconder o mostrar ':'Hide or show '}${escapeHtml(title)}" onclick="alternarSemana(${w})"><span class="week-chevron" aria-hidden="true">▾</span></button>`
         + `<input class="week-title-editable" size="${Math.max(9,Math.min(28,(title||'').length+1))}" value="${escapeHtml(title)}" readonly aria-label="${es?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`
         + `<button class="clear-week-btn" type="button" title="${es?'Quitar todas las insignias de esta semana':'Remove every badge from this week'}" onclick="limpiarInsignias(${w})">🧹 ${es?'Limpiar casillas':'Clear cells'}</button>`
         + `</div>`;
@@ -3667,6 +3753,7 @@ function renderClassroomGrid() {
     for(let w=1;w<=gridWeeks;w++){
         const wb=document.createElement('div');
         wb.innerHTML=weekHeaderHtml(w);
+        const cuerpo=cuerpoDeSemana(w);
         const table=document.createElement('table'); table.className='student-grid-table';
         const thead=document.createElement('thead');
         thead.innerHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr>`;
@@ -3678,7 +3765,7 @@ function renderClassroomGrid() {
             for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${s.id}" data-cell-idx="${ci}">${renderCellBadges(s,ci)}</td>`;}
             tbody.appendChild(tr);
         });
-        table.appendChild(tbody); wb.appendChild(table); gc.appendChild(wb);
+        table.appendChild(tbody); cuerpo.appendChild(table); wb.appendChild(cuerpo); gc.appendChild(wb);
     }
     attachDragAndDropListeners();
 }
@@ -3688,6 +3775,7 @@ function renderClassroomRows() {
     for(let w=1;w<=gridWeeks;w++){
         const sd=document.createElement('div');
         sd.innerHTML=weekHeaderHtml(w);
+        const cuerpo=cuerpoDeSemana(w);
         const filas=Math.ceil(currentStudents.length/groupSize);
         for(let f=0;f<filas;f++){
             const table=document.createElement('table'); table.className='student-grid-table';
@@ -3700,8 +3788,9 @@ function renderClassroomRows() {
                 for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${st.id}" data-cell-idx="${ci}" data-row="${f}">${renderCellBadges(st,ci)}</td>`;}
                 tbody.appendChild(tr);
             }
-            table.appendChild(tbody); sd.appendChild(table);
+            table.appendChild(tbody); cuerpo.appendChild(table);
         }
+        sd.appendChild(cuerpo);
         g.appendChild(sd);
     }
     const ac=document.createElement('div'); ac.className='week-controls';
@@ -4577,6 +4666,11 @@ function filterStudents(){
     // Se normalizan los acentos: buscar "perez" ahora encuentra "Pérez".
     const norm = v => String(v||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
     const q=norm((inp?inp.value:'').trim());
+    // Con una busqueda en curso se abren todas las semanas: de lo contrario el
+    // alumno encontrado se queda dentro de una plegada y parece que no esta.
+    ['classroomRowsView','classroomGridView','classroomScoresView'].forEach(id=>{
+        const v=document.getElementById(id); if(v) v.classList.toggle('buscando', !!q);
+    });
     let totalVisible=0;
     document.querySelectorAll('#classroomRowsView table, #classroomGridView table, #classroomScoresView table').forEach(table=>{
         let visible=0;
