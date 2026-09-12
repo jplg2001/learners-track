@@ -454,6 +454,33 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .score-low { color:var(--danger); }
 #statisticsPage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #statisticsPage.show { display:block; animation:fadeIn .3s; }
+/* === PLANILLA DE ASISTENCIA === */
+#attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
+#attendancePage.show { display:block; animation:fadeIn .3s; }
+#attendancePage .statistics-content { max-width:1180px; }
+.planilla-barra { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:20px; }
+.planilla-barra label { font-weight:700; font-size:.88rem; color:var(--fg-muted); }
+.planilla-barra select { font-family:inherit; font-size:.9rem; font-weight:600; color:var(--fg); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:8px 11px; }
+/* La planilla de un mes es ancha: se desliza dentro de su recuadro y el
+   nombre queda fijo a la izquierda para no perder de vista de quien es la fila. */
+.planilla-scroll { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-alt); }
+.planilla-table { border-collapse:separate; border-spacing:0; width:100%; font-size:.82rem; }
+.planilla-table th,.planilla-table td { border-bottom:1px solid var(--border); border-right:1px solid var(--border); padding:7px 6px; text-align:center; white-space:nowrap; }
+.planilla-table thead th { position:sticky; top:0; z-index:2; background:var(--surface-2); color:var(--fg); font-weight:700; font-size:.76rem; }
+.planilla-table tbody tr:last-child td { border-bottom:none; }
+.planilla-table th:last-child,.planilla-table td:last-child { border-right:none; }
+.planilla-nombre { position:sticky; left:0; z-index:1; text-align:left !important; background:var(--bg-card); font-weight:700; min-width:190px; max-width:260px; white-space:normal !important; }
+.planilla-table thead .planilla-nombre { z-index:3; background:var(--surface-2); }
+.planilla-table td.marca { font-weight:800; width:30px; }
+.planilla-table td.marca.si { color:var(--success); }
+.planilla-table td.marca.no { color:var(--danger); }
+.planilla-table td.marca.sin { color:var(--fg-muted); opacity:.4; }
+.planilla-num { font-weight:700; color:var(--fg-muted); }
+.planilla-pct { font-weight:800; color:var(--accent-strong); }
+.planilla-pct.en-riesgo { color:var(--danger); }
+.planilla-table tr.en-riesgo .planilla-nombre { box-shadow:inset 3px 0 0 var(--danger); }
+.planilla-pie { font-size:.8rem; color:var(--fg-muted); margin-top:12px; line-height:1.5; }
+.planilla-vacia { font-size:.92rem; color:var(--fg-muted); line-height:1.6; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:22px; }
 .statistics-content { margin:32px auto; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); max-width:900px; padding:32px 30px 34px; box-shadow:var(--shadow-lg); }
 .statistics-content h2 { color:var(--fg); margin:0 0 20px; display:flex; align-items:center; gap:11px; font-size:1.55rem; font-family:'Montserrat',sans-serif; }
 .statistics-data-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:26px; padding-bottom:0; border-bottom:none; }
@@ -1290,6 +1317,7 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
                     <input type="date" id="attendanceDateInput" onchange="cambiarFechaAsistencia(this.value)">
                     <span class="att-summary" id="attendanceSummary"></span>
                 </label>
+                <button class="clear-badges-btn" type="button" id="planillaBtn" onclick="abrirPlanilla()" title="Planilla de asistencia del mes">📊 <span id="planillaBtnText">Planilla</span></button>
                 <label class="group-size-box" id="groupSizeBox">
                     <span id="groupSizeLabel">👥 Integrantes por grupo:</span>
                     <input type="number" id="groupSizeInput" min="2" max="12" step="1" value="7">
@@ -1337,6 +1365,21 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 </section>
 
 <!-- Statistics Page -->
+<!-- Planilla de asistencia del mes -->
+<section id="attendancePage">
+    <div class="statistics-content">
+        <button class="volver-btn" type="button" id="planillaVolver" onclick="cerrarPlanilla()">← Volver al aula</button>
+        <h2 id="attendancePageTitle" style="margin:0 0 18px;">📋 Planilla de asistencia</h2>
+        <div class="planilla-barra">
+            <label for="planillaMes" id="planillaMesLabel">Mes:</label>
+            <select id="planillaMes" onchange="cambiarMesPlanilla(this.value)"></select>
+            <button class="add-student-btn" type="button" onclick="exportarPlanillaExcel()">📊 Excel</button>
+            <button class="add-student-btn" type="button" onclick="exportarPlanillaPDF()">📄 PDF</button>
+        </div>
+        <div class="statistics-data-row" id="planillaResumen"></div>
+        <div id="planillaTabla"></div>
+    </div>
+</section>
 <section id="statisticsPage">
     <div class="statistics-content">
         <button class="volver-btn" onclick="returnToMain()">← Back to classroom</button>
@@ -2058,6 +2101,7 @@ const translations = {
         clearAllWeeksBtn:"Clear all cells",
         attendanceLabel:"📋 Attendance:",
         remoteBtn:"Phone",
+        planillaBtn:"Sheet", planillaMonth:"Month:",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -2108,6 +2152,7 @@ const translations = {
         clearAllWeeksBtn:"Limpiar todas las casillas",
         attendanceLabel:"📋 Asistencia:",
         remoteBtn:"Celular",
+        planillaBtn:"Planilla", planillaMonth:"Mes:",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2185,6 +2230,7 @@ function updateUIText() {
         ['clearAllWeeksText','textContent',t.clearAllWeeksBtn],
         ['attendanceLabel','textContent',t.attendanceLabel],
         ['remoteBtnText','textContent',t.remoteBtn],
+        ['planillaBtnText','textContent',t.planillaBtn],['planillaMesLabel','textContent',t.planillaMonth],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -2983,6 +3029,7 @@ function logout() {
     const _hl=document.getElementById('institutionLogoSmall'); if(_hl){_hl.src='';_hl.style.display='none';}
     const _ha=document.getElementById('headerAvatar'); if(_ha){_ha.src='';_ha.style.display='none';}
     document.getElementById('statisticsPage').classList.remove('show');
+    const _pl=document.getElementById('attendancePage'); if(_pl) _pl.classList.remove('show');
     document.getElementById('authContainer').style.display='flex';
     document.getElementById('profileSetupContainer').style.display='none';
     document.getElementById('mainContainer').style.display='none';
@@ -4208,6 +4255,7 @@ function goToStatisticsPage(){
     renderStatisticsPage();
 }
 function returnToMain(){
+    const _pl=document.getElementById('attendancePage'); if(_pl) _pl.classList.remove('show');
     document.getElementById('statisticsPage').classList.remove('show');
     document.getElementById('mainContainer').style.display='flex';
 }
@@ -5892,6 +5940,182 @@ function loadUserFromCloud(uid,email){
 }
 
 
+
+// === PLANILLA DE ASISTENCIA ==============================================
+// La asistencia se venia guardando dia a dia pero no salia a ningun lado.
+// Esta pantalla la junta por mes, saca el porcentaje de cada estudiante y
+// se puede llevar a Excel o a PDF, que es lo que piden en coordinacion.
+let mesDePlanilla = (attendanceDate||fechaISO()).slice(0,7);
+// Por debajo de esto se considera que el estudiante esta faltando demasiado.
+const PLANILLA_ALERTA = 80;
+
+// Solo los dias en que de verdad se paso lista: un mes entero de casillas
+// vacias no le dice nada a nadie.
+function diasConLista(mes){
+    const vistos=new Set();
+    (currentStudents||[]).forEach(s=>{
+        Object.keys(s.attendance||{}).forEach(f=>{ if(f.indexOf(mes)===0) vistos.add(f); });
+    });
+    return Array.from(vistos).sort();
+}
+function mesesConLista(){
+    const vistos=new Set();
+    (currentStudents||[]).forEach(s=>{
+        Object.keys(s.attendance||{}).forEach(f=>vistos.add(f.slice(0,7)));
+    });
+    if(!vistos.size) vistos.add(mesDePlanilla);
+    vistos.add((attendanceDate||fechaISO()).slice(0,7));
+    return Array.from(vistos).sort().reverse();
+}
+function nombreDeMes(mes){
+    const [a,m]=mes.split('-').map(Number);
+    const d=new Date(a,(m||1)-1,1);
+    const txt=d.toLocaleDateString(currentLanguage==='es'?'es-ES':'en-US',{month:'long',year:'numeric'});
+    return txt.charAt(0).toUpperCase()+txt.slice(1);
+}
+function diaCorto(f){
+    const [a,m,d]=f.split('-').map(Number);
+    return String(d).padStart(2,'0');
+}
+// Fila por estudiante con sus marcas del mes y el porcentaje de asistencia.
+function filasDePlanilla(mes){
+    const dias=diasConLista(mes);
+    return (currentStudents||[]).map(s=>{
+        const marcas=dias.map(f=>(s.attendance||{})[f]||'');
+        const p=marcas.filter(x=>x==='p').length;
+        const a=marcas.filter(x=>x==='a').length;
+        const tomadas=p+a;
+        const pct=tomadas?Math.round(p*100/tomadas):null;
+        return { alumno:s, marcas:marcas, presentes:p, ausentes:a, tomadas:tomadas, pct:pct };
+    });
+}
+window.abrirPlanilla=function(){
+    const mc=document.getElementById('mainContainer'); if(mc) mc.style.display='none';
+    const pg=document.getElementById('attendancePage'); if(pg) pg.classList.add('show');
+    const meses=mesesConLista();
+    if(meses.indexOf(mesDePlanilla)<0) mesDePlanilla=meses[0];
+    renderPlanilla();
+};
+window.cerrarPlanilla=function(){
+    const pg=document.getElementById('attendancePage'); if(pg) pg.classList.remove('show');
+    const mc=document.getElementById('mainContainer'); if(mc) mc.style.display='flex';
+};
+window.cambiarMesPlanilla=function(v){ mesDePlanilla=v; renderPlanilla(); };
+function renderPlanilla(){
+    const es=currentLanguage==='es';
+    const sel=document.getElementById('planillaMes');
+    if(sel) sel.innerHTML=mesesConLista().map(m=>`<option value="${m}"${m===mesDePlanilla?' selected':''}>${escapeHtml(nombreDeMes(m))}</option>`).join('');
+    const tit=document.getElementById('attendancePageTitle');
+    if(tit) tit.textContent=(es?'📋 Planilla de asistencia':'📋 Attendance sheet');
+    const volver=document.getElementById('planillaVolver');
+    if(volver) volver.textContent=es?'← Volver al aula':'← Back to classroom';
+    const dias=diasConLista(mesDePlanilla);
+    const filas=filasDePlanilla(mesDePlanilla);
+    // Resumen de arriba
+    const res=document.getElementById('planillaResumen');
+    if(res){
+        const conDatos=filas.filter(f=>f.pct!==null);
+        const media=conDatos.length?Math.round(conDatos.reduce((a,f)=>a+f.pct,0)/conDatos.length):0;
+        const enRiesgo=conDatos.filter(f=>f.pct<PLANILLA_ALERTA).length;
+        res.innerHTML=
+            `<div><b>${dias.length}</b>${es?'Clases registradas':'Sessions recorded'}</div>`
+          + `<div><b>${filas.length}</b>${es?'Estudiantes':'Students'}</div>`
+          + `<div><b>${conDatos.length?media+'%':'—'}</b>${es?'Asistencia del salón':'Class attendance'}</div>`
+          + `<div><b>${enRiesgo}</b>${es?'Por debajo del '+PLANILLA_ALERTA+'%':'Below '+PLANILLA_ALERTA+'%'}</div>`;
+    }
+    const caja=document.getElementById('planillaTabla');
+    if(!caja) return;
+    if(!dias.length){
+        caja.innerHTML=`<p class="planilla-vacia">${es
+            ? 'Todavía no has pasado lista en este mes. Márcala en el aula con el chulito y la equis y aquí aparecerá.'
+            : 'No attendance has been taken this month yet. Mark it in the classroom with the check and the cross and it will show up here.'}</p>`;
+        return;
+    }
+    const cab=`<tr><th class="planilla-nombre">${es?'Estudiante':'Student'}</th>`
+        + dias.map(f=>`<th title="${escapeHtml(f)}">${diaCorto(f)}</th>`).join('')
+        + `<th>✓</th><th>✗</th><th>%</th></tr>`;
+    const cuerpo=filas.map(f=>{
+        const alerta=(f.pct!==null && f.pct<PLANILLA_ALERTA)?' en-riesgo':'';
+        return `<tr class="${alerta.trim()}">`
+            + `<td class="planilla-nombre">${escapeHtml(f.alumno.name||'')}</td>`
+            + f.marcas.map(m=>`<td class="marca ${m==='p'?'si':(m==='a'?'no':'sin')}">${m==='p'?'✓':(m==='a'?'✗':'·')}</td>`).join('')
+            + `<td class="planilla-num">${f.presentes}</td>`
+            + `<td class="planilla-num">${f.ausentes}</td>`
+            + `<td class="planilla-pct${alerta}">${f.pct===null?'—':f.pct+'%'}</td>`
+            + `</tr>`;
+    }).join('');
+    caja.innerHTML=`<div class="planilla-scroll"><table class="planilla-table"><thead>${cab}</thead><tbody>${cuerpo}</tbody></table></div>`
+        + `<p class="planilla-pie">${es
+            ? `Los números de arriba son los días del mes. En rojo, quien está por debajo del ${PLANILLA_ALERTA}%.`
+            : `The numbers on top are the days of the month. In red, anyone below ${PLANILLA_ALERTA}%.`}</p>`;
+}
+// Tabla plana, la misma para Excel y para PDF.
+function tablaPlanilla(){
+    const es=currentLanguage==='es';
+    const dias=diasConLista(mesDePlanilla);
+    const head=[es?'Estudiante':'Student', ...dias.map(diaCorto), es?'Presentes':'Present', es?'Ausencias':'Absences', '%'];
+    const body=filasDePlanilla(mesDePlanilla).map(f=>[
+        f.alumno.name||'',
+        ...f.marcas.map(m=>m==='p'?'P':(m==='a'?'A':'')),
+        f.presentes, f.ausentes, f.pct===null?'':f.pct+'%'
+    ]);
+    return { head:head, body:body, dias:dias };
+}
+window.exportarPlanillaExcel=function(){
+    const es=currentLanguage==='es';
+    if(!window.XLSX){ showNotification(es?'La librería de Excel no cargó':'Excel library not loaded','error'); return; }
+    const t=tablaPlanilla();
+    if(!t.dias.length){ showNotification(es?'No hay asistencia registrada en este mes':'No attendance recorded this month','info'); return; }
+    try{
+        const info=getInstitutionalInfo(); const tr=translations[currentLanguage];
+        const datos=[
+            [tr.institutionHeader,info.institution],
+            [tr.teacherHeader,info.teacher],
+            [tr.classroomHeader,info.classroom],
+            [es?'Mes':'Month',nombreDeMes(mesDePlanilla)],
+            [],
+            t.head, ...t.body
+        ];
+        const wb=window.XLSX.utils.book_new();
+        const ws=window.XLSX.utils.aoa_to_sheet(datos);
+        window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(nombreDeMes(mesDePlanilla),es?'Asistencia':'Attendance'));
+        window.XLSX.writeFile(wb,`Asistencia_${info.classroom.replace(/\s+/g,'_')}_${mesDePlanilla}.xlsx`);
+        showNotification(translations[currentLanguage].exportSuccess,'success');
+    }catch(e){ console.error(e); showNotification(translations[currentLanguage].exportError,'error'); }
+};
+window.exportarPlanillaPDF=function(){
+    const es=currentLanguage==='es';
+    if(!window.jspdf){ showNotification(es?'La librería de PDF no cargó':'PDF library not loaded','error'); return; }
+    const t=tablaPlanilla();
+    if(!t.dias.length){ showNotification(es?'No hay asistencia registrada en este mes':'No attendance recorded this month','info'); return; }
+    try{
+        const {jsPDF}=window.jspdf;
+        // Apaisado: una planilla de un mes tiene demasiadas columnas para vertical.
+        const pdf=new jsPDF('l','mm','a4');
+        const info=getInstitutionalInfo(); const tr=translations[currentLanguage];
+        pdf.setFillColor(102,126,234); pdf.rect(0,0,297,26,'F');
+        if(userProfile.institutionLogo) addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:262,y:4,width:26,height:18});
+        pdf.setTextColor(255,255,255); pdf.setFontSize(15);
+        pdf.text(es?'Planilla de asistencia':'Attendance sheet',148,14,{align:'center'});
+        pdf.setTextColor(40,40,40); pdf.setFontSize(9);
+        pdf.text(`${tr.institutionHeader}: ${info.institution}`,10,33);
+        pdf.text(`${tr.teacherHeader}: ${info.teacher}`,10,38);
+        pdf.text(`${tr.classroomHeader}: ${info.classroom}`,10,43);
+        pdf.text(`${es?'Mes':'Month'}: ${nombreDeMes(mesDePlanilla)}`,10,48);
+        pdf.autoTable({
+            head:[t.head], body:t.body, startY:53, theme:'grid',
+            headStyles:{fillColor:[102,126,234],fontSize:7},
+            styles:{fontSize:7,cellPadding:1.4,halign:'center'},
+            columnStyles:{0:{halign:'left',cellWidth:44,fontStyle:'bold'}}
+        });
+        let y=pdf.lastAutoTable.finalY+7;
+        pdf.setFontSize(8); pdf.setTextColor(90,90,90);
+        pdf.text(es?'P = presente · A = ausente · casilla vacía = no se pasó lista ese día'
+                   :'P = present · A = absent · empty cell = attendance not taken that day',10,y);
+        pdf.save(`Asistencia_${info.classroom.replace(/\s+/g,'_')}_${mesDePlanilla}.pdf`);
+        showNotification(translations[currentLanguage].exportSuccess,'success');
+    }catch(e){ console.error(e); showNotification(translations[currentLanguage].exportError,'error'); }
+};
 // === CONTROL DESDE EL CELULAR =============================================
 // Una pagina web no puede mover el raton del computador ni pulsar fuera de si
 // misma: eso lo prohibe el navegador. Lo que si puede es recibir ordenes y
