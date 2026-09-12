@@ -390,22 +390,21 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
 .grid-badge:hover .remove-grid-badge { opacity:1; }
 .grid-badge .remove-grid-badge:hover { opacity:1; background:rgba(239,68,103,.16); }
 .student-grid-table td.drag-over { background:#d6e6ff; border:2px dashed var(--accent); transition:background 0.15s; }
-.week-title-editable { background:none; border:none; font-size:1.2em; font-weight:bold; color:var(--accent); width:auto; min-width:80px; max-width:320px; text-align:left; }
-.week-title-editable:focus { outline:2px solid var(--accent-strong); }
+.week-title-editable { background:none; border:none; font-size:1.2em; font-weight:bold; color:var(--accent); width:auto; min-width:80px; max-width:320px; text-align:left; border-radius:7px; padding:2px 4px; transition:background 160ms var(--ease-out); }
+/* Mientras no se esta editando, el titulo hace de interruptor de la semana. */
+.week-title-editable[readonly] { cursor:pointer; }
+.week-title-editable:focus:not([readonly]) { outline:2px solid var(--accent-strong); }
+@media (hover:hover) and (pointer:fine){ .week-title-editable[readonly]:hover { background:var(--bg-card); } }
 /* Titulo de la semana y su escoba, en la misma linea. */
 .week-head { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:3px; }
 /* Semanas plegables. El acordeon es de las pocas animaciones que cuestan layout
    en cada cuadro, asi que va corta a proposito: 200 ms. */
 .week-body { overflow:hidden; transition:height 200ms var(--ease-out), opacity 200ms var(--ease-out); }
 .week-body.plegado { opacity:0; }
-.week-toggle { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; font-size:.92rem; line-height:1; color:var(--accent); background:var(--bg-card); border:1px solid var(--border); border-radius:9px; cursor:pointer; }
-.week-toggle .week-chevron { display:block; transition:transform 200ms var(--ease-out); }
-.week-toggle.cerrado .week-chevron { transform:rotate(-90deg); }
-@media (hover:hover) and (pointer:fine){ .week-toggle:hover { border-color:var(--accent); background:var(--bg-alt); } }
 /* Mientras se busca, las semanas se abren todas: si no, el alumno encontrado
    queda escondido dentro de una semana plegada y parece que no existe. */
 .table-scroll.buscando .week-body { height:auto !important; opacity:1 !important; }
-@media (prefers-reduced-motion:reduce){ .week-body,.week-toggle .week-chevron { transition:none; } }
+@media (prefers-reduced-motion:reduce){ .week-body { transition:none; } }
 .clear-week-btn,.clear-badges-btn { font-family:inherit; font-size:.8rem; font-weight:600; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; cursor:pointer; transition:var(--transition); }
 .clear-week-btn:hover,.clear-badges-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(239,68,103,.08); }
 /* El movimiento al pasar por encima solo donde hay raton de verdad: en una
@@ -3249,7 +3248,15 @@ function updateWeekButtons() { const a=document.getElementById('addWeekBtn'),r=d
 window.addWeek=function(){ if(gridWeeks>=10)return; gridWeeks++; const wn=currentLanguage==='es'?"Semana ":"Week "; weekTitles.push(wn+gridWeeks); const h=getGridHeaders(); currentStudents.forEach(s=>{while(s.gridBadges.length<h.length)s.gridBadges.push([]);}); saveData(); renderCurrentView(); updateWeekButtons(); };
 window.removeWeek=function(){ if(gridWeeks<=1)return; gridWeeks--; weekTitles.pop(); const h=getGridHeaders(); currentStudents.forEach(s=>{s.gridBadges=s.gridBadges.slice(0,h.length);}); saveData(); renderCurrentView(); updateWeekButtons(); };
 window.editWeekTitle=function(i,el){el.readOnly=false;el.focus();el.select();};
-window.setWeekTitle=function(i,el){el.readOnly=true;weekTitles[i]=el.value||(currentLanguage==='es'?"Semana ":"Week ")+(i+1);saveData();renderCurrentView();};
+// Al salir del titulo no se redibuja si el nombre quedo igual: ahora se sale de
+// el en cada toque para plegar, y redibujar la parrilla entera cada vez seria
+// tirar trabajo a la basura.
+window.setWeekTitle=function(i,el){
+    el.readOnly=true;
+    const nuevo=el.value||((currentLanguage==='es'?"Semana ":"Week ")+(i+1));
+    if(weekTitles[i]===nuevo){ el.value=nuevo; return; }
+    weekTitles[i]=nuevo; saveData(); renderCurrentView();
+};
 window.addStudentAt=function(pos) {
     const c=classrooms[activeClassroomIndex]; const h=getGridHeaders();
     const nid=c.students.length>0?Math.max(...c.students.map(s=>s.id))+1:1;
@@ -3590,6 +3597,19 @@ function medirAbierto(el){
     el.style.height=previo;
     return alto;
 }
+// Un clic recoge o saca la semana; dos, le cambian el nombre. Se espera un
+// instante antes de actuar para distinguir uno de otro: si no, el doble clic
+// plegaria y desplegaria a su paso.
+let _clicTitulo=null;
+window.clicEnSemana=function(w,el){
+    if(el && !el.readOnly) return;   // se le esta cambiando el nombre
+    clearTimeout(_clicTitulo);
+    _clicTitulo=setTimeout(()=>{ _clicTitulo=null; alternarSemana(w); },220);
+};
+window.editarTituloSemana=function(i,el){
+    clearTimeout(_clicTitulo); _clicTitulo=null;
+    editWeekTitle(i,el);
+};
 window.alternarSemana=function(w){
     w=Number(w);
     const abrir=semanaPlegada(w);
@@ -3624,9 +3644,8 @@ window.alternarSemana=function(w){
         clearTimeout(el._plegarTimer);
         el._plegarTimer=setTimeout(()=>fin(),320);
     });
-    document.querySelectorAll(`.week-toggle[data-semana="${w}"]`).forEach(b=>{
-        b.setAttribute('aria-expanded', abrir?'true':'false');
-        b.classList.toggle('cerrado', !abrir);
+    document.querySelectorAll(`.week-title-editable[data-semana="${w}"]`).forEach(t=>{
+        t.setAttribute('aria-expanded', abrir?'true':'false');
     });
 };
 // Cabecera de cada semana: el titulo editable y la escoba que la vacia.
@@ -3634,9 +3653,15 @@ function weekHeaderHtml(w){
     const es=currentLanguage==='es';
     const title=weekTitles[w-1]||((es?"Semana ":"Week ")+w);
     const plegada=semanaPlegada(w);
+    // El titulo ES el interruptor: un toque recoge la semana entera, otro la
+    // saca. El doble clic sigue sirviendo para cambiarle el nombre.
     return `<div class="week-head">`
-        + `<button class="week-toggle${plegada?' cerrado':''}" type="button" data-semana="${w}" aria-expanded="${plegada?'false':'true'}" title="${es?'Esconder o mostrar esta semana':'Hide or show this week'}" aria-label="${es?'Esconder o mostrar ':'Hide or show '}${escapeHtml(title)}" onclick="alternarSemana(${w})"><span class="week-chevron" aria-hidden="true">▾</span></button>`
-        + `<input class="week-title-editable" size="${Math.max(9,Math.min(28,(title||'').length+1))}" value="${escapeHtml(title)}" readonly aria-label="${es?'Título de la semana':'Week title'}" ondblclick="editWeekTitle(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`
+        + `<input class="week-title-editable" size="${Math.max(9,Math.min(28,(title||'').length+1))}" value="${escapeHtml(title)}" readonly`
+        + ` data-semana="${w}" aria-expanded="${plegada?'false':'true'}"`
+        + ` title="${es?'Toca para recoger o mostrar esta semana · doble clic para cambiarle el nombre':'Tap to fold or unfold this week · double-click to rename it'}"`
+        + ` aria-label="${es?'Título de la semana':'Week title'}"`
+        + ` onmousedown="if(this.readOnly)event.preventDefault();"`
+        + ` onclick="clicEnSemana(${w},this)" ondblclick="editarTituloSemana(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`
         + `<button class="clear-week-btn" type="button" title="${es?'Quitar todas las insignias de esta semana':'Remove every badge from this week'}" onclick="limpiarInsignias(${w})">🧹 ${es?'Limpiar casillas':'Clear cells'}</button>`
         + `</div>`;
 }
