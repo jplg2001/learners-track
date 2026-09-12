@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Learners Track: plataforma educativa para el seguimiento, la evaluación y el reconocimiento de estudiantes.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#4facfe">
+<meta name="theme-color" content="#6d5efc">
 <title>Learners Track</title>
+<!-- Instalable y con copia local: la plataforma abre aunque no haya internet -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Learners Track">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Montserrat:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -5841,6 +5848,10 @@ let db = null;
     if(!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey==='TU_API_KEY') return; // Sin configurar → modo local
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
+    // Copia local de Firestore: permite leer y escribir sin senal; lo pendiente
+    // se sube solo al reconectar. Falla sin ruido si hay varias pestanas o el
+    // navegador no lo admite, y en ese caso simplemente no hay copia local.
+    try{ db.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
     window.FIREBASE_ON = true;
     console.log('%cLearners Track: modo NUBE activo (Firebase) ✅','color:#20d184;font-weight:bold;');
   }catch(e){ console.error('Firebase no se pudo iniciar; se usa modo local:', e); window.FIREBASE_ON = false; }
@@ -5886,6 +5897,65 @@ function updateCloudStatusPill(){
   else { el.textContent='💾 '+(es?'Modo local (sin nube)':'Local mode (no cloud)'); el.style.background='rgba(0,0,0,0.06)'; el.style.color='#888'; }
 }
 updateCloudStatusPill();
+
+// === SIN INTERNET ========================================================
+// En muchos colegios la senal se cae a media clase. La plataforma guarda una
+// copia de si misma para poder abrir igual, y avisa en pantalla de que se esta
+// trabajando sin conexion. Lo que se marque queda guardado y sube solo despues.
+let _hayActualizacion = false;
+
+function registrarTrabajadorDeServicio(){
+    if(!('serviceWorker' in navigator)) return;
+    // Solo sirve en https o en localhost; en file:// el navegador lo rechaza.
+    if(location.protocol!=='https:' && location.hostname!=='localhost' && location.hostname!=='127.0.0.1') return;
+    window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('sw.js').then(reg=>{
+            reg.addEventListener('updatefound',()=>{
+                const nuevo=reg.installing; if(!nuevo) return;
+                nuevo.addEventListener('statechange',()=>{
+                    // Solo es "actualizacion" si ya habia una version anterior.
+                    if(nuevo.state==='installed' && navigator.serviceWorker.controller){
+                        _hayActualizacion=true;
+                        const es=currentLanguage==='es';
+                        showNotification(es?'Hay una versión nueva lista':'A new version is ready','info',{
+                            texto: es?'Actualizar':'Update',
+                            onClick(){ try{ nuevo.postMessage('saltar-espera'); }catch(e){} location.reload(); }
+                        });
+                    }
+                });
+            });
+        }).catch(err=>console.warn('sw',err));
+    });
+}
+registrarTrabajadorDeServicio();
+
+// Aviso permanente mientras no haya red, para que el docente sepa por que no
+// ve el pictograma de la nube y no piense que perdio lo que acaba de marcar.
+function pintarEstadoDeRed(){
+    const el=document.getElementById('cloudStatusPill');
+    const es=(localStorage.getItem('learnersTrackLanguage')||currentLanguage||'en')==='es';
+    if(el && !navigator.onLine){
+        el.textContent='📴 '+(es?'Sin conexión · se guarda aquí':'Offline · saved on this device');
+        el.style.background='rgba(245,158,11,.16)'; el.style.color='#b45309';
+    } else if(typeof updateCloudStatusPill==='function'){
+        updateCloudStatusPill();
+    }
+    document.body.classList.toggle('sin-red', !navigator.onLine);
+}
+window.addEventListener('offline',()=>{
+    pintarEstadoDeRed();
+    const es=currentLanguage==='es';
+    showNotification(es?'📴 Se fue el internet. Sigue trabajando: todo queda guardado y sube cuando vuelva.'
+                       :'📴 Internet is down. Keep working: everything is saved and will sync when it returns.','info');
+});
+window.addEventListener('online',()=>{
+    pintarEstadoDeRed();
+    const es=currentLanguage==='es';
+    showNotification(es?'✅ Volvió el internet. Subiendo lo pendiente…':'✅ Back online. Syncing what is pending…','success');
+    if(window.FIREBASE_ON && typeof scheduleCloudPush==='function' && currentUser) scheduleCloudPush();
+});
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',pintarEstadoDeRed);
+else pintarEstadoDeRed();
 
 function fbErr(err){
   const c = (err && err.code) ? err.code : ''; const es = currentLanguage==='es';
