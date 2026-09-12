@@ -39,6 +39,12 @@
 --shadow-brand: 0 8px 22px rgba(79,70,229,.28);
 --radius: 18px; --radius-sm: 11px; --radius-lg: 26px;
 --transition: all .2s cubic-bezier(.4,0,.2,1);
+/* Curvas de animación. Las de serie del navegador son demasiado flojas para que
+   el movimiento se note intencionado; estas son las de referencia (easing.dev) y
+   --ease-out-back es la easeOutBack de easings.net, para el remate con rebote. */
+--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 --ai-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #a855f7 100%);
 }
 [data-theme="dark"] {
@@ -340,7 +346,6 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 /* Pasar lista: el chulito y la equis, al lado del nombre. */
 .att-group { display:flex; gap:3px; flex:0 0 auto; }
 .att-btn { position:relative; width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:700; font-family:inherit; line-height:1; border-radius:8px; border:1px solid var(--border); background:var(--bg-alt); color:var(--fg-muted); cursor:pointer; transition:background .15s, color .15s, border-color .15s, transform .12s; }
-.att-btn:hover { transform:translateY(-1px); }
 .att-yes:hover { border-color:var(--success); color:var(--success); }
 .att-no:hover { border-color:var(--danger); color:var(--danger); }
 .att-yes.on { background:var(--success); border-color:var(--success); color:#fff; }
@@ -376,7 +381,7 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
    pastilla, no flotando en la esquina, para que no se monte sobre la de al lado. */
 .cell-badges { display:flex; flex-direction:column; gap:4px; }
 .grid-badge { display:flex; align-items:center; gap:5px; width:100%; box-sizing:border-box; margin:0; padding:3px 5px 3px 7px; font-size:.78rem; line-height:1.3; border-radius:7px; background:var(--badge-bg); border:1px solid var(--badge-border); cursor:pointer; text-align:left; transition:box-shadow .2s, transform .15s; }
-.grid-badge:hover { box-shadow:0 2px 8px var(--badge-border,#4facfe); transform:translateY(-1px); }
+.grid-badge:hover { box-shadow:0 2px 8px var(--badge-border,#4facfe); }
 .grid-badge .badge-ico { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:1.15em; }
 /* El nombre se parte en dos lineas antes que recortarse: en clase hace falta
    leer de que insignia se trata, no solo su icono. */
@@ -390,7 +395,15 @@ tr.flash-no td { animation:flashNo .8s ease-out; }
 /* Titulo de la semana y su escoba, en la misma linea. */
 .week-head { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:3px; }
 .clear-week-btn,.clear-badges-btn { font-family:inherit; font-size:.8rem; font-weight:600; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:6px 12px; cursor:pointer; transition:var(--transition); }
-.clear-week-btn:hover,.clear-badges-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(239,68,103,.08); transform:translateY(-1px); }
+.clear-week-btn:hover,.clear-badges-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(239,68,103,.08); }
+/* El movimiento al pasar por encima solo donde hay raton de verdad: en una
+   pantalla tactil un toque deja el estado :hover pegado y el boton se queda
+   levantado. El cambio de color sí se mantiene en ambas. */
+@media (hover:hover) and (pointer:fine){
+  .att-btn:hover { transform:translateY(-1px); }
+  .grid-badge:hover { transform:translateY(-1px); }
+  .clear-week-btn:hover,.clear-badges-btn:hover { transform:translateY(-1px); }
+}
 .clear-badges-btn { font-size:.88rem; padding:8px 15px; }
 /* Boton opcional dentro de un aviso, para deshacer lo que se acaba de hacer. */
 .notification-action { margin-left:14px; font:inherit; font-weight:700; color:inherit; background:rgba(255,255,255,.24); border:1px solid rgba(255,255,255,.55); border-radius:7px; padding:3px 11px; cursor:pointer; transition:background .15s; }
@@ -466,12 +479,16 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .sorteo-modal h3 { margin:0 0 18px; font-size:1.4rem; }
 .sorteo-escenario { position:relative; display:flex; align-items:center; justify-content:center; min-height:150px; padding:18px 14px; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
 /* El nombre grande, para que se lea desde el fondo del salon. */
-.sorteo-nombre { font-family:'Baloo 2','Montserrat','Nunito',sans-serif; font-weight:800; font-size:2.1rem; line-height:1.2; color:var(--fg-muted); overflow-wrap:break-word; max-width:100%; transition:color .2s; }
-.sorteo-nombre.ganador { color:var(--accent-strong); animation:sorteoGanador .55s cubic-bezier(.2,1.4,.4,1); }
-@keyframes sorteoGanador { 0%{transform:scale(.72);opacity:.3;} 60%{transform:scale(1.12);} 100%{transform:scale(1);opacity:1;} }
+.sorteo-nombre { font-family:'Baloo 2','Montserrat','Nunito',sans-serif; font-weight:800; font-size:2.1rem; line-height:1.2; color:var(--fg-muted); overflow-wrap:break-word; max-width:100%; transition:color 200ms var(--ease-out); }
+/* Redoble: los ultimos nombres, ya lentos, entran con un golpecito. */
+.sorteo-nombre.tic { animation:sorteoTic 180ms var(--ease-out); }
+@keyframes sorteoTic { from{ transform:scale(.94); } to{ transform:scale(1); } }
+/* Remate: entra con rebote, pero desde 0.82, nunca desde cero. */
+.sorteo-nombre.ganador { color:var(--accent-strong); animation:sorteoGanador 300ms var(--ease-out-back); }
+@keyframes sorteoGanador { from{ transform:scale(.82); opacity:.45; } to{ transform:scale(1); opacity:1; } }
 .sorteo-confeti { position:absolute; inset:0; pointer-events:none; }
 .sorteo-confeti span { position:absolute; top:50%; left:50%; font-size:1.5rem; opacity:0; }
-.sorteo-confeti.lanzar span { animation:sorteoConfeti 1.1s ease-out forwards; }
+.sorteo-confeti.lanzar span { animation:sorteoConfeti 1.1s var(--ease-out) forwards; }
 .sorteo-confeti.lanzar span:nth-child(1){ --dx:-150px; --dy:-70px; animation-delay:0s; }
 .sorteo-confeti.lanzar span:nth-child(2){ --dx:140px; --dy:-80px; animation-delay:.05s; }
 .sorteo-confeti.lanzar span:nth-child(3){ --dx:-110px; --dy:65px; animation-delay:.1s; }
@@ -485,7 +502,7 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .sorteo-info { font-size:.85rem; font-weight:600; color:var(--fg-muted); margin:14px 0 18px; }
 .sorteo-acciones { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
 @media (max-width:600px){ .sorteo-nombre { font-size:1.5rem; } }
-@media (prefers-reduced-motion:reduce){ .sorteo-nombre.ganador,.sorteo-confeti.lanzar span { animation:none; } .sorteo-confeti { display:none; } }
+@media (prefers-reduced-motion:reduce){ .sorteo-nombre.ganador,.sorteo-nombre.tic,.sorteo-confeti.lanzar span { animation:none; } .sorteo-confeti { display:none; } }
 /* === PLANILLA DE ASISTENCIA === */
 #attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #attendancePage.show { display:block; animation:fadeIn .3s; }
@@ -6063,7 +6080,7 @@ function loadUserFromCloud(uid,email){
 // quien esta marcado presente ese dia, y nadie repite hasta que hayan salido
 // todos: asi no caen siempre los mismos.
 let _yaSorteados = [];       // ids que ya salieron en esta ronda
-let _sorteoAnim = null;      // intervalo de la animacion en curso
+let _sorteoAnim = null;      // temporizador de la vuelta en curso
 
 function candidatosSorteo(){
     const todos=(currentStudents||[]).filter(s=>s && (s.name||'').trim());
@@ -6087,7 +6104,7 @@ window.abrirSorteo=function(){
     sortearEstudiante();
 };
 window.cerrarSorteo=function(){
-    if(_sorteoAnim){ clearInterval(_sorteoAnim); _sorteoAnim=null; }
+    pararRuleta();
     hideModal('sorteoModal');
 };
 window.reiniciarSorteo=function(){
@@ -6113,6 +6130,26 @@ function pintarSorteo(elegido,estado){
     partes.push(`${quedan} ${es?'por salir':'left to go'}`);
     info.textContent=partes.join(' · ');
 }
+// La ruleta FRENA. A velocidad constante y parada en seco no hay expectativa:
+// lo que la crea es la desaceleracion, igual que en un sorteo de verdad. Los
+// intervalos crecen segun una curva cubica, de 40 ms al principio a 260 ms al
+// final; en total, poco mas de un segundo y medio.
+const SORTEO_PASOS = 18;
+const SORTEO_MS_INICIO = 40;
+const SORTEO_MS_FINAL = 260;
+function pararRuleta(){ if(_sorteoAnim){ clearTimeout(_sorteoAnim); _sorteoAnim=null; } }
+function movimientoSuave(){
+    try{ return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch(e){ return true; }
+}
+function rematarSorteo(elegido){
+    _yaSorteados.push(elegido.id);
+    pintarSorteo(elegido);
+    const conf=document.getElementById('sorteoConfeti');
+    if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
+    // En el aula tambien se resalta su fila, para que el salon lo vea.
+    if(typeof remoteEnfocarAlumno==='function') remoteEnfocarAlumno(elegido.id);
+}
 window.sortearEstudiante=function(){
     const es=currentLanguage==='es';
     const c=candidatosSorteo();
@@ -6124,28 +6161,29 @@ window.sortearEstudiante=function(){
         showNotification(es?'Ya salieron todos: empieza una vuelta nueva':'Everyone has had a turn: starting a new round','info');
     }
     const elegido=pozo[Math.floor(Math.random()*pozo.length)];
-    if(_sorteoAnim){ clearInterval(_sorteoAnim); _sorteoAnim=null; }
+    // Se puede volver a pulsar "Sacar otro" a media vuelta: la anterior se corta.
+    pararRuleta();
     const caja=document.getElementById('sorteoNombre');
-    if(caja) caja.classList.remove('ganador');
-    // Los nombres pasan rapido y van frenando, como una ruleta.
-    let vueltas=0;
-    const total=16;
-    const girar=()=>{
-        vueltas++;
-        const x=c.lista[Math.floor(Math.random()*c.lista.length)];
-        if(caja) caja.textContent=x.name||'';
-        if(vueltas>=total){
-            clearInterval(_sorteoAnim); _sorteoAnim=null;
-            _yaSorteados.push(elegido.id);
-            pintarSorteo(elegido);
-            const conf=document.getElementById('sorteoConfeti');
-            if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
-            // En el aula tambien se resalta su fila, para que el salon lo vea.
-            if(typeof remoteEnfocarAlumno==='function') remoteEnfocarAlumno(elegido.id);
+    if(caja) caja.classList.remove('ganador','tic');
+    const suave=movimientoSuave();
+    const pasos=suave?SORTEO_PASOS:3;
+    let i=0;
+    const paso=()=>{
+        const x = (i<pasos-1) ? c.lista[Math.floor(Math.random()*c.lista.length)] : elegido;
+        if(caja){
+            caja.textContent=x.name||'';
+            // Los ultimos nombres son el redoble: cada uno da un golpecito.
+            if(suave && i>=pasos-5 && i<pasos-1){
+                caja.classList.remove('tic'); void caja.offsetWidth; caja.classList.add('tic');
+            }
         }
+        i++;
+        if(i>=pasos){ _sorteoAnim=null; if(caja) caja.classList.remove('tic'); rematarSorteo(elegido); return; }
+        const t=i/pasos;
+        const espera = suave ? SORTEO_MS_INICIO + (SORTEO_MS_FINAL-SORTEO_MS_INICIO)*Math.pow(t,3) : 90;
+        _sorteoAnim=setTimeout(paso, espera);
     };
-    _sorteoAnim=setInterval(girar,70);
-    girar();
+    paso();
 };
 // === PLANILLA DE ASISTENCIA ==============================================
 // La asistencia se venia guardando dia a dia pero no salia a ningun lado.
