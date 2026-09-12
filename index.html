@@ -454,6 +454,31 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .score-low { color:var(--danger); }
 #statisticsPage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #statisticsPage.show { display:block; animation:fadeIn .3s; }
+/* === SORTEO DE ESTUDIANTE === */
+.sorteo-modal { max-width:640px; text-align:center; }
+.sorteo-modal h3 { margin:0 0 18px; font-size:1.4rem; }
+.sorteo-escenario { position:relative; display:flex; align-items:center; justify-content:center; min-height:150px; padding:18px 14px; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+/* El nombre grande, para que se lea desde el fondo del salon. */
+.sorteo-nombre { font-family:'Baloo 2','Montserrat','Nunito',sans-serif; font-weight:800; font-size:2.1rem; line-height:1.2; color:var(--fg-muted); overflow-wrap:break-word; max-width:100%; transition:color .2s; }
+.sorteo-nombre.ganador { color:var(--accent-strong); animation:sorteoGanador .55s cubic-bezier(.2,1.4,.4,1); }
+@keyframes sorteoGanador { 0%{transform:scale(.72);opacity:.3;} 60%{transform:scale(1.12);} 100%{transform:scale(1);opacity:1;} }
+.sorteo-confeti { position:absolute; inset:0; pointer-events:none; }
+.sorteo-confeti span { position:absolute; top:50%; left:50%; font-size:1.5rem; opacity:0; }
+.sorteo-confeti.lanzar span { animation:sorteoConfeti 1.1s ease-out forwards; }
+.sorteo-confeti.lanzar span:nth-child(1){ --dx:-150px; --dy:-70px; animation-delay:0s; }
+.sorteo-confeti.lanzar span:nth-child(2){ --dx:140px; --dy:-80px; animation-delay:.05s; }
+.sorteo-confeti.lanzar span:nth-child(3){ --dx:-110px; --dy:65px; animation-delay:.1s; }
+.sorteo-confeti.lanzar span:nth-child(4){ --dx:120px; --dy:60px; animation-delay:.08s; }
+.sorteo-confeti.lanzar span:nth-child(5){ --dx:0px; --dy:-100px; animation-delay:.14s; }
+@keyframes sorteoConfeti {
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.4); }
+  25%{ opacity:1; }
+  100%{ opacity:0; transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.15) rotate(28deg); }
+}
+.sorteo-info { font-size:.85rem; font-weight:600; color:var(--fg-muted); margin:14px 0 18px; }
+.sorteo-acciones { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
+@media (max-width:600px){ .sorteo-nombre { font-size:1.5rem; } }
+@media (prefers-reduced-motion:reduce){ .sorteo-nombre.ganador,.sorteo-confeti.lanzar span { animation:none; } .sorteo-confeti { display:none; } }
 /* === PLANILLA DE ASISTENCIA === */
 #attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #attendancePage.show { display:block; animation:fadeIn .3s; }
@@ -1318,6 +1343,7 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
                     <span class="att-summary" id="attendanceSummary"></span>
                 </label>
                 <button class="clear-badges-btn" type="button" id="planillaBtn" onclick="abrirPlanilla()" title="Planilla de asistencia del mes">📊 <span id="planillaBtnText">Planilla</span></button>
+                <button class="clear-badges-btn" type="button" id="sorteoBtn" onclick="abrirSorteo()" title="Sacar un estudiante al azar">🎲 <span id="sorteoBtnText">Al azar</span></button>
                 <label class="group-size-box" id="groupSizeBox">
                     <span id="groupSizeLabel">👥 Integrantes por grupo:</span>
                     <input type="number" id="groupSizeInput" min="2" max="12" step="1" value="7">
@@ -1419,6 +1445,23 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
     </div>
 </div>
 
+<!-- Sorteo de estudiante para participar -->
+<div class="modal" id="sorteoModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content sorteo-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarSorteo()">&times;</button>
+    <h3 id="sorteoTitulo">🎲 ¿A quién le toca?</h3>
+    <div class="sorteo-escenario">
+      <div class="sorteo-confeti" id="sorteoConfeti" aria-hidden="true"><span>🎉</span><span>⭐</span><span>✨</span><span>🎊</span><span>🌟</span></div>
+      <div class="sorteo-nombre" id="sorteoNombre" role="status" aria-live="polite">…</div>
+    </div>
+    <p class="sorteo-info" id="sorteoInfo"></p>
+    <div class="sorteo-acciones">
+      <button class="btn-primary" type="button" id="sorteoOtra" onclick="sortearEstudiante()">🎲 Sacar otro</button>
+      <button class="btn-secondary" type="button" id="sorteoReset" onclick="reiniciarSorteo()">↻ Nueva ronda</button>
+      <button class="btn-secondary" type="button" id="sorteoCerrar" onclick="cerrarSorteo()">Cerrar</button>
+    </div>
+  </div>
+</div>
 <!-- Codigo QR para emparejar el celular como mando -->
 <div class="modal" id="remoteModal" style="display:none;" aria-hidden="true">
   <div class="modal-content remote-modal">
@@ -2102,6 +2145,7 @@ const translations = {
         attendanceLabel:"📋 Attendance:",
         remoteBtn:"Phone",
         planillaBtn:"Sheet", planillaMonth:"Month:",
+        sorteoBtn:"Random",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -2153,6 +2197,7 @@ const translations = {
         attendanceLabel:"📋 Asistencia:",
         remoteBtn:"Celular",
         planillaBtn:"Planilla", planillaMonth:"Mes:",
+        sorteoBtn:"Al azar",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2231,6 +2276,7 @@ function updateUIText() {
         ['attendanceLabel','textContent',t.attendanceLabel],
         ['remoteBtnText','textContent',t.remoteBtn],
         ['planillaBtnText','textContent',t.planillaBtn],['planillaMesLabel','textContent',t.planillaMonth],
+        ['sorteoBtnText','textContent',t.sorteoBtn],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -5941,6 +5987,96 @@ function loadUserFromCloud(uid,email){
 
 
 
+
+// === SACAR UN ESTUDIANTE AL AZAR ========================================
+// Para preguntar sin que parezca que uno la tiene contra alguien. Solo entra
+// quien esta marcado presente ese dia, y nadie repite hasta que hayan salido
+// todos: asi no caen siempre los mismos.
+let _yaSorteados = [];       // ids que ya salieron en esta ronda
+let _sorteoAnim = null;      // intervalo de la animacion en curso
+
+function candidatosSorteo(){
+    const todos=(currentStudents||[]).filter(s=>s && (s.name||'').trim());
+    const presentes=todos.filter(s=>(s.attendance||{})[attendanceDate]==='p');
+    // Si todavia no se ha pasado lista, se sortea entre todo el salon.
+    return presentes.length ? { lista:presentes, soloPresentes:true } : { lista:todos, soloPresentes:false };
+}
+window.abrirSorteo=function(){
+    const es=currentLanguage==='es';
+    if(!(currentStudents||[]).length){
+        showNotification(es?'Este salón no tiene estudiantes':'This classroom has no students','info');
+        return;
+    }
+    showModal('sorteoModal');
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('sorteoTitulo', es?'🎲 ¿A quién le toca?':'🎲 Whose turn is it?');
+    t('sorteoOtra', es?'🎲 Sacar otro':'🎲 Pick another');
+    t('sorteoReset', es?'↻ Nueva ronda':'↻ New round');
+    t('sorteoCerrar', es?'Cerrar':'Close');
+    pintarSorteo(null);
+    sortearEstudiante();
+};
+window.cerrarSorteo=function(){
+    if(_sorteoAnim){ clearInterval(_sorteoAnim); _sorteoAnim=null; }
+    hideModal('sorteoModal');
+};
+window.reiniciarSorteo=function(){
+    _yaSorteados=[];
+    pintarSorteo(null);
+    showNotification(currentLanguage==='es'?'Ronda reiniciada: vuelven a entrar todos':'Round reset: everyone is back in','info');
+};
+function pintarSorteo(elegido,estado){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('sorteoNombre');
+    if(caja){
+        caja.textContent = elegido ? (elegido.name||'') : (estado||(es?'…':'…'));
+        caja.classList.toggle('ganador', !!elegido && !estado);
+    }
+    const info=document.getElementById('sorteoInfo');
+    if(!info) return;
+    const c=candidatosSorteo();
+    const quedan=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0).length;
+    const partes=[];
+    partes.push(c.soloPresentes
+        ? `${c.lista.length} ${es?'presentes hoy':'present today'}`
+        : (es?'Sin lista pasada: entra todo el salón':'Attendance not taken: the whole class is in'));
+    partes.push(`${quedan} ${es?'por salir':'left to go'}`);
+    info.textContent=partes.join(' · ');
+}
+window.sortearEstudiante=function(){
+    const es=currentLanguage==='es';
+    const c=candidatosSorteo();
+    if(!c.lista.length){ pintarSorteo(null, es?'Nadie disponible':'Nobody available'); return; }
+    let pozo=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0);
+    if(!pozo.length){
+        // Ya salieron todos: se empieza vuelta nueva sola.
+        _yaSorteados=[]; pozo=c.lista.slice();
+        showNotification(es?'Ya salieron todos: empieza una vuelta nueva':'Everyone has had a turn: starting a new round','info');
+    }
+    const elegido=pozo[Math.floor(Math.random()*pozo.length)];
+    if(_sorteoAnim){ clearInterval(_sorteoAnim); _sorteoAnim=null; }
+    const caja=document.getElementById('sorteoNombre');
+    if(caja) caja.classList.remove('ganador');
+    // Los nombres pasan rapido y van frenando, como una ruleta.
+    let vueltas=0;
+    const total=16;
+    const girar=()=>{
+        vueltas++;
+        const x=c.lista[Math.floor(Math.random()*c.lista.length)];
+        if(caja) caja.textContent=x.name||'';
+        if(vueltas>=total){
+            clearInterval(_sorteoAnim); _sorteoAnim=null;
+            _yaSorteados.push(elegido.id);
+            pintarSorteo(elegido);
+            const conf=document.getElementById('sorteoConfeti');
+            if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
+            // En el aula tambien se resalta su fila, para que el salon lo vea.
+            if(typeof remoteEnfocarAlumno==='function') remoteEnfocarAlumno(elegido.id);
+        }
+    };
+    _sorteoAnim=setInterval(girar,70);
+    girar();
+};
 // === PLANILLA DE ASISTENCIA ==============================================
 // La asistencia se venia guardando dia a dia pero no salia a ningun lado.
 // Esta pantalla la junta por mes, saca el porcentaje de cada estudiante y
@@ -6285,6 +6421,13 @@ function remoteEjecutar(c){
             case 'scroll':
                 window.scrollBy({ top:(p.dir||1)*Math.round(window.innerHeight*0.72), behavior:'smooth' });
                 break;
+            case 'sorteo': {
+                // Si ya esta abierto, el boton vuelve a sortear en vez de reabrir.
+                const m=document.getElementById('sorteoModal');
+                const abierto = m && getComputedStyle(m).display!=='none';
+                if(abierto) sortearEstudiante(); else abrirSorteo();
+                break;
+            }
             case 'ping': break;
         }
     }catch(e){ console.error('orden remota',e); }
@@ -6404,6 +6547,7 @@ function pintarMando(){
     if(extra) extra.innerHTML=
         `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:-1})">▲</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:1})">▼</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('sorteo',{})" title="${es?'Sacar al azar':'Pick at random'}">🎲</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'abrir'})">📽️</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:-1})">⟨</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:1})">⟩</button>`
