@@ -516,16 +516,9 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 @media (prefers-reduced-motion:reduce){ .sorteo-nombre.ganador,.sorteo-nombre.tic,.sorteo-confeti.lanzar span { animation:none; } .sorteo-confeti { display:none; } }
 /* === SORTEO: DADO Y PREGUNTA DEL DIA === */
 .sorteo-escenario { flex-direction:column; gap:4px; }
-/* Etapa 1. El dado cae dando vueltas y se asienta: movimiento en pantalla,
-   curva ease-in-out. 700 ms porque es la entrada de una celebracion, no UI. */
-.sorteo-dado { font-size:3rem; line-height:1; display:inline-block; }
-.sorteo-dado.rueda { animation:dadoRueda 700ms var(--ease-in-out) both; }
-@keyframes dadoRueda {
-  0%   { transform:translateY(-22px) rotate(0deg); opacity:.4; }
-  35%  { transform:translateY(0) rotate(260deg); opacity:1; }
-  62%  { transform:translateY(-9px) rotate(450deg); }
-  100% { transform:translateY(0) rotate(720deg); opacity:1; }
-}
+/* Etapa 1. El dado: su vuelta y su aterrizaje se animan desde JS (lanzarDado
+   y pararDado), porque tiene que poder detenerse en cualquier instante. */
+.sorteo-dado { font-size:3rem; line-height:1; display:inline-block; will-change:transform; }
 /* Dos confetis mas, con el escalonado dentro de 30-80 ms. */
 .sorteo-confeti.lanzar span:nth-child(6){ --dx:-60px; --dy:95px; animation-delay:.03s; }
 .sorteo-confeti.lanzar span:nth-child(7){ --dx:70px; --dy:-110px; animation-delay:.11s; }
@@ -588,7 +581,7 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 /* Movimiento reducido: menos y mas suave, no nada. La carta no gira: sus
    caras se funden. Se anuncian igual el nombre y la pregunta. */
 @media (prefers-reduced-motion:reduce){
-  .sorteo-dado.rueda,.pregunta-brillos.lanzar span { animation:none; }
+  .pregunta-brillos.lanzar span { animation:none; }
   .pregunta-brillos { display:none; }
   .pregunta-zona.entra { animation:preguntaFade 200ms ease both; }
   .pregunta-carta,.pregunta-carta.volteada { transform:none; transition:none; }
@@ -6496,6 +6489,7 @@ function pararRuleta(){ if(_sorteoAnim){ clearTimeout(_sorteoAnim); _sorteoAnim=
 // Corta TODA la secuencia: se puede pulsar "Sacar otro" a mitad de cualquier etapa.
 function cancelarSecuencia(){
     pararRuleta();
+    if(typeof pararDado==='function') pararDado(false);
     _sorteoTimers.forEach(clearTimeout); _sorteoTimers=[];
 }
 
@@ -6590,10 +6584,39 @@ function pintarInfoSorteo(){
 }
 
 // --- Etapa 1: el dado ----------------------------------------------------
-const SORTEO_MS_DADO = 700;
+// El dado rueda MIENTRAS pasan los nombres y se para justo cuando sale el
+// ganador. Pararlo en un instante cualquiera con fotogramas clave de CSS lo haria
+// saltar de golpe a su posicion inicial; con la Web Animations API se lee donde
+// va, se corta la vuelta y aterriza desde ahi.
+const SORTEO_MS_DADO = 400;   // arranca un momento antes que los nombres
+let _dadoVuelta = null;
+function curvaDelProyecto(nombre,reserva){
+    try{ return getComputedStyle(document.documentElement).getPropertyValue(nombre).trim() || reserva; }
+    catch(e){ return reserva; }
+}
 function lanzarDado(){
-    const d=document.getElementById('sorteoDado'); if(!d) return;
-    d.classList.remove('rueda'); void d.offsetWidth; d.classList.add('rueda');
+    const d=document.getElementById('sorteoDado');
+    if(!d || typeof d.animate!=='function') return;
+    pararDado(false);
+    // Vuelta continua, curva lineal; el saltito a mitad hace que ruede y no gire como una rueda.
+    _dadoVuelta=d.animate([
+        { transform:'translateY(0) rotate(0deg)' },
+        { transform:'translateY(-10px) rotate(180deg)', offset:.5 },
+        { transform:'translateY(0) rotate(360deg)' }
+    ],{ duration:420, iterations:Infinity, easing:'linear' });
+}
+function pararDado(asentar){
+    const d=document.getElementById('sorteoDado');
+    if(!d || !_dadoVuelta) return;
+    const donde=getComputedStyle(d).transform;
+    _dadoVuelta.cancel(); _dadoVuelta=null;
+    if(!asentar || typeof d.animate!=='function') return;
+    // El golpe contra la mesa: se asienta desde donde iba, con un rebote corto.
+    d.animate([
+        { transform:(donde && donde!=='none') ? donde : 'translateY(0) rotate(0deg)' },
+        { transform:'translateY(0) rotate(0deg) scale(1.15)', offset:.6 },
+        { transform:'translateY(0) rotate(0deg) scale(1)' }
+    ],{ duration:360, easing:curvaDelProyecto('--ease-out','cubic-bezier(0.23, 1, 0.32, 1)') });
 }
 
 // --- Etapa 2: la ruleta, que FRENA ----------------------------------------
@@ -6697,9 +6720,11 @@ window.sortearEstudiante=function(){
     const caja=document.getElementById('sorteoNombre');
     if(caja){ caja.classList.remove('ganador','tic'); caja.textContent='…'; }
     const suave=movimientoSuave();
-    lanzarDado();
+    if(suave) lanzarDado();
     programarSorteo(()=>{
         girarRuleta(c.lista, elegido, ()=>{
+            // El dado y el nombre se detienen a la vez.
+            pararDado(true);
             rematarSorteo(elegido);
             if(preguntasValidas().length) programarSorteo(mostrarPregunta, suave?480:0);
         });
