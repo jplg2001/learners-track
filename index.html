@@ -514,6 +514,90 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .sorteo-acciones { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
 @media (max-width:600px){ .sorteo-nombre { font-size:1.5rem; } }
 @media (prefers-reduced-motion:reduce){ .sorteo-nombre.ganador,.sorteo-nombre.tic,.sorteo-confeti.lanzar span { animation:none; } .sorteo-confeti { display:none; } }
+/* === SORTEO: DADO Y PREGUNTA DEL DIA === */
+.sorteo-escenario { flex-direction:column; gap:4px; }
+/* Etapa 1. El dado cae dando vueltas y se asienta: movimiento en pantalla,
+   curva ease-in-out. 700 ms porque es la entrada de una celebracion, no UI. */
+.sorteo-dado { font-size:3rem; line-height:1; display:inline-block; }
+.sorteo-dado.rueda { animation:dadoRueda 700ms var(--ease-in-out) both; }
+@keyframes dadoRueda {
+  0%   { transform:translateY(-22px) rotate(0deg); opacity:.4; }
+  35%  { transform:translateY(0) rotate(260deg); opacity:1; }
+  62%  { transform:translateY(-9px) rotate(450deg); }
+  100% { transform:translateY(0) rotate(720deg); opacity:1; }
+}
+/* Dos confetis mas, con el escalonado dentro de 30-80 ms. */
+.sorteo-confeti.lanzar span:nth-child(6){ --dx:-60px; --dy:95px; animation-delay:.03s; }
+.sorteo-confeti.lanzar span:nth-child(7){ --dx:70px; --dy:-110px; animation-delay:.11s; }
+
+/* Etapa 4. La carta entra desde abajo, nunca desde la nada. */
+.pregunta-zona { position:relative; margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:12px; perspective:1100px; }
+.pregunta-zona[hidden] { display:none; }
+.pregunta-zona.entra { animation:preguntaEntra 300ms var(--ease-out) both; }
+@keyframes preguntaEntra { from{ opacity:0; transform:translateY(12px) scale(.96); } to{ opacity:1; transform:none; } }
+@keyframes preguntaFade { from{ opacity:0; } to{ opacity:1; } }
+/* El giro: la carta se transforma en pantalla, asi que ease-in-out. 520 ms
+   porque es el remate de la celebracion y tiene que leerse como una carta que
+   se voltea; por debajo de 300 ms parece un parpadeo. Es transicion y no
+   fotogramas clave: si se interrumpe, retoma desde donde va. */
+.pregunta-carta { position:relative; width:100%; max-width:540px; transform-style:preserve-3d; transition:transform 520ms var(--ease-in-out); }
+.pregunta-carta.volteada { transform:rotateY(180deg); }
+.pregunta-cara { border-radius:var(--radius-lg); backface-visibility:hidden; -webkit-backface-visibility:hidden; box-sizing:border-box; }
+.pregunta-cara.frente { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#fff; font-family:'Baloo 2','Montserrat','Nunito',sans-serif; font-weight:800; font-size:1.2rem; background:linear-gradient(135deg,var(--accent),var(--accent-strong)); box-shadow:inset 0 0 0 3px rgba(255,255,255,.28), var(--shadow-sm); }
+.pregunta-icono { font-size:2.2rem; line-height:1; }
+/* La cara de la pregunta marca el alto de la carta: se rellena antes de voltear
+   para que el tamano no cambie a mitad del giro. */
+.pregunta-cara.dorso { position:relative; min-height:130px; display:flex; align-items:center; justify-content:center; padding:20px 24px; transform:rotateY(180deg); background:var(--bg-card); border:2px solid var(--accent); box-shadow:var(--shadow-sm); }
+.pregunta-cara.dorso p { margin:0; font-family:'Baloo 2','Montserrat','Nunito',sans-serif; font-weight:700; font-size:1.4rem; line-height:1.3; color:var(--fg); text-align:center; overflow-wrap:break-word; }
+/* Destellos al descubrirla, escalonados. */
+.pregunta-brillos { position:absolute; inset:0; pointer-events:none; z-index:2; }
+.pregunta-brillos span { position:absolute; top:40%; left:50%; font-size:1.4rem; opacity:0; }
+.pregunta-brillos.lanzar span { animation:preguntaBrillo 900ms var(--ease-out) forwards; }
+.pregunta-brillos.lanzar span:nth-child(1){ --bx:-190px; --by:-40px; animation-delay:0s; }
+.pregunta-brillos.lanzar span:nth-child(2){ --bx:185px; --by:-50px; animation-delay:.04s; }
+.pregunta-brillos.lanzar span:nth-child(3){ --bx:-150px; --by:55px; animation-delay:.08s; }
+.pregunta-brillos.lanzar span:nth-child(4){ --bx:160px; --by:50px; animation-delay:.05s; }
+.pregunta-brillos.lanzar span:nth-child(5){ --bx:-20px; --by:-85px; animation-delay:.07s; }
+.pregunta-brillos.lanzar span:nth-child(6){ --bx:30px; --by:80px; animation-delay:.03s; }
+@keyframes preguntaBrillo {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.5); }
+  30%  { opacity:1; }
+  100% { opacity:0; transform:translate(calc(-50% + var(--bx)),calc(-50% + var(--by))) scale(1.1) rotate(24deg); }
+}
+/* Pulsar se nota: la receta del boton, 160 ms. */
+.pregunta-descubrir { transition:transform 160ms var(--ease-out); }
+.pregunta-descubrir:active { transform:scale(.97); }
+.pregunta-descubrir[hidden] { display:none; }
+
+/* Editor */
+.preguntas-modal { max-width:560px; }
+.preguntas-modal h3 { margin:0 0 8px; }
+.preguntas-ayuda { font-size:.86rem; color:var(--fg-muted); line-height:1.45; margin:0 0 12px; }
+#preguntasInput { width:100%; box-sizing:border-box; font-family:inherit; font-size:.95rem; line-height:1.55; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:12px 14px; resize:vertical; }
+#preguntasInput:focus { outline:2px solid var(--accent); outline-offset:1px; }
+.preguntas-pie { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0; flex-wrap:wrap; }
+.preguntas-cuenta { font-size:.85rem; font-weight:700; color:var(--accent-strong); }
+.preguntas-opcion { display:flex; align-items:center; gap:9px; font-size:.88rem; margin:6px 0 16px; cursor:pointer; }
+.preguntas-opcion input { width:auto; transform:scale(1.1); }
+.preguntas-acciones { display:flex; gap:9px; justify-content:flex-end; }
+
+@media (max-width:600px){
+  .sorteo-dado { font-size:2.4rem; }
+  .pregunta-cara.dorso p { font-size:1.12rem; }
+}
+/* Movimiento reducido: menos y mas suave, no nada. La carta no gira: sus
+   caras se funden. Se anuncian igual el nombre y la pregunta. */
+@media (prefers-reduced-motion:reduce){
+  .sorteo-dado.rueda,.pregunta-brillos.lanzar span { animation:none; }
+  .pregunta-brillos { display:none; }
+  .pregunta-zona.entra { animation:preguntaFade 200ms ease both; }
+  .pregunta-carta,.pregunta-carta.volteada { transform:none; transition:none; }
+  .pregunta-cara { transition:opacity 200ms ease; }
+  .pregunta-cara.dorso { transform:none; opacity:0; }
+  .pregunta-carta.volteada .frente { opacity:0; }
+  .pregunta-carta.volteada .dorso { opacity:1; }
+  .pregunta-descubrir,.pregunta-descubrir:active { transition:none; transform:none; }
+}
 /* === PERIODOS === */
 .periodo-box { display:flex; align-items:center; gap:9px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:6px 12px; }
 .periodo-box > span { font-size:.85rem; font-weight:700; color:var(--fg-muted); }
@@ -1494,20 +1578,56 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
     </div>
 </div>
 
-<!-- Sorteo de estudiante para participar -->
+<!-- Sorteo de estudiante para participar, con pregunta del dia -->
 <div class="modal" id="sorteoModal" style="display:none;" aria-hidden="true">
   <div class="modal-content sorteo-modal">
     <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarSorteo()">&times;</button>
     <h3 id="sorteoTitulo">🎲 ¿A quién le toca?</h3>
     <div class="sorteo-escenario">
-      <div class="sorteo-confeti" id="sorteoConfeti" aria-hidden="true"><span>🎉</span><span>⭐</span><span>✨</span><span>🎊</span><span>🌟</span></div>
+      <div class="sorteo-confeti" id="sorteoConfeti" aria-hidden="true"><span>🎉</span><span>⭐</span><span>✨</span><span>🎊</span><span>🌟</span><span>🎈</span><span>💫</span></div>
+      <div class="sorteo-dado" id="sorteoDado" aria-hidden="true">🎲</div>
       <div class="sorteo-nombre" id="sorteoNombre" role="status" aria-live="polite">…</div>
+    </div>
+    <div class="pregunta-zona" id="preguntaZona" hidden>
+      <div class="pregunta-brillos" id="preguntaBrillos" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span><span>💫</span><span>⭐</span><span>✨</span></div>
+      <div class="pregunta-carta" id="preguntaCarta">
+        <div class="pregunta-cara frente" aria-hidden="true">
+          <span class="pregunta-icono">❓</span>
+          <span id="preguntaFrenteTxt">Pregunta sorpresa</span>
+        </div>
+        <div class="pregunta-cara dorso" id="preguntaDorso" aria-hidden="true" aria-live="polite">
+          <p id="preguntaTexto"></p>
+        </div>
+      </div>
+      <button class="btn-primary pregunta-descubrir" type="button" id="preguntaDescubrir" onclick="descubrirPregunta()">👀 <span id="preguntaDescubrirTxt">Descubrir pregunta</span></button>
     </div>
     <p class="sorteo-info" id="sorteoInfo"></p>
     <div class="sorteo-acciones">
       <button class="btn-primary" type="button" id="sorteoOtra" onclick="sortearEstudiante()">🎲 Sacar otro</button>
       <button class="btn-secondary" type="button" id="sorteoReset" onclick="reiniciarSorteo()">↻ Nueva ronda</button>
+      <button class="btn-secondary" type="button" id="sorteoPreguntasBtn" onclick="abrirPreguntas()">✏️ <span id="sorteoPreguntasTxt">Preguntas del día</span> <span id="sorteoPreguntasN"></span></button>
       <button class="btn-secondary" type="button" id="sorteoCerrar" onclick="cerrarSorteo()">Cerrar</button>
+    </div>
+  </div>
+</div>
+<!-- Editor de las preguntas del dia -->
+<div class="modal" id="preguntasModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content preguntas-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarPreguntas()">&times;</button>
+    <h3 id="preguntasTitulo">❓ Preguntas del día</h3>
+    <p class="preguntas-ayuda" id="preguntasAyuda">Escribe una pregunta por renglón.</p>
+    <textarea id="preguntasInput" rows="9" oninput="contarPreguntasEditor()" aria-labelledby="preguntasTitulo"></textarea>
+    <div class="preguntas-pie">
+      <span class="preguntas-cuenta" id="preguntasCuenta"></span>
+      <button class="btn-secondary" type="button" id="preguntasReusar" onclick="reusarPreguntas()">↻ Volver a usar todas</button>
+    </div>
+    <label class="preguntas-opcion">
+      <input type="checkbox" id="preguntasBocaAbajo" checked>
+      <span id="preguntasBocaAbajoTxt">Mostrar la pregunta boca abajo y descubrirla al tocar</span>
+    </label>
+    <div class="preguntas-acciones">
+      <button class="btn-secondary" type="button" id="preguntasCancelar" onclick="cerrarPreguntas()">Cancelar</button>
+      <button class="btn-primary" type="button" id="preguntasGuardar" onclick="guardarPreguntas()">Guardar</button>
     </div>
   </div>
 </div>
@@ -6353,8 +6473,13 @@ function loadUserFromCloud(uid,email){
 // Para preguntar sin que parezca que uno la tiene contra alguien. Solo entra
 // quien esta marcado presente ese dia, y nadie repite hasta que hayan salido
 // todos: asi no caen siempre los mismos.
+//
+// Es un momento de celebracion delante del salon, asi que va por etapas: rueda
+// el dado, pasan los nombres frenando, sale el ganador con confeti y, si hay
+// preguntas del dia, aparece una carta boca abajo que se voltea al descubrirla.
 let _yaSorteados = [];       // ids que ya salieron en esta ronda
 let _sorteoAnim = null;      // temporizador de la vuelta en curso
+let _sorteoTimers = [];      // el resto de etapas pendientes
 
 function candidatosSorteo(){
     const todos=(currentStudents||[]).filter(s=>s && (s.name||'').trim());
@@ -6362,6 +6487,46 @@ function candidatosSorteo(){
     // Si todavia no se ha pasado lista, se sortea entre todo el salon.
     return presentes.length ? { lista:presentes, soloPresentes:true } : { lista:todos, soloPresentes:false };
 }
+function movimientoSuave(){
+    try{ return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch(e){ return true; }
+}
+function programarSorteo(fn,ms){ const id=setTimeout(fn,ms); _sorteoTimers.push(id); return id; }
+function pararRuleta(){ if(_sorteoAnim){ clearTimeout(_sorteoAnim); _sorteoAnim=null; } }
+// Corta TODA la secuencia: se puede pulsar "Sacar otro" a mitad de cualquier etapa.
+function cancelarSecuencia(){
+    pararRuleta();
+    _sorteoTimers.forEach(clearTimeout); _sorteoTimers=[];
+}
+
+// --- Preguntas del dia ---------------------------------------------------
+// Viven en el salon, asi que viajan a la nube con el resto. Cuales ya se
+// hicieron es cosa de la clase de hoy: se lleva en memoria, por texto, para que
+// editar la lista no descuadre nada.
+let _preguntasUsadas = [];
+const PREGUNTA_BOCA_ABAJO_KEY='learnersTrackPreguntaBocaAbajo';
+function preguntasDelSalon(){
+    const c=classrooms[activeClassroomIndex]; if(!c) return [];
+    if(!Array.isArray(c.preguntas)) c.preguntas=[];
+    return c.preguntas;
+}
+function preguntasValidas(){ return preguntasDelSalon().map(t=>String(t||'').trim()).filter(Boolean); }
+function preguntaBocaAbajo(){ try{ return localStorage.getItem(PREGUNTA_BOCA_ABAJO_KEY)!=='0'; }catch(e){ return true; } }
+function elegirPregunta(){
+    const lista=preguntasValidas();
+    if(!lista.length) return null;
+    let pozo=lista.filter(t=>_preguntasUsadas.indexOf(t)<0);
+    if(!pozo.length){
+        // Vuelta nueva, pero sin repetir justo la ultima que se hizo.
+        const ultima=_preguntasUsadas[_preguntasUsadas.length-1];
+        _preguntasUsadas=[];
+        pozo=lista.length>1 ? lista.filter(t=>t!==ultima) : lista.slice();
+    }
+    const p=pozo[Math.floor(Math.random()*pozo.length)];
+    _preguntasUsadas.push(p);
+    return p;
+}
+
 window.abrirSorteo=function(){
     const es=currentLanguage==='es';
     if(!(currentStudents||[]).length){
@@ -6374,25 +6539,39 @@ window.abrirSorteo=function(){
     t('sorteoOtra', es?'🎲 Sacar otro':'🎲 Pick another');
     t('sorteoReset', es?'↻ Nueva ronda':'↻ New round');
     t('sorteoCerrar', es?'Cerrar':'Close');
+    t('sorteoPreguntasTxt', es?'Preguntas del día':'Questions of the day');
+    t('preguntaFrenteTxt', es?'Pregunta sorpresa':'Surprise question');
+    t('preguntaDescubrirTxt', es?'Descubrir pregunta':'Reveal question');
+    pintarContadorPreguntas();
     pintarSorteo(null);
     sortearEstudiante();
 };
 window.cerrarSorteo=function(){
-    pararRuleta();
+    cancelarSecuencia();
     hideModal('sorteoModal');
 };
 window.reiniciarSorteo=function(){
-    _yaSorteados=[];
+    _yaSorteados=[]; _preguntasUsadas=[];
     pintarSorteo(null);
-    showNotification(currentLanguage==='es'?'Ronda reiniciada: vuelven a entrar todos':'Round reset: everyone is back in','info');
+    showNotification(currentLanguage==='es'?'Ronda reiniciada: vuelven a entrar todos, y todas las preguntas':'Round reset: everyone and every question is back in','info');
 };
+function pintarContadorPreguntas(){
+    const n=preguntasValidas().length;
+    const el=document.getElementById('sorteoPreguntasN');
+    if(el) el.textContent = n ? `(${n})` : '';
+}
 function pintarSorteo(elegido,estado){
     const es=currentLanguage==='es';
     const caja=document.getElementById('sorteoNombre');
     if(caja){
-        caja.textContent = elegido ? (elegido.name||'') : (estado||(es?'…':'…'));
+        caja.textContent = elegido ? (elegido.name||'') : (estado||'…');
         caja.classList.toggle('ganador', !!elegido && !estado);
     }
+    pintarInfoSorteo();
+}
+// La linea de abajo: cuantos presentes, cuantos faltan y cuantas preguntas quedan.
+function pintarInfoSorteo(){
+    const es=currentLanguage==='es';
     const info=document.getElementById('sorteoInfo');
     if(!info) return;
     const c=candidatosSorteo();
@@ -6402,48 +6581,34 @@ function pintarSorteo(elegido,estado){
         ? `${c.lista.length} ${es?'presentes hoy':'present today'}`
         : (es?'Sin lista pasada: entra todo el salón':'Attendance not taken: the whole class is in'));
     partes.push(`${quedan} ${es?'por salir':'left to go'}`);
+    const pv=preguntasValidas();
+    if(pv.length){
+        const pq=pv.filter(t=>_preguntasUsadas.indexOf(t)<0).length;
+        partes.push(`${pq} ${es?'preguntas por hacer':'questions left'}`);
+    }
     info.textContent=partes.join(' · ');
 }
-// La ruleta FRENA. A velocidad constante y parada en seco no hay expectativa:
-// lo que la crea es la desaceleracion, igual que en un sorteo de verdad. Los
-// intervalos crecen segun una curva cubica, de 40 ms al principio a 260 ms al
-// final; en total, poco mas de un segundo y medio.
+
+// --- Etapa 1: el dado ----------------------------------------------------
+const SORTEO_MS_DADO = 700;
+function lanzarDado(){
+    const d=document.getElementById('sorteoDado'); if(!d) return;
+    d.classList.remove('rueda'); void d.offsetWidth; d.classList.add('rueda');
+}
+
+// --- Etapa 2: la ruleta, que FRENA ----------------------------------------
+// A velocidad constante y parada en seco no hay expectativa: lo que la crea es
+// la desaceleracion. Los intervalos crecen por una curva cubica, de 40 a 260 ms.
 const SORTEO_PASOS = 18;
 const SORTEO_MS_INICIO = 40;
 const SORTEO_MS_FINAL = 260;
-function pararRuleta(){ if(_sorteoAnim){ clearTimeout(_sorteoAnim); _sorteoAnim=null; } }
-function movimientoSuave(){
-    try{ return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
-    catch(e){ return true; }
-}
-function rematarSorteo(elegido){
-    _yaSorteados.push(elegido.id);
-    pintarSorteo(elegido);
-    const conf=document.getElementById('sorteoConfeti');
-    if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
-    // En el aula tambien se resalta su fila, para que el salon lo vea.
-    if(typeof remoteEnfocarAlumno==='function') remoteEnfocarAlumno(elegido.id);
-}
-window.sortearEstudiante=function(){
-    const es=currentLanguage==='es';
-    const c=candidatosSorteo();
-    if(!c.lista.length){ pintarSorteo(null, es?'Nadie disponible':'Nobody available'); return; }
-    let pozo=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0);
-    if(!pozo.length){
-        // Ya salieron todos: se empieza vuelta nueva sola.
-        _yaSorteados=[]; pozo=c.lista.slice();
-        showNotification(es?'Ya salieron todos: empieza una vuelta nueva':'Everyone has had a turn: starting a new round','info');
-    }
-    const elegido=pozo[Math.floor(Math.random()*pozo.length)];
-    // Se puede volver a pulsar "Sacar otro" a media vuelta: la anterior se corta.
-    pararRuleta();
+function girarRuleta(lista,elegido,alTerminar){
     const caja=document.getElementById('sorteoNombre');
-    if(caja) caja.classList.remove('ganador','tic');
     const suave=movimientoSuave();
     const pasos=suave?SORTEO_PASOS:3;
     let i=0;
     const paso=()=>{
-        const x = (i<pasos-1) ? c.lista[Math.floor(Math.random()*c.lista.length)] : elegido;
+        const x = (i<pasos-1) ? lista[Math.floor(Math.random()*lista.length)] : elegido;
         if(caja){
             caja.textContent=x.name||'';
             // Los ultimos nombres son el redoble: cada uno da un golpecito.
@@ -6452,12 +6617,143 @@ window.sortearEstudiante=function(){
             }
         }
         i++;
-        if(i>=pasos){ _sorteoAnim=null; if(caja) caja.classList.remove('tic'); rematarSorteo(elegido); return; }
+        if(i>=pasos){ _sorteoAnim=null; if(caja) caja.classList.remove('tic'); alTerminar(); return; }
         const t=i/pasos;
         const espera = suave ? SORTEO_MS_INICIO + (SORTEO_MS_FINAL-SORTEO_MS_INICIO)*Math.pow(t,3) : 90;
         _sorteoAnim=setTimeout(paso, espera);
     };
     paso();
+}
+
+// --- Etapa 3: el ganador ---------------------------------------------------
+function rematarSorteo(elegido){
+    _yaSorteados.push(elegido.id);
+    pintarSorteo(elegido);
+    const conf=document.getElementById('sorteoConfeti');
+    if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
+    // En el aula tambien se resalta su fila, para que el salon lo vea.
+    if(typeof remoteEnfocarAlumno==='function') remoteEnfocarAlumno(elegido.id);
+}
+
+// --- Etapa 4: la carta de la pregunta ------------------------------------
+function ocultarPregunta(){
+    const zona=document.getElementById('preguntaZona');
+    const carta=document.getElementById('preguntaCarta');
+    if(carta) carta.classList.remove('volteada');
+    if(zona){ zona.hidden=true; zona.classList.remove('entra'); }
+    const dorso=document.getElementById('preguntaDorso'); if(dorso) dorso.setAttribute('aria-hidden','true');
+}
+function mostrarPregunta(){
+    const texto=elegirPregunta();
+    if(!texto) return;
+    const zona=document.getElementById('preguntaZona');
+    const carta=document.getElementById('preguntaCarta');
+    const p=document.getElementById('preguntaTexto');
+    const btn=document.getElementById('preguntaDescubrir');
+    // El texto se pone YA, con la carta boca abajo: si se escribiera al voltear,
+    // la carta cambiaria de alto a mitad del giro.
+    if(p) p.textContent=texto;
+    if(carta) carta.classList.remove('volteada');
+    if(btn){ btn.hidden=false; btn.disabled=false; }
+    if(zona){ zona.hidden=false; zona.classList.remove('entra'); void zona.offsetWidth; zona.classList.add('entra'); }
+    pintarInfoSorteo();
+    if(!preguntaBocaAbajo()){
+        programarSorteo(descubrirPregunta, movimientoSuave()?650:60);
+    }
+}
+window.descubrirPregunta=function(){
+    const carta=document.getElementById('preguntaCarta');
+    const zona=document.getElementById('preguntaZona');
+    if(!carta || !zona || zona.hidden || carta.classList.contains('volteada')) return;
+    carta.classList.add('volteada');
+    const dorso=document.getElementById('preguntaDorso'); if(dorso) dorso.removeAttribute('aria-hidden');
+    const btn=document.getElementById('preguntaDescubrir'); if(btn){ btn.disabled=true; btn.hidden=true; }
+    // Destellos a mitad del giro, cuando la cara de la pregunta empieza a verse.
+    if(movimientoSuave()){
+        programarSorteo(()=>{
+            const b=document.getElementById('preguntaBrillos');
+            if(b){ b.classList.remove('lanzar'); void b.offsetWidth; b.classList.add('lanzar'); }
+        }, 240);
+    }
+};
+
+// --- La secuencia completa -------------------------------------------------
+window.sortearEstudiante=function(){
+    const es=currentLanguage==='es';
+    const c=candidatosSorteo();
+    if(!c.lista.length){ pintarSorteo(null, es?'Nadie disponible':'Nobody available'); return; }
+    let pozo=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0);
+    if(!pozo.length){
+        // Ya salieron todos: se empieza vuelta nueva sola.
+        // Tampoco repite al ultimo que salio, que seria lo primero que notaria el salon.
+        const ultimo=_yaSorteados[_yaSorteados.length-1];
+        _yaSorteados=[];
+        pozo=c.lista.length>1 ? c.lista.filter(s=>s.id!==ultimo) : c.lista.slice();
+        showNotification(es?'Ya salieron todos: empieza una vuelta nueva':'Everyone has had a turn: starting a new round','info');
+    }
+    const elegido=pozo[Math.floor(Math.random()*pozo.length)];
+    cancelarSecuencia();
+    ocultarPregunta();
+    const caja=document.getElementById('sorteoNombre');
+    if(caja){ caja.classList.remove('ganador','tic'); caja.textContent='…'; }
+    const suave=movimientoSuave();
+    lanzarDado();
+    programarSorteo(()=>{
+        girarRuleta(c.lista, elegido, ()=>{
+            rematarSorteo(elegido);
+            if(preguntasValidas().length) programarSorteo(mostrarPregunta, suave?480:0);
+        });
+    }, suave?SORTEO_MS_DADO:0);
+};
+
+// --- Editor de preguntas ---------------------------------------------------
+window.abrirPreguntas=function(){
+    const es=currentLanguage==='es';
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('preguntasTitulo', es?'❓ Preguntas del día':'❓ Questions of the day');
+    t('preguntasAyuda', es?'Escribe una pregunta por renglón. Al sacar a un estudiante al azar le saldrá una de estas, sin repetirse hasta que se hayan hecho todas.'
+                         :'Write one question per line. When a student is picked at random they get one of these, with no repeats until all have been asked.');
+    t('preguntasBocaAbajoTxt', es?'Mostrar la pregunta boca abajo y descubrirla al tocar':'Show the question face down and reveal it on tap');
+    t('preguntasGuardar', es?'Guardar':'Save');
+    t('preguntasCancelar', es?'Cancelar':'Cancel');
+    t('preguntasReusar', es?'↻ Volver a usar todas':'↻ Reuse all');
+    const ta=document.getElementById('preguntasInput');
+    if(ta){
+        ta.value=preguntasDelSalon().join('\n');
+        ta.placeholder='What did you do last weekend?\nDescribe your favourite food.\nHow do you say "biblioteca" in English?';
+    }
+    const cb=document.getElementById('preguntasBocaAbajo'); if(cb) cb.checked=preguntaBocaAbajo();
+    contarPreguntasEditor();
+    showModal('preguntasModal');
+    setTimeout(()=>{ if(ta) ta.focus(); },60);
+};
+window.cerrarPreguntas=function(){ hideModal('preguntasModal'); };
+window.contarPreguntasEditor=function(){
+    const es=currentLanguage==='es';
+    const ta=document.getElementById('preguntasInput');
+    const n=ta ? ta.value.split('\n').map(x=>x.trim()).filter(Boolean).length : 0;
+    const el=document.getElementById('preguntasCuenta');
+    if(el) el.textContent = n ? `${n} ${es?(n===1?'pregunta':'preguntas'):(n===1?'question':'questions')}` : (es?'Sin preguntas todavía':'No questions yet');
+};
+window.guardarPreguntas=function(){
+    const es=currentLanguage==='es';
+    const c=classrooms[activeClassroomIndex]; if(!c) return;
+    const ta=document.getElementById('preguntasInput');
+    c.preguntas = ta ? ta.value.split('\n').map(x=>x.trim()).filter(Boolean) : [];
+    const cb=document.getElementById('preguntasBocaAbajo');
+    try{ localStorage.setItem(PREGUNTA_BOCA_ABAJO_KEY, (cb&&!cb.checked)?'0':'1'); }catch(e){}
+    // Las que ya se hicieron y siguen en la lista, siguen contando como hechas.
+    _preguntasUsadas=_preguntasUsadas.filter(t=>c.preguntas.indexOf(t)>=0);
+    saveData();
+    pintarContadorPreguntas();
+    pintarInfoSorteo();
+    hideModal('preguntasModal');
+    showNotification(es?`❓ ${c.preguntas.length} pregunta(s) guardada(s)`:`❓ ${c.preguntas.length} question(s) saved`,'success');
+};
+window.reusarPreguntas=function(){
+    _preguntasUsadas=[];
+    pintarInfoSorteo();
+    showNotification(currentLanguage==='es'?'Todas las preguntas vuelven a estar disponibles':'All questions are available again','info');
 };
 // === PLANILLA DE ASISTENCIA ==============================================
 // La asistencia se venia guardando dia a dia pero no salia a ningun lado.
@@ -6810,6 +7106,9 @@ function remoteEjecutar(c){
                 if(abierto) sortearEstudiante(); else abrirSorteo();
                 break;
             }
+            case 'descubrir':
+                if(typeof descubrirPregunta==='function') descubrirPregunta();
+                break;
             case 'ping': break;
         }
     }catch(e){ console.error('orden remota',e); }
@@ -6930,6 +7229,7 @@ function pintarMando(){
         `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:-1})">▲</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('scroll',{dir:1})">▼</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('sorteo',{})" title="${es?'Sacar al azar':'Pick at random'}">🎲</button>`
+      + `<button type="button" class="remote-mini" onclick="enviarOrden('descubrir',{})" title="${es?'Descubrir pregunta':'Reveal question'}">👀</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'abrir'})">📽️</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:-1})">⟨</button>`
       + `<button type="button" class="remote-mini" onclick="enviarOrden('proj',{que:'mover',delta:1})">⟩</button>`
