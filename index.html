@@ -601,15 +601,11 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .periodo-punto { position:absolute; right:5px; bottom:5px; width:5px; height:5px; border-radius:50%; background:var(--success); }
 .periodo-btn.on .periodo-punto { background:#fff; }
 @media (hover:hover) and (pointer:fine){ .periodo-btn:not(.on):hover { border-color:var(--accent); color:var(--accent); } }
-/* === BOLETIN PARA LA FAMILIA: lado del docente === */
-.familia-caja { margin-top:18px; padding-top:16px; border-top:1px dashed var(--border); }
-.familia-titulo { color:var(--accent-strong); margin:0 0 8px; }
+/* === ACCESO DE INVITADOS: lado del docente === */
 .familia-nota { font-size:.86rem; color:var(--fg-muted); line-height:1.5; margin:0 0 12px; }
-.familia-compartir { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
 /* El QR siempre sobre blanco: en tema oscuro deja de leerse. */
-.familia-qr { flex:0 0 auto; padding:10px; background:#fff; border-radius:12px; box-shadow:var(--shadow-sm); line-height:0; }
+.familia-qr { flex:0 0 auto; padding:9px; background:#fff; border-radius:12px; box-shadow:var(--shadow-sm); line-height:0; }
 .familia-qr img,.familia-qr canvas { display:block; }
-.familia-datos { flex:1 1 220px; min-width:0; }
 .familia-url { font-size:.74rem; color:var(--fg-muted); word-break:break-all; margin:0 0 10px; }
 .familia-acciones { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:8px; }
 .familia-acciones .btn-secondary { text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
@@ -619,21 +615,24 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .familia-reglas summary { cursor:pointer; font-weight:700; font-size:.87rem; }
 .familia-reglas p { font-size:.82rem; color:var(--fg-muted); line-height:1.5; }
 .familia-reglas pre { background:var(--bg-alt); border:1px solid var(--border); border-radius:9px; padding:10px; font-size:.72rem; overflow-x:auto; white-space:pre; }
-.familias-modal { max-width:620px; }
-.familias-modal h3 { margin:0 0 8px; }
-.familias-barra { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:4px 0 12px; }
-.familias-cuenta { font-weight:800; color:var(--accent-strong); font-size:.88rem; margin-right:auto; }
-.familias-lista { list-style:none; margin:0; padding:0; max-height:46vh; overflow-y:auto; border:1px solid var(--border); border-radius:12px; }
-.familias-lista li { display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px solid var(--border); }
-.familias-lista li:last-child { border-bottom:none; }
-.familias-lista li.familias-reglas { display:block; }
-.familias-nombre { flex:1 1 auto; min-width:0; font-weight:700; font-size:.88rem; overflow-wrap:break-word; }
-.familias-estado { font-size:.8rem; font-weight:700; color:var(--success); white-space:nowrap; }
-.familias-estado.sin { color:var(--fg-muted); }
-.familias-lista .btn-secondary { padding:5px 11px; font-size:.8rem; }
-.familias-pie { display:flex; justify-content:flex-end; margin-top:14px; }
+.invitados-modal { max-width:600px; }
+.invitados-modal h3 { margin:0 0 10px; }
+/* El codigo en grande, para dictarlo o copiarlo de la pantalla del salon. */
+.invitados-codigo { font-family:'Montserrat',ui-monospace,monospace; font-weight:800; font-size:2.3rem; letter-spacing:.14em; text-align:center; color:var(--accent-strong); background:var(--bg-card); border:2px dashed var(--accent); border-radius:16px; padding:14px 10px; margin:4px 0 14px; }
+.invitados-compartir { display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+.invitados-datos { flex:1 1 240px; min-width:0; }
+.invitados-estado { margin:10px 0 0; color:var(--success); font-weight:700; }
+.invitados-acciones { display:flex; justify-content:flex-end; margin-top:14px; }
+@media (max-width:600px){ .invitados-codigo { font-size:1.7rem; } }
 
-/* === BOLETIN PARA LA FAMILIA: lo que ve el padre, pensado para el celular === */
+/* Pantalla de inicio: docente o invitado */
+.acceso-roles { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:5px; margin:0 0 16px; background:var(--bg-alt); border:1px solid var(--border); border-radius:14px; }
+.acceso-rol { font-family:inherit; font-size:.86rem; font-weight:700; color:var(--fg-muted); background:transparent; border:none; border-radius:10px; padding:10px 6px; cursor:pointer; transition:background 160ms var(--ease-out), color 160ms var(--ease-out); }
+.acceso-rol.on { background:var(--bg-card); color:var(--accent-strong); box-shadow:var(--shadow-sm); }
+.invitado-ayuda { font-size:.86rem; line-height:1.5; color:var(--fg-muted); margin:0 0 14px; text-align:left; }
+.invitado-codigo-input { font-family:'Montserrat',ui-monospace,monospace !important; font-size:1.35rem !important; font-weight:800 !important; letter-spacing:.14em; text-align:center; text-transform:uppercase; }
+
+/* === ACCESO DE INVITADOS: lo que ve el padre, pensado para el celular === */
 body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !important; }
 .familia-screen { min-height:100vh; background:var(--bg-gradient,var(--bg)); color:var(--fg); padding:18px 14px 40px; box-sizing:border-box; }
 .familia-hoja { max-width:640px; margin:0 auto; }
@@ -677,6 +676,20 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .fam-insignias li b { color:var(--accent-strong); }
 .fam-comentario { margin:0; font-size:.92rem; line-height:1.6; white-space:pre-wrap; }
 .fam-pie { text-align:center; font-size:.74rem; color:var(--fg-muted); margin-top:18px; }
+.fam-barra { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.fam-barra-rol { font-size:.8rem; font-weight:800; color:var(--fg-muted); }
+.fam-barra-btn { font-family:inherit; font-size:.84rem; font-weight:700; color:var(--accent-strong); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; cursor:pointer; }
+.fam-barra-btn:last-child { margin-left:auto; }
+.fam-busqueda { width:100%; box-sizing:border-box; font-family:inherit; font-size:1.05rem; font-weight:600; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:13px 14px; }
+.fam-busqueda:focus { outline:2px solid var(--accent); outline-offset:1px; }
+.fam-ayuda { margin-top:8px; font-size:.8rem; }
+.fam-resultados { list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.fam-resultado { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; text-align:left; font-family:inherit; font-size:.98rem; font-weight:700; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:13px 14px; cursor:pointer; }
+.fam-resultado span { color:var(--accent-strong); font-size:1.3rem; line-height:1; }
+.fam-sin { font-size:.86rem; color:var(--fg-muted); padding:6px 2px; }
+.fam-rapido { width:100%; margin-top:12px; font-family:inherit; font-size:.92rem; color:var(--fg); text-align:left; background:var(--badge-bg); border:1px solid var(--badge-border); border-radius:12px; padding:12px 14px; cursor:pointer; }
+.fam-vacio-acciones { margin-top:18px; }
+.fam-olvidar { font-family:inherit; font-size:inherit; color:var(--fg-muted); background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; }
 /* === PLANILLA DE ASISTENCIA === */
 #attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #attendancePage.show { display:block; animation:fadeIn .3s; }
@@ -1382,6 +1395,17 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
         <h1 class="auth-title" id="authTitle">Learners Track</h1>
         <p id="authSubtitle">Sign in to your account</p>
         <div id="cloudStatusPill" style="display:inline-block;font-size:0.8rem;font-weight:700;padding:5px 12px;border-radius:999px;margin-bottom:14px;"></div>
+        <!-- Dos entradas: el docente con su cuenta, el padre con el codigo de la clase -->
+        <div class="acceso-roles" role="tablist" aria-label="Tipo de acceso">
+            <button type="button" class="acceso-rol on" id="rolDocenteBtn" role="tab" aria-selected="true" onclick="elegirRol('docente')">👩‍🏫 <span id="rolDocenteTxt">Soy docente</span></button>
+            <button type="button" class="acceso-rol" id="rolInvitadoBtn" role="tab" aria-selected="false" onclick="elegirRol('invitado')">👨‍👩‍👧 <span id="rolInvitadoTxt">Soy padre o invitado</span></button>
+        </div>
+        <form id="invitadoForm" class="auth-form" style="display:none;" autocomplete="off" novalidate onsubmit="event.preventDefault();entrarComoInvitado();">
+            <p class="invitado-ayuda" id="invitadoAyuda">Pídele al docente el código de la clase. Con él podrás buscar a tu hijo o hija y ver sus notas, su asistencia y sus insignias.</p>
+            <div class="form-group"><label for="invitadoCodigo" id="invitadoCodigoLabel">Código de la clase</label>
+                <input type="text" id="invitadoCodigo" class="invitado-codigo-input" maxlength="12" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"></div>
+            <button type="submit" class="btn-primary" id="invitadoEntrarBtn" style="width:100%;">🔎 <span id="invitadoEntrarTxt">Entrar a la clase</span></button>
+        </form>
         <form id="loginForm" class="auth-form" autocomplete="on">
             <div class="form-group"><label for="loginEmail" id="loginEmailLabel">Email</label><input type="email" id="loginEmail" placeholder="teacher@school.edu" autocomplete="email username" autocapitalize="off" autocorrect="off" spellcheck="false" required></div>
             <div class="form-group"><label for="loginPassword" id="loginPasswordLabel">Password</label><div style="display:flex;gap:8px;align-items:center;"><input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required><button type="button" id="toggleLoginPasswordBtn" class="btn-secondary" style="white-space:nowrap;padding:10px 12px;">Show</button></div></div>
@@ -1555,7 +1579,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
                 <button class="add-note-col-btn" id="addNoteColBtn">+ Add Score Column</button>
                 <button class="remove-note-col-btn" id="removeNoteColBtn">- Remove Score Column</button>
                 <button class="add-student-btn" id="bulkCertBtn" type="button" style="background:linear-gradient(135deg,#667eea,#764ba2);" onclick="openBulkCertModal()">🎓 <span id="bulkCertBtnText">Certificados del curso</span></button>
-                <button class="add-student-btn" id="familiasBtn" type="button" onclick="abrirFamilias()">👨‍👩‍👧 <span id="familiasBtnText">Familias</span></button>
+                <button class="add-student-btn" id="invitadosBtn" type="button" onclick="abrirInvitados()">👨‍👩‍👧 <span id="invitadosBtnText">Acceso para padres</span></button>
                 <div class="badge-points-box">
                     <label class="badge-points-toggle">
                         <input type="checkbox" id="badgePointsEnabledInput">
@@ -1701,19 +1725,12 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
     </div>
   </div>
 </div>
-<!-- Boletines de todo el salon y hoja de QR -->
-<div class="modal" id="familiasModal" style="display:none;" aria-hidden="true">
-  <div class="modal-content familias-modal">
-    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarFamilias()">&times;</button>
-    <h3 id="familiasTitulo">👨‍👩‍👧 Boletines para las familias</h3>
-    <p class="familia-nota" id="familiasAyuda"></p>
-    <div class="familias-barra">
-      <span class="familias-cuenta" id="familiasCuenta"></span>
-      <button class="btn-secondary" type="button" id="familiasTodosBtn" onclick="crearTodosLosEnlaces()">🔗 <span id="familiasTodosTxt">Crear los que faltan</span></button>
-      <button class="btn-primary" type="button" id="familiasPdfBtn" onclick="hojaDeQRFamilias()">📄 <span id="familiasPdfTxt">Hoja de QR para imprimir</span></button>
-    </div>
-    <ul class="familias-lista" id="familiasLista"></ul>
-    <div class="familias-pie"><button class="btn-secondary" type="button" id="familiasCerrar" onclick="cerrarFamilias()">Cerrar</button></div>
+<!-- Acceso de los padres a un salon con un codigo -->
+<div class="modal" id="invitadosModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content invitados-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarInvitados()">&times;</button>
+    <h3 id="invitadosTitulo">👨‍👩‍👧 Acceso para padres</h3>
+    <div id="invitadosCuerpo"></div>
   </div>
 </div>
 <!-- Codigo QR para emparejar el celular como mando -->
@@ -1761,7 +1778,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
     <div class="remote-extra" id="remoteExtra"></div>
   </footer>
 </div>
-<!-- Lo unico que ve una familia: el boletin de solo lectura de su hijo -->
+<!-- Lo unico que ve un padre invitado: buscador del salon y boletin de solo lectura -->
 <div id="familiaScreen" class="familia-screen" style="display:none;">
   <main class="familia-hoja" id="familiaHoja"></main>
 </div>
@@ -2410,7 +2427,7 @@ const translations = {
         planillaBtn:"Sheet", planillaMonth:"Month:",
         sorteoBtn:"Random",
         periodoLabel:"Period:",
-        familiasBtn:"Families",
+        invitadosBtn:"Parent access", rolDocente:"I'm a teacher", rolInvitado:"I'm a parent or guest", invitadoAyuda:"Ask the teacher for the class code. With it you can find your child and see their scores, attendance and badges.", invitadoCodigoLabel:"Class code", invitadoEntrar:"Enter the class",
         removeNoteColBtn:"- Remove Score Column", backBtn:"← Back to classroom", statisticsTitle:"📊 Course Statistics",
         badgeModalTitle:"Create or Edit Badge", badgeNameLabel:"Badge name:", badgeNamePlaceholder:"e.g: Excellent work",
         badgeIconLabel:"Icon or image:", badgeIconPlaceholder:"Or type your emoji here", cancelBtn:"Cancel", saveBtn:"Save",
@@ -2464,7 +2481,7 @@ const translations = {
         planillaBtn:"Planilla", planillaMonth:"Mes:",
         sorteoBtn:"Al azar",
         periodoLabel:"Periodo:",
-        familiasBtn:"Familias",
+        invitadosBtn:"Acceso para padres", rolDocente:"Soy docente", rolInvitado:"Soy padre o invitado", invitadoAyuda:"Pídele al docente el código de la clase. Con él podrás buscar a tu hijo o hija y ver sus notas, su asistencia y sus insignias.", invitadoCodigoLabel:"Código de la clase", invitadoEntrar:"Entrar a la clase",
         removeNoteColBtn:"- Quitar Columna de Score", backBtn:"← Volver al aula", statisticsTitle:"📊 Estadísticas del curso",
         badgeModalTitle:"Crear o Editar Insignia", badgeNameLabel:"Nombre de la insignia:", badgeNamePlaceholder:"Ej: Excelente trabajo",
         badgeIconLabel:"Ícono o imagen:", badgeIconPlaceholder:"O escribe tu emoji aquí", cancelBtn:"Cancelar", saveBtn:"Guardar",
@@ -2545,7 +2562,8 @@ function updateUIText() {
         ['planillaBtnText','textContent',t.planillaBtn],['planillaMesLabel','textContent',t.planillaMonth],
         ['sorteoBtnText','textContent',t.sorteoBtn],
         ['periodoLabel','textContent',t.periodoLabel],
-        ['familiasBtnText','textContent',t.familiasBtn],
+        ['invitadosBtnText','textContent',t.invitadosBtn],['rolDocenteTxt','textContent',t.rolDocente],['rolInvitadoTxt','textContent',t.rolInvitado],
+        ['invitadoAyuda','textContent',t.invitadoAyuda],['invitadoCodigoLabel','textContent',t.invitadoCodigoLabel],['invitadoEntrarTxt','textContent',t.invitadoEntrar],
         ['addNoteColBtn','textContent',t.addNoteColBtn],['removeNoteColBtn','textContent',t.removeNoteColBtn],
         ['authTitle','textContent',t.authTitle],['authSubtitle','textContent',t.authSubtitle],
         ['loginEmailLabel','textContent',t.loginEmailLabel],['loginPasswordLabel','textContent',t.loginPasswordLabel],
@@ -3401,8 +3419,8 @@ function saveData() {
     currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
     saveUsers();
     if(window.FIREBASE_ON) scheduleCloudPush();
-    // Los boletines de las familias siguen a los datos del docente.
-    if(typeof programarBoletines==='function') programarBoletines();
+    // Lo que ven los padres sigue a los datos del docente.
+    if(typeof programarClaseInvitados==='function') programarClaseInvitados();
 }
 function resetApplication() {
     const t=translations[currentLanguage];
@@ -5131,10 +5149,8 @@ function openStudentReport(sid){
          <button type="button" class="btn-secondary" onclick="closeStudentReport();openStudentCommentModal(${s.id});">✏️ ${es?'Editar comentario':'Edit comment'}</button>
          <button type="button" class="btn-secondary" onclick="closeStudentReport();openCertificateModal(${s.id});">📜 ${es?'Certificado':'Certificate'}</button>
          <button type="button" class="btn-primary" onclick="generateStudentReportPDF(${s.id})">📄 ${es?'Descargar reporte PDF':'Download PDF report'}</button>
-       </div>
-       <div class="familia-caja" id="familiaCaja"></div>`;
+       </div>`;
     showModal('studentReportModal');
-    pintarFamilia(s.id);
 }
 function closeStudentReport(){hideModal('studentReportModal');}
 function generateStudentReportPDF(sid){
@@ -6361,21 +6377,27 @@ let db = null;
 })();
 
 
-// === BOLETIN PARA LA FAMILIA =============================================
-// Los padres entran con un enlace o un QR, sin cuenta, y ven como va su hijo.
+// === ACCESO DE INVITADOS (PADRES DE FAMILIA) =============================
+// El docente activa el acceso de un salon y reparte UN codigo. El padre entra
+// como invitado, escribe el codigo, busca a su hijo por el nombre y ve su
+// boletin: notas por periodo, asistencia, insignias y comentario.
 //
-// Decisiones que no son de estilo, sino de privacidad:
-//  - Un enlace POR ESTUDIANTE, nunca uno por salon: con uno comun, cada padre
-//    veria las notas de todos los companeros de su hijo.
-//  - Nada sale del documento privado del docente hasta que el crea el enlace de
-//    ese estudiante. Se publica una copia minima en "boletines/{token}": solo
-//    datos de ese nino, sin companeros ni grupos.
-//  - El token son 128 bits aleatorios y la regla de Firestore prohibe listar la
-//    coleccion: el boletin solo se abre sabiendo su enlace exacto.
-//  - Si un enlace llega a otras manos, se crea uno nuevo y el viejo muere.
-const BOLETIN_COL='boletines';
+// Consecuencia que el docente eligio conociendola: quien tenga el codigo puede
+// buscar a CUALQUIER estudiante del salon, no solo al suyo. Para que no sea mas
+// abierto de lo necesario:
+//  - Esta apagado hasta que el docente lo enciende, salon por salon.
+//  - Nunca se muestra la lista del salon: hay que escribir parte del nombre, y
+//    si coinciden mas de tres se pide escribir mas.
+//  - Nada de rankings ni comparaciones: se ve un estudiante cada vez.
+//  - Si el codigo llega a quien no debe, se cambia en un toque y el viejo muere.
+//  - Firestore deja leer una clase con su codigo exacto pero no listarlas, y
+//    solo el docente que la publico puede escribirla o borrarla.
+const CLASES_COL='clases';
 const BOLETIN_APROBACION=3.0;
-const FAMILIA_QR_URL='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+const INVITADO_QR_URL='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+// Sin 0/O ni 1/I: el codigo se dicta por telefono o se copia de la pizarra.
+const ALFABETO_CODIGO='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const INVITADO_RECORDADO_KEY='learnersTrackInvitado';
 const REGLAS_FIRESTORE_COMPLETAS=`rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -6388,9 +6410,9 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Boletines para las familias: se leen con el enlace exacto,
-    // no se pueden listar, y solo los escribe el docente que los creo.
-    match /boletines/{token} {
+    // Acceso de padres: se lee una clase con su codigo exacto,
+    // no se pueden listar, y solo la escribe el docente que la publico.
+    match /clases/{codigo} {
       allow get: if true;
       allow list: if false;
       allow create: if request.auth != null
@@ -6404,32 +6426,40 @@ service cloud.firestore {
   }
 }`;
 
-// Pedido de boletin en la direccion: esta pantalla es la de una familia.
-let _familiaPedida=null;
-(function(){
-    try{
-        const t=new URLSearchParams(location.search).get('familia');
-        if(t && /^[a-f0-9]{32}$/.test(t)) _familiaPedida=t;
-    }catch(e){}
-})();
-
-function boletinRef(token){
-    try{ return (window.FIREBASE_ON && db) ? db.collection(BOLETIN_COL).doc(token) : null; }catch(e){ return null; }
+function normalizarCodigo(txt){
+    const c=String(txt||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    return /^[A-Z0-9]{8}$/.test(c) ? c : null;
 }
-function tokenFamilia(){
-    const a=new Uint8Array(16); crypto.getRandomValues(a);
-    return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join('');
+function codigoLegible(c){ return c ? c.slice(0,4)+'-'+c.slice(4) : ''; }
+function nuevoCodigoClase(){
+    // 256 es multiplo exacto de 32: el modulo no sesga ninguna letra. 32^8 = 2^40.
+    const a=new Uint8Array(8); crypto.getRandomValues(a);
+    return Array.from(a).map(x=>ALFABETO_CODIGO[x%ALFABETO_CODIGO.length]).join('');
 }
-function enlaceFamilia(token){ return location.origin+location.pathname+'?familia='+token; }
+function claveNombre(t){
+    return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+        .replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+}
+function enlaceDeClase(codigo){ return location.origin+location.pathname+'?clase='+codigo; }
+function claseRef(codigo){
+    try{ return (window.FIREBASE_ON && db) ? db.collection(CLASES_COL).doc(codigo) : null; }catch(e){ return null; }
+}
 function docenteConectado(){
     try{ return !!(window.FIREBASE_ON && firebase.auth().currentUser); }catch(e){ return false; }
 }
 function esErrorDePermiso(err){ return !!(err && (err.code==='permission-denied' || /permission/i.test(err.message||''))); }
 
-// Copia minima de UN estudiante. Sin fecha ni idioma: asi la huella solo cambia
-// cuando cambian sus datos, y no se reescribe el boletin en cada guardado.
-function construirBoletin(s){
-    const c=classrooms[activeClassroomIndex]||{};
+// Codigo pedido en la direccion: ?clase=XXXXXXXX lleva directo al buscador.
+let _invitadoCodigoURL=null;
+(function(){
+    try{
+        const c=normalizarCodigo(new URLSearchParams(location.search).get('clase'));
+        if(c) _invitadoCodigoURL=c;
+    }catch(e){}
+})();
+
+// --- Lo que se publica ------------------------------------------------------
+function reporteDeAlumno(s){
     const periodos=PERIODOS.map(p=>{
         const columnas = p===activePeriod ? noteColumns.slice() : (noteColumnsByPeriod[p]||[]).slice();
         const notas = notasDePeriodo(s,p).map(n=>String(n==null?'':n));
@@ -6438,7 +6468,6 @@ function construirBoletin(s){
     }).filter(Boolean);
     const registros=Object.entries(s.attendance||{}).filter(r=>r[1]==='p'||r[1]==='a').sort((a,b)=>a[0]<b[0]?1:-1);
     const presentes=registros.filter(r=>r[1]==='p').length;
-    const ausencias=registros.length-presentes;
     const cuenta={};
     (s.gridBadges||[]).forEach(celda=>(celda||[]).forEach(b=>{
         if(!b) return;
@@ -6447,19 +6476,10 @@ function construirBoletin(s){
         cuenta[k].cantidad++;
     }));
     const insignias=Object.values(cuenta).sort((a,b)=>b.cantidad-a.cantidad);
-    const logo=userProfile.institutionLogo;
     return {
-        v:1,
-        owner:firebase.auth().currentUser.uid,
-        alumno:String(s.name||''),
-        salon:String(c.name||''),
-        institucion:String(userProfile.school||''),
-        docente:String(userProfile.name||''),
-        logo:(typeof logo==='string' && logo.length<120000 && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(logo)) ? logo : null,
-        aprobacion:BOLETIN_APROBACION,
         periodos:periodos,
         asistencia:{
-            presentes:presentes, ausencias:ausencias, tomadas:registros.length,
+            presentes:presentes, ausencias:registros.length-presentes, tomadas:registros.length,
             porcentaje:registros.length?Math.round(presentes*100/registros.length):null,
             ultimas:registros.slice(0,12).map(r=>({ f:r[0], e:r[1] }))
         },
@@ -6467,303 +6487,359 @@ function construirBoletin(s){
         comentario:String(s.comment||'')
     };
 }
-
-// --- Publicacion ----------------------------------------------------------
-const _boletinHuellas=new Map();
-let _boletinTimer=null;
-let _boletinSinPermiso=false;
-// Se llama desde saveData. Espera a que el docente deje de tocar para no
-// escribir en Firestore en cada insignia.
-function programarBoletines(){
-    if(!docenteConectado()) return;
-    if(!(currentStudents||[]).some(s=>s.familiaToken)) return;
-    clearTimeout(_boletinTimer);
-    _boletinTimer=setTimeout(()=>{ publicarBoletines(false); },4000);
+function construirClase(){
+    const c=classrooms[activeClassroomIndex]||{};
+    const logo=userProfile.institutionLogo;
+    const datos={
+        v:2,
+        owner:firebase.auth().currentUser.uid,
+        salon:String(c.name||''),
+        institucion:String(userProfile.school||''),
+        docente:String(userProfile.name||''),
+        logo:(typeof logo==='string' && logo.length<120000 && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(logo)) ? logo : null,
+        aprobacion:BOLETIN_APROBACION,
+        alumnos:(currentStudents||[]).filter(s=>(s.name||'').trim()).map(s=>({
+            id:s.id, nombre:String(s.name), clave:claveNombre(s.name), r:reporteDeAlumno(s)
+        }))
+    };
+    // Firestore no admite documentos de mas de 1 MiB: primero se sacrifica el logo.
+    if(JSON.stringify(datos).length>900000) datos.logo=null;
+    if(JSON.stringify(datos).length>900000){
+        datos.alumnos.forEach(a=>{ a.r.asistencia.ultimas=a.r.asistencia.ultimas.slice(0,4); a.r.insignias.lista=a.r.insignias.lista.slice(0,6); });
+    }
+    return datos;
 }
-async function publicarBoletin(s,forzar){
-    const ref=boletinRef(s.familiaToken); if(!ref) throw new Error('sin nube');
-    const datos=construirBoletin(s);
-    const huella=JSON.stringify(datos);
-    if(!forzar && _boletinHuellas.get(s.familiaToken)===huella) return false;
+
+let _claseHuella=null, _claseTimer=null, _claseSinPermiso=false, _enlacesViejosLimpios=false;
+// Se llama desde saveData: publica cuatro segundos despues del ultimo cambio, y
+// solo si algo cambio de verdad, para no escribir en Firestore con cada insignia.
+function programarClaseInvitados(){
+    if(!docenteConectado()) return;
+    limpiarEnlacesViejos();
+    const c=classrooms[activeClassroomIndex];
+    if(!c || !c.invitadosActivos || !c.codigoInvitado) return;
+    clearTimeout(_claseTimer);
+    _claseTimer=setTimeout(()=>{ publicarClase(false).catch(err=>{ console.warn('clase',err); if(esErrorDePermiso(err)) _claseSinPermiso=true; }); },4000);
+}
+async function publicarClase(forzar){
+    const c=classrooms[activeClassroomIndex];
+    if(!c || !c.codigoInvitado) return false;
+    const ref=claseRef(c.codigoInvitado); if(!ref) throw new Error('sin nube');
+    const datos=construirClase();
+    const huella=c.codigoInvitado+'|'+JSON.stringify(datos);
+    if(!forzar && huella===_claseHuella) return false;
     await ref.set(Object.assign({},datos,{ actualizado:Date.now() }));
-    _boletinHuellas.set(s.familiaToken,huella);
-    _boletinSinPermiso=false;
+    _claseHuella=huella; _claseSinPermiso=false;
     return true;
 }
-async function publicarBoletines(forzar){
-    if(!docenteConectado()) return 0;
-    let hechos=0;
-    for(const s of (currentStudents||[]).filter(x=>x.familiaToken)){
-        try{ if(await publicarBoletin(s,forzar)) hechos++; }
-        catch(err){
-            console.warn('boletin',err);
-            if(esErrorDePermiso(err)) _boletinSinPermiso=true;
-            break;
-        }
-    }
-    return hechos;
+// Los enlaces por estudiante de la version anterior se retiran: sus boletines
+// se borran si todavia se puede y el token sale del estudiante.
+function limpiarEnlacesViejos(){
+    if(_enlacesViejosLimpios) return;
+    _enlacesViejosLimpios=true;
+    let cambio=false;
+    (classrooms||[]).forEach(c=>(c.students||[]).forEach(s=>{
+        if(!s.familiaToken) return;
+        const t=s.familiaToken; delete s.familiaToken; cambio=true;
+        try{ db.collection('boletines').doc(t).delete().catch(()=>{}); }catch(e){}
+    }));
+    if(cambio) setTimeout(()=>{ try{ saveData(); }catch(e){} },0);
 }
 
-// --- Seccion en la ficha del estudiante ------------------------------------
-function htmlReglasFamilia(){
-    const es=currentLanguage==='es';
-    return `<details class="familia-reglas" open>`
-        + `<summary>${es?'🔒 Falta una regla en Firebase':'🔒 A Firebase rule is missing'}</summary>`
-        + `<p>${es?'Para publicar boletines hay que añadir la parte de <b>boletines</b>. En Firebase → Firestore → Reglas, reemplaza todo por esto y pulsa Publicar:':'To publish reports, add the <b>boletines</b> part. In Firebase → Firestore → Rules, replace everything with this and press Publish:'}</p>`
-        + `<pre>${escapeHtml(REGLAS_FIRESTORE_COMPLETAS)}</pre>`
-        + `<button type="button" class="btn-secondary" onclick="copiarTextoFamilia(REGLAS_FIRESTORE_COMPLETAS,'${es?'Reglas copiadas':'Rules copied'}')">📋 ${es?'Copiar reglas':'Copy rules'}</button>`
-        + `</details>`;
-}
-window.copiarTextoFamilia=function(texto,aviso){
+// --- Ventana del docente ---------------------------------------------------
+window.copiarTextoInvitados=function(texto,aviso){
     const es=currentLanguage==='es';
     if(!navigator.clipboard){ showNotification(es?'Cópialo a mano':'Copy it manually','info'); return; }
     navigator.clipboard.writeText(texto)
         .then(()=>showNotification(aviso||(es?'Copiado':'Copied'),'success'))
         .catch(()=>showNotification(es?'Cópialo a mano':'Copy it manually','info'));
 };
-async function dibujarQRFamilia(caja,texto,tam){
-    if(!caja) return null;
-    caja.innerHTML='';
-    try{
-        await loadScriptOnce(FAMILIA_QR_URL,'QRCode');
-        new QRCode(caja,{ text:texto, width:tam||180, height:tam||180, correctLevel:QRCode.CorrectLevel.M });
-        return caja.querySelector('canvas');
-    }catch(e){ caja.textContent=currentLanguage==='es'?'No se pudo dibujar el QR':'Could not draw the QR'; return null; }
-}
-function pintarFamilia(sid){
-    const caja=document.getElementById('familiaCaja'); if(!caja) return;
+function htmlReglasInvitados(){
     const es=currentLanguage==='es';
-    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s){ caja.innerHTML=''; return; }
-    const titulo=`<h4 class="familia-titulo">👨‍👩‍👧 ${es?'Boletín para la familia':'Report for the family'}</h4>`;
+    return `<details class="familia-reglas" open>`
+        + `<summary>${es?'🔒 Falta una regla en Firebase':'🔒 A Firebase rule is missing'}</summary>`
+        + `<p>${es?'Para que los padres puedan entrar hay que añadir la parte de <b>clases</b>. En Firebase → Firestore → Reglas, reemplaza todo por esto y pulsa Publicar:':'For parents to get in, add the <b>clases</b> part. In Firebase → Firestore → Rules, replace everything with this and press Publish:'}</p>`
+        + `<pre>${escapeHtml(REGLAS_FIRESTORE_COMPLETAS)}</pre>`
+        + `<button type="button" class="btn-secondary" onclick="copiarTextoInvitados(REGLAS_FIRESTORE_COMPLETAS,'${es?'Reglas copiadas':'Rules copied'}')">📋 ${es?'Copiar reglas':'Copy rules'}</button>`
+        + `</details>`;
+}
+window.abrirInvitados=function(){
+    showModal('invitadosModal');
+    pintarInvitados();
+};
+window.cerrarInvitados=function(){ hideModal('invitadosModal'); };
+function pintarInvitados(){
+    const es=currentLanguage==='es';
+    const t=document.getElementById('invitadosTitulo');
+    if(t) t.textContent=es?'👨‍👩‍👧 Acceso para padres':'👨‍👩‍👧 Parent access';
+    const caja=document.getElementById('invitadosCuerpo'); if(!caja) return;
+    const c=classrooms[activeClassroomIndex];
+    if(!c){ caja.innerHTML=''; return; }
     if(!docenteConectado()){
-        caja.innerHTML=titulo+`<p class="familia-nota">${es?'Esto necesita la nube: entra con tu correo y contraseña.':'This needs cloud mode: sign in with your email and password.'}</p>`;
+        caja.innerHTML=`<p class="familia-nota">${es?'Esto necesita la nube: entra con tu correo y contraseña.':'This needs cloud mode: sign in with your email and password.'}</p>`;
         return;
     }
-    if(!s.familiaToken){
-        caja.innerHTML=titulo
-            + `<p class="familia-nota">${es
-                ? 'Crea un enlace para que su familia vea desde el celular sus notas por periodo, su asistencia y sus insignias, sin crear cuenta. <b>Solo verán a este estudiante.</b>'
-                : 'Create a link so their family can see scores by period, attendance and badges from a phone, with no account. <b>They will only see this student.</b>'}</p>`
-            + `<button type="button" class="btn-primary" onclick="crearEnlaceFamilia(${s.id})">🔗 ${es?'Crear enlace para la familia':'Create family link'}</button>`
-            + (_boletinSinPermiso?htmlReglasFamilia():'');
+    const aviso=`<p class="familia-aviso">🔒 ${es
+        ? '<b>Cualquier persona con el código podrá buscar a cualquier estudiante de este salón.</b> Compártelo solo con las familias del curso, por ejemplo en su grupo. Si llega a otras manos, pulsa <b>Cambiar código</b> y el anterior deja de funcionar.'
+        : '<b>Anyone with the code can look up any student in this classroom.</b> Share it only with the families of this class. If it reaches the wrong hands, press <b>Change code</b> and the old one stops working.'}</p>`;
+    if(!c.invitadosActivos){
+        caja.innerHTML=
+            `<p class="familia-nota">${es
+                ? `Activa el acceso y comparte <b>un solo código</b> con las familias de <b>${escapeHtml(c.name||'')}</b>. Cada padre entra como invitado, busca a su hijo por el nombre y ve sus notas por periodo, su asistencia, sus insignias y tu comentario. Solo pueden mirar, no cambiar nada.`
+                : `Turn on access and share <b>one code</b> with the families of <b>${escapeHtml(c.name||'')}</b>. Each parent signs in as a guest, looks up their child by name and sees scores by period, attendance, badges and your comment. They can only look, not change anything.`}</p>`
+            + aviso
+            + `<div class="invitados-acciones"><button type="button" class="btn-primary" onclick="activarInvitados()">✅ ${es?'Activar acceso para padres':'Turn on parent access'}</button></div>`
+            + (_claseSinPermiso?htmlReglasInvitados():'');
         return;
     }
-    const url=enlaceFamilia(s.familiaToken);
-    const mensaje=(es?`Hola. Este es el boletín de ${s.name} en Learners Track, para ver sus notas, asistencia e insignias: `:`Hello. This is ${s.name}'s report on Learners Track, with scores, attendance and badges: `)+url;
-    caja.innerHTML=titulo
-        + `<div class="familia-compartir">`
-        +   `<div class="familia-qr" id="familiaQr"></div>`
-        +   `<div class="familia-datos">`
+    const url=enlaceDeClase(c.codigoInvitado);
+    const legible=codigoLegible(c.codigoInvitado);
+    const mensaje=es
+        ? `Hola, familias de ${c.name}. Para ver cómo van sus hijos en inglés, entren a ${location.origin+location.pathname} , toquen "Soy padre o invitado" y escriban el código ${legible}. También pueden abrir directamente: ${url}`
+        : `Hello, families of ${c.name}. To see how your children are doing, go to ${location.origin+location.pathname} , tap "I'm a parent or guest" and enter the code ${legible}. Or open directly: ${url}`;
+    caja.innerHTML=
+        `<p class="familia-nota">${es?'Comparte este código con las familias de':'Share this code with the families of'} <b>${escapeHtml(c.name||'')}</b>:</p>`
+        + `<div class="invitados-codigo" aria-label="${es?'Código de la clase':'Class code'}">${escapeHtml(legible)}</div>`
+        + `<div class="invitados-compartir">`
+        +   `<div class="familia-qr" id="invitadosQr"></div>`
+        +   `<div class="invitados-datos">`
         +     `<p class="familia-url">${escapeHtml(url)}</p>`
         +     `<div class="familia-acciones">`
-        +       `<button type="button" class="btn-secondary" onclick="copiarTextoFamilia('${url}','${es?'Enlace copiado':'Link copied'}')">📋 ${es?'Copiar':'Copy'}</button>`
-        +       `<a class="btn-secondary familia-wa" href="https://wa.me/?text=${encodeURIComponent(mensaje)}" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>`
-        +       `<a class="btn-secondary" href="${url}" target="_blank" rel="noopener noreferrer">👁️ ${es?'Ver como la familia':'View as family'}</a>`
+        +       `<button type="button" class="btn-secondary" onclick="copiarTextoInvitados('${legible}','${es?'Código copiado':'Code copied'}')">🔢 ${es?'Copiar código':'Copy code'}</button>`
+        +       `<button type="button" class="btn-secondary" onclick="copiarTextoInvitados('${url}','${es?'Enlace copiado':'Link copied'}')">🔗 ${es?'Copiar enlace':'Copy link'}</button>`
+        +       `<a class="btn-secondary" href="https://wa.me/?text=${encodeURIComponent(mensaje)}" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>`
         +     `</div>`
         +     `<div class="familia-acciones">`
-        +       `<button type="button" class="btn-secondary" onclick="nuevoEnlaceFamilia(${s.id})">↻ ${es?'Nuevo enlace':'New link'}</button>`
-        +       `<button type="button" class="btn-secondary familia-peligro" onclick="desactivarEnlaceFamilia(${s.id})">⛔ ${es?'Desactivar':'Turn off'}</button>`
+        +       `<a class="btn-secondary" href="${url}" target="_blank" rel="noopener noreferrer">👁️ ${es?'Ver como un padre':'View as a parent'}</a>`
+        +       `<button type="button" class="btn-secondary" onclick="cambiarCodigoClase()">↻ ${es?'Cambiar código':'Change code'}</button>`
+        +       `<button type="button" class="btn-secondary familia-peligro" onclick="desactivarInvitados()">⛔ ${es?'Desactivar':'Turn off'}</button>`
         +     `</div>`
         +   `</div>`
         + `</div>`
-        + `<p class="familia-aviso">🔒 ${es
-            ? 'Cualquiera con este enlace puede ver el boletín de este estudiante. Compártelo solo con su familia. Si llega a otras manos, pulsa <b>Nuevo enlace</b>: el anterior deja de funcionar.'
-            : 'Anyone with this link can see this student\'s report. Share it only with their family. If it reaches the wrong hands, press <b>New link</b>: the old one stops working.'}</p>`
-        + (_boletinSinPermiso?htmlReglasFamilia():'');
-    dibujarQRFamilia(document.getElementById('familiaQr'),url,168);
+        + `<p class="familia-nota invitados-estado">${es?`✅ Activo · ${(currentStudents||[]).length} estudiantes · se actualiza solo cuando cambias algo`:`✅ On · ${(currentStudents||[]).length} students · updates by itself when you change something`}</p>`
+        + aviso
+        + (_claseSinPermiso?htmlReglasInvitados():'');
+    (async()=>{
+        const q=document.getElementById('invitadosQr'); if(!q) return;
+        try{ await loadScriptOnce(INVITADO_QR_URL,'QRCode'); q.innerHTML=''; new QRCode(q,{ text:url, width:132, height:132, correctLevel:QRCode.CorrectLevel.M }); }
+        catch(e){ q.textContent=''; }
+    })();
 }
-window.crearEnlaceFamilia=async function(sid){
+window.activarInvitados=async function(){
     const es=currentLanguage==='es';
-    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s) return;
-    s.familiaToken=tokenFamilia();
+    const c=classrooms[activeClassroomIndex]; if(!c) return;
+    if(!c.codigoInvitado) c.codigoInvitado=nuevoCodigoClase();
+    c.invitadosActivos=true;
     try{
-        await publicarBoletin(s,true);
+        await publicarClase(true);
         saveData();
-        showNotification(es?'🔗 Enlace creado y boletín publicado':'🔗 Link created and report published','success');
+        showNotification(es?'✅ Acceso para padres activado':'✅ Parent access turned on','success');
     }catch(err){
-        console.warn('boletin',err);
-        delete s.familiaToken;
-        if(esErrorDePermiso(err)) _boletinSinPermiso=true;
-        showNotification(es?'No se pudo publicar el boletín':'Could not publish the report','error');
+        console.warn('clase',err);
+        c.invitadosActivos=false;
+        if(esErrorDePermiso(err)) _claseSinPermiso=true;
+        showNotification(es?'No se pudo activar el acceso':'Could not turn on access','error');
     }
-    pintarFamilia(sid);
+    pintarInvitados();
 };
-window.nuevoEnlaceFamilia=async function(sid){
+window.cambiarCodigoClase=async function(){
     const es=currentLanguage==='es';
-    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s||!s.familiaToken) return;
-    if(!confirm(es?'El enlace actual dejará de funcionar y tendrás que compartir el nuevo con la familia. ¿Continuar?'
-                  :'The current link will stop working and you will need to share the new one. Continue?')) return;
-    const viejo=s.familiaToken;
-    const nuevo=tokenFamilia();
+    const c=classrooms[activeClassroomIndex]; if(!c||!c.codigoInvitado) return;
+    if(!confirm(es?'El código actual dejará de funcionar y tendrás que compartir el nuevo con las familias. ¿Continuar?'
+                  :'The current code will stop working and you will need to share the new one. Continue?')) return;
+    const viejo=c.codigoInvitado;
+    c.codigoInvitado=nuevoCodigoClase();
     try{
-        s.familiaToken=nuevo;
-        await publicarBoletin(s,true);
-        const ref=boletinRef(viejo); if(ref) await ref.delete().catch(()=>{});
-        _boletinHuellas.delete(viejo);
+        await publicarClase(true);
+        const ref=claseRef(viejo); if(ref) await ref.delete().catch(()=>{});
         saveData();
-        showNotification(es?'↻ Enlace nuevo listo; el anterior ya no funciona':'↻ New link ready; the old one no longer works','success');
+        showNotification(es?'↻ Código nuevo listo; el anterior ya no funciona':'↻ New code ready; the old one no longer works','success');
     }catch(err){
-        console.warn('boletin',err);
-        s.familiaToken=viejo;
-        if(esErrorDePermiso(err)) _boletinSinPermiso=true;
-        showNotification(es?'No se pudo cambiar el enlace':'Could not change the link','error');
+        console.warn('clase',err);
+        c.codigoInvitado=viejo;
+        if(esErrorDePermiso(err)) _claseSinPermiso=true;
+        showNotification(es?'No se pudo cambiar el código':'Could not change the code','error');
     }
-    pintarFamilia(sid);
+    pintarInvitados();
 };
-window.desactivarEnlaceFamilia=async function(sid){
+window.desactivarInvitados=async function(){
     const es=currentLanguage==='es';
-    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s||!s.familiaToken) return;
-    if(!confirm(es?'La familia ya no podrá abrir el boletín con este enlace. ¿Desactivarlo?'
-                  :'The family will no longer be able to open the report with this link. Turn it off?')) return;
-    const token=s.familiaToken;
+    const c=classrooms[activeClassroomIndex]; if(!c||!c.invitadosActivos) return;
+    if(!confirm(es?'Las familias ya no podrán consultar este salón. ¿Desactivar el acceso?'
+                  :'Families will no longer be able to look up this classroom. Turn off access?')) return;
     try{
-        const ref=boletinRef(token); if(ref) await ref.delete();
-        _boletinHuellas.delete(token);
-        delete s.familiaToken;
+        const ref=claseRef(c.codigoInvitado); if(ref) await ref.delete();
+        c.invitadosActivos=false;
+        _claseHuella=null;
         saveData();
-        showNotification(es?'⛔ Enlace desactivado':'⛔ Link turned off','success');
+        showNotification(es?'⛔ Acceso para padres desactivado':'⛔ Parent access turned off','success');
     }catch(err){
-        console.warn('boletin',err);
-        if(esErrorDePermiso(err)) _boletinSinPermiso=true;
+        console.warn('clase',err);
+        if(esErrorDePermiso(err)) _claseSinPermiso=true;
         showNotification(es?'No se pudo desactivar':'Could not turn it off','error');
     }
-    pintarFamilia(sid);
+    pintarInvitados();
 };
 
-// --- Todos los enlaces del salon y la hoja de QR ---------------------------
-window.abrirFamilias=function(){
-    const es=currentLanguage==='es';
-    if(!(currentStudents||[]).length){ showNotification(es?'Este salón no tiene estudiantes':'This classroom has no students','info'); return; }
-    showModal('familiasModal');
-    pintarFamilias();
+// --- Pantalla de inicio: docente o invitado --------------------------------
+window.elegirRol=function(rol){
+    const invitado=rol==='invitado';
+    const es=(localStorage.getItem('learnersTrackLanguage')||currentLanguage||'es')!=='en';
+    const lf=document.getElementById('loginForm'), rf=document.getElementById('registerForm'), inf=document.getElementById('invitadoForm');
+    if(lf) lf.style.display=invitado?'none':'';
+    if(rf) rf.style.display='none';
+    if(inf) inf.style.display=invitado?'':'none';
+    const bd=document.getElementById('rolDocenteBtn'), bi=document.getElementById('rolInvitadoBtn');
+    if(bd){ bd.classList.toggle('on',!invitado); bd.setAttribute('aria-selected',String(!invitado)); }
+    if(bi){ bi.classList.toggle('on',invitado); bi.setAttribute('aria-selected',String(invitado)); }
+    const sub=document.getElementById('authSubtitle');
+    if(sub){
+        const tr=(typeof translations!=='undefined' && translations[es?'es':'en'])||{};
+        sub.textContent = invitado ? (es?'Consulta cómo va tu hijo o hija':'See how your child is doing') : (tr.authSubtitle||sub.textContent);
+    }
+    if(invitado){
+        const inp=document.getElementById('invitadoCodigo');
+        if(inp && !inp.value){
+            try{ const r=JSON.parse(localStorage.getItem(INVITADO_RECORDADO_KEY)||'null'); if(r&&r.codigo) inp.value=codigoLegible(r.codigo); }catch(e){}
+        }
+        setTimeout(()=>{ if(inp) inp.focus(); },50);
+    }
 };
-window.cerrarFamilias=function(){ hideModal('familiasModal'); };
-function pintarFamilias(){
-    const es=currentLanguage==='es';
-    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
-    t('familiasTitulo', es?'👨‍👩‍👧 Boletines para las familias':'👨‍👩‍👧 Reports for families');
-    t('familiasAyuda', es
-        ? 'Cada estudiante tiene su propio enlace: su familia solo ve sus notas, su asistencia y sus insignias. Imprime la hoja de QR para la reunión de padres, o comparte cada enlace por WhatsApp desde la ficha del estudiante.'
-        : 'Each student has their own link: their family only sees that student\'s scores, attendance and badges. Print the QR sheet for the parents\' meeting, or share each link from the student\'s report.');
-    t('familiasTodosTxt', es?'Crear los que faltan':'Create missing links');
-    t('familiasPdfTxt', es?'Hoja de QR para imprimir':'Printable QR sheet');
-    t('familiasCerrar', es?'Cerrar':'Close');
-    const lista=document.getElementById('familiasLista'); if(!lista) return;
-    if(!docenteConectado()){
-        lista.innerHTML=`<p class="familia-nota">${es?'Esto necesita la nube: entra con tu correo y contraseña.':'This needs cloud mode: sign in with your email and password.'}</p>`;
+window.entrarComoInvitado=function(){
+    const es=(localStorage.getItem('learnersTrackLanguage')||currentLanguage||'es')!=='en';
+    const inp=document.getElementById('invitadoCodigo');
+    const codigo=normalizarCodigo(inp?inp.value:'');
+    if(!codigo){
+        showNotification(es?'El código tiene 8 letras o números, por ejemplo 7K3Q-9PXM':'The code has 8 letters or numbers, for example 7K3Q-9PXM','error');
+        if(inp) inp.focus();
         return;
     }
-    const activos=(currentStudents||[]).filter(s=>s.familiaToken).length;
-    t('familiasCuenta', `${activos}/${currentStudents.length} ${es?'con enlace':'with a link'}`);
-    lista.innerHTML=(currentStudents||[]).map(s=>
-        `<li class="${s.familiaToken?'activo':''}">`
-        + `<span class="familias-nombre">${escapeHtml(s.name||'')}</span>`
-        + (s.familiaToken
-            ? `<span class="familias-estado">✅ ${es?'Activo':'Active'}</span><button type="button" class="btn-secondary" onclick="cerrarFamilias();openStudentReport(${s.id})">${es?'Ver':'View'}</button>`
-            : `<span class="familias-estado sin">— ${es?'Sin enlace':'No link'}</span><button type="button" class="btn-secondary" onclick="crearEnlaceFamiliaDesdeLista(${s.id})">🔗 ${es?'Crear':'Create'}</button>`)
-        + `</li>`
-    ).join('') + (_boletinSinPermiso?`<li class="familias-reglas">${htmlReglasFamilia()}</li>`:'');
-}
-window.crearEnlaceFamiliaDesdeLista=async function(sid){
-    await crearEnlaceFamilia(sid);
-    pintarFamilias();
-};
-window.crearTodosLosEnlaces=async function(){
-    const es=currentLanguage==='es';
-    const faltan=(currentStudents||[]).filter(s=>!s.familiaToken);
-    if(!faltan.length){ showNotification(es?'Todos tienen ya su enlace':'Everyone already has a link','info'); return; }
-    const btn=document.getElementById('familiasTodosBtn'); if(btn) btn.disabled=true;
-    let hechos=0;
-    for(const s of faltan){
-        s.familiaToken=tokenFamilia();
-        try{ await publicarBoletin(s,true); hechos++; }
-        catch(err){
-            delete s.familiaToken;
-            if(esErrorDePermiso(err)) _boletinSinPermiso=true;
-            console.warn('boletin',err);
-            break;
-        }
-    }
-    saveData();
-    if(btn) btn.disabled=false;
-    pintarFamilias();
-    showNotification(hechos
-        ? (es?`🔗 ${hechos} enlace(s) creados`:`🔗 ${hechos} link(s) created`)
-        : (es?'No se pudo crear ningún enlace':'No link could be created'), hechos?'success':'error');
-};
-window.hojaDeQRFamilias=async function(){
-    const es=currentLanguage==='es';
-    const con=(currentStudents||[]).filter(s=>s.familiaToken);
-    if(!con.length){ showNotification(es?'Primero crea los enlaces':'Create the links first','info'); return; }
-    if(!window.jspdf){ showNotification(es?'La librería de PDF no cargó':'PDF library not loaded','error'); return; }
-    const btn=document.getElementById('familiasPdfBtn'); if(btn) btn.disabled=true;
-    try{
-        const {jsPDF}=window.jspdf;
-        const pdf=new jsPDF('p','mm','a4');
-        const salon=(classrooms[activeClassroomIndex]||{}).name||'';
-        const oculto=document.createElement('div');
-        oculto.style.cssText='position:fixed;left:-9999px;top:0;';
-        document.body.appendChild(oculto);
-        // 2 columnas x 4 filas: tarjetas que se recortan y se entregan una a una.
-        const COLS=2, FILAS=4, MX=12, MY=14, AN=(210-MX*2)/COLS, AL=(297-MY*2)/FILAS;
-        for(let i=0;i<con.length;i++){
-            if(i>0 && i%(COLS*FILAS)===0) pdf.addPage();
-            const s=con[i];
-            const col=i%COLS, fila=Math.floor(i/COLS)%FILAS;
-            const x=MX+col*AN, y=MY+fila*AL;
-            pdf.setDrawColor(190,190,210); pdf.setLineDashPattern([1.5,1.5],0);
-            pdf.rect(x+2,y+2,AN-4,AL-4);
-            pdf.setLineDashPattern([],0);
-            const tmp=document.createElement('div'); oculto.appendChild(tmp);
-            const canvas=await dibujarQRFamilia(tmp,enlaceFamilia(s.familiaToken),240);
-            const lado=AL-26;
-            if(canvas) pdf.addImage(canvas.toDataURL('image/png'),'PNG',x+6,y+10,lado,lado);
-            const tx=x+10+lado, ancho=AN-lado-16;
-            pdf.setTextColor(102,126,234); pdf.setFont('helvetica','bold'); pdf.setFontSize(8);
-            pdf.text(es?'BOLETÍN PARA LA FAMILIA':'REPORT FOR THE FAMILY',tx,y+15);
-            pdf.setTextColor(30,30,40); pdf.setFontSize(11);
-            pdf.text(pdf.splitTextToSize(String(s.name||''),ancho),tx,y+23);
-            pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor(90,90,100);
-            pdf.text(pdf.splitTextToSize(salon,ancho),tx,y+40);
-            pdf.text(pdf.splitTextToSize(es?'Escanea con la cámara del celular para ver notas, asistencia e insignias.':'Scan with your phone camera to see scores, attendance and badges.',ancho),tx,y+49);
-            pdf.setFontSize(7); pdf.setTextColor(150,150,160);
-            pdf.text(pdf.splitTextToSize(es?'Solo para la familia de este estudiante.':'Only for this student\'s family.',ancho),tx,y+AL-12);
-            tmp.remove();
-        }
-        oculto.remove();
-        pdf.save(`QR_familias_${String(salon||'salon').replace(/[^A-Za-z0-9]+/g,'_')}.pdf`);
-        showNotification(es?'📄 Hoja de QR descargada':'📄 QR sheet downloaded','success');
-    }catch(err){
-        console.error(err);
-        showNotification(es?'No se pudo generar la hoja':'Could not generate the sheet','error');
-    }finally{ if(btn) btn.disabled=false; }
+    abrirInvitado(codigo);
 };
 
-// --- La pantalla que ve la familia -----------------------------------------
-async function abrirPantallaFamilia(){
-    const es=(localStorage.getItem('learnersTrackLanguage')||'es')!=='en';
+// --- Pantalla del invitado -------------------------------------------------
+let _claseInvitado=null, _codigoInvitado=null, _busquedaTimer=null;
+let _famDatos=null, _famEs=true, _famPeriodo=null, _famBarra='';
+function esInvitadoEs(){ return (localStorage.getItem('learnersTrackLanguage')||'es')!=='en'; }
+async function abrirInvitado(codigo){
+    const es=esInvitadoEs();
     document.body.classList.add('modo-familia');
     const pantalla=document.getElementById('familiaScreen'); if(pantalla) pantalla.style.display='block';
     const hoja=document.getElementById('familiaHoja'); if(!hoja) return;
-    hoja.innerHTML=`<div class="fam-cargando">⏳ ${es?'Cargando el boletín…':'Loading the report…'}</div>`;
-    const ref=boletinRef(_familiaPedida);
+    hoja.innerHTML=`<div class="fam-cargando">⏳ ${es?'Buscando la clase…':'Looking up the class…'}</div>`;
+    const volver=`<div class="fam-vacio-acciones"><button type="button" class="btn-primary" onclick="salirInvitado()">${es?'Probar otro código':'Try another code'}</button></div>`;
+    const ref=claseRef(codigo);
     if(!ref){
-        hoja.innerHTML=`<div class="fam-vacio">📶 ${es?'No se pudo conectar. Revisa tu internet y vuelve a abrir el enlace.':'Could not connect. Check your internet and open the link again.'}</div>`;
+        hoja.innerHTML=`<div class="fam-vacio">📶 ${es?'No se pudo conectar. Revisa tu internet e inténtalo de nuevo.':'Could not connect. Check your internet and try again.'}${volver}</div>`;
         return;
     }
     try{
         const doc=await ref.get();
         if(!doc.exists){
-            hoja.innerHTML=`<div class="fam-vacio">🔗 ${es?'Este enlace ya no está activo. Pídele uno nuevo al docente.':'This link is no longer active. Ask the teacher for a new one.'}</div>`;
+            hoja.innerHTML=`<div class="fam-vacio">🔢 ${es?'Ese código no corresponde a ninguna clase, o el docente desactivó el acceso. Revisa que esté bien escrito.':'That code does not match any class, or the teacher turned off access. Check that it is typed correctly.'}${volver}</div>`;
             return;
         }
-        pintarBoletinFamilia(doc.data()||{},es);
+        _claseInvitado=doc.data()||{};
+        _codigoInvitado=codigo;
+        let recordado=null;
+        try{ recordado=JSON.parse(localStorage.getItem(INVITADO_RECORDADO_KEY)||'null'); }catch(e){}
+        const alumnoPrevio=(recordado&&recordado.codigo===codigo)?recordado.alumnoId:null;
+        try{ localStorage.setItem(INVITADO_RECORDADO_KEY,JSON.stringify({ codigo:codigo, alumnoId:alumnoPrevio })); }catch(e){}
+        pintarBuscadorInvitado();
     }catch(err){
-        console.warn('boletin familia',err);
-        hoja.innerHTML=`<div class="fam-vacio">📶 ${es?'No se pudo abrir el boletín. Intenta de nuevo en un momento.':'Could not open the report. Try again in a moment.'}</div>`;
+        console.warn('invitado',err);
+        hoja.innerHTML=`<div class="fam-vacio">📶 ${es?'No se pudo abrir la clase. Inténtalo de nuevo en un momento.':'Could not open the class. Try again in a moment.'}${volver}</div>`;
     }
 }
-let _famDatos=null, _famEs=true, _famPeriodo=null;
+window.salirInvitado=function(){
+    _claseInvitado=null; _codigoInvitado=null; _famDatos=null; _famPeriodo=null;
+    document.body.classList.remove('modo-familia');
+    const pantalla=document.getElementById('familiaScreen'); if(pantalla) pantalla.style.display='none';
+    try{ if(new URLSearchParams(location.search).has('clase')) history.replaceState(null,'',location.origin+location.pathname); }catch(e){}
+    if(!currentUser){
+        const ac=document.getElementById('authContainer'); if(ac) ac.style.display='flex';
+        elegirRol('invitado');
+    }
+};
+window.olvidarCodigoInvitado=function(){
+    try{ localStorage.removeItem(INVITADO_RECORDADO_KEY); }catch(e){}
+    const inp=document.getElementById('invitadoCodigo'); if(inp) inp.value='';
+    salirInvitado();
+};
+function cabeceraClaseHtml(d,es){
+    const e=escapeHtml;
+    const logoOk=typeof d.logo==='string' && /^data:image\/(png|jpe?g|webp|gif);base64,/.test(d.logo);
+    return `<header class="fam-cabecera">`
+        + (logoOk?`<img class="fam-logo" src="${d.logo}" alt="">`:`<div class="fam-logo fam-logo-vacio">📘</div>`)
+        + `<div><p class="fam-inst">${e(d.institucion||'')}</p>`
+        + `<h1 class="fam-nombre">${e(d.salon||'')}</h1>`
+        + `<p class="fam-sub">${d.docente?`${es?'Docente':'Teacher'}: ${e(d.docente)}`:''}</p></div>`
+        + `</header>`;
+}
+function pintarBuscadorInvitado(){
+    const es=esInvitadoEs();
+    const d=_claseInvitado||{};
+    const hoja=document.getElementById('familiaHoja'); if(!hoja) return;
+    let recordado=null;
+    try{ recordado=JSON.parse(localStorage.getItem(INVITADO_RECORDADO_KEY)||'null'); }catch(e){}
+    const previo=(recordado && recordado.codigo===_codigoInvitado) ? (d.alumnos||[]).find(a=>a.id===recordado.alumnoId) : null;
+    hoja.innerHTML=
+        `<div class="fam-barra"><span class="fam-barra-rol">👨‍👩‍👧 ${es?'Invitado':'Guest'}</span><button type="button" class="fam-barra-btn" onclick="salirInvitado()">${es?'Salir':'Sign out'}</button></div>`
+        + cabeceraClaseHtml(d,es)
+        + (previo?`<button type="button" class="fam-rapido" onclick="verAlumnoInvitado(${Number(previo.id)})">↩ ${es?'Ver de nuevo a':'See again'} <b>${escapeHtml(previo.nombre)}</b></button>`:'')
+        + `<section class="fam-bloque">`
+        +   `<h2>🔎 ${es?'Busca a tu hijo o hija':'Find your child'}</h2>`
+        +   `<input type="search" id="invitadoBusqueda" class="fam-busqueda" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="${es?'Escribe su nombre o apellido':'Type their first or last name'}" oninput="buscarEnClaseInvitado()">`
+        +   `<p class="fam-nota fam-ayuda">${es?'Escribe al menos 3 letras. Por privacidad no se muestra la lista del salón.':'Type at least 3 letters. For privacy, the class list is not shown.'}</p>`
+        +   `<ul class="fam-resultados" id="invitadoResultados" aria-live="polite"></ul>`
+        + `</section>`
+        + `<footer class="fam-pie">${es?'Solo lectura':'Read only'} · Learners Track · <button type="button" class="fam-olvidar" onclick="olvidarCodigoInvitado()">${es?'Olvidar este código en este celular':'Forget this code on this phone'}</button></footer>`;
+    setTimeout(()=>{ const i=document.getElementById('invitadoBusqueda'); if(i) i.focus(); },60);
+}
+window.buscarEnClaseInvitado=function(){
+    clearTimeout(_busquedaTimer);
+    _busquedaTimer=setTimeout(()=>{
+        const es=esInvitadoEs();
+        const inp=document.getElementById('invitadoBusqueda');
+        const caja=document.getElementById('invitadoResultados'); if(!inp||!caja) return;
+        const r=coincidenciasInvitado(inp.value);
+        if(r.estado==='corto'){ caja.innerHTML=''; return; }
+        if(r.estado==='nada'){ caja.innerHTML=`<li class="fam-sin">${es?'No aparece nadie con ese nombre. Revisa cómo está escrito.':'Nobody matches that name. Check the spelling.'}</li>`; return; }
+        if(r.estado==='muchos'){ caja.innerHTML=`<li class="fam-sin">${es?`Hay ${r.n} coincidencias: escribe también el apellido.`:`${r.n} matches: add the last name too.`}</li>`; return; }
+        caja.innerHTML=r.hits.map(a=>`<li><button type="button" class="fam-resultado" onclick="verAlumnoInvitado(${Number(a.id)})">${escapeHtml(a.nombre)} <span>›</span></button></li>`).join('');
+    },180);
+};
+// Cada palabra escrita tiene que ser el comienzo de alguna palabra del nombre,
+// en cualquier orden y sin importar tildes: "maria gonz" encuentra "GONZALEZ MARIA".
+// Mas de tres coincidencias no se muestran, para no ir desvelando el salon.
+function coincidenciasInvitado(texto){
+    const k=claveNombre(texto);
+    if(k.replace(/ /g,'').length<3) return { estado:'corto' };
+    const palabras=k.split(' ').filter(Boolean);
+    const hits=((_claseInvitado&&_claseInvitado.alumnos)||[]).filter(a=>{
+        const w=String(a.clave||'').split(' ');
+        return palabras.every(p=>w.some(x=>x.indexOf(p)===0));
+    });
+    if(!hits.length) return { estado:'nada' };
+    if(hits.length>3) return { estado:'muchos', n:hits.length };
+    return { estado:'ok', hits:hits };
+}
+window.verAlumnoInvitado=function(id){
+    const d=_claseInvitado||{};
+    const a=(d.alumnos||[]).find(x=>x.id===id); if(!a) return;
+    try{ localStorage.setItem(INVITADO_RECORDADO_KEY,JSON.stringify({ codigo:_codigoInvitado, alumnoId:a.id })); }catch(e){}
+    const es=esInvitadoEs();
+    const r=a.r||{};
+    const datos={
+        alumno:a.nombre, salon:d.salon, institucion:d.institucion, docente:d.docente, logo:d.logo,
+        aprobacion:d.aprobacion, actualizado:d.actualizado,
+        periodos:r.periodos||[], asistencia:r.asistencia||{}, insignias:r.insignias||{}, comentario:r.comentario||''
+    };
+    _famPeriodo=null;
+    _famBarra=`<div class="fam-barra"><button type="button" class="fam-barra-btn" onclick="pintarBuscadorInvitado()">← ${es?'Buscar otro estudiante':'Find another student'}</button><button type="button" class="fam-barra-btn" onclick="salirInvitado()">${es?'Salir':'Sign out'}</button></div>`;
+    pintarBoletinFamilia(datos,es);
+    window.scrollTo(0,0);
+};
 function pintarBoletinFamilia(d,es){
     _famDatos=d; _famEs=es;
     const periodos=Array.isArray(d.periodos)?d.periodos:[];
@@ -6779,7 +6855,7 @@ function pintarBoletinFamilia(d,es){
     const fecha=d.actualizado?new Date(d.actualizado).toLocaleDateString(es?'es-CO':'en-US',{day:'numeric',month:'long',year:'numeric'}):'';
     const estadoNota=(v)=>v===null?'':(v>=apr?'bien':'baja');
 
-    let h='';
+    let h=_famBarra||'';
     h+=`<header class="fam-cabecera">`
       + (logoOk?`<img class="fam-logo" src="${d.logo}" alt="">`:`<div class="fam-logo fam-logo-vacio">📘</div>`)
       + `<div><p class="fam-inst">${e(d.institucion||'')}</p>`
@@ -6803,10 +6879,10 @@ function pintarBoletinFamilia(d,es){
         h+=`<p class="fam-nota">${es?'Todavía no hay notas registradas.':'No scores recorded yet.'}</p>`;
     }else{
         h+=`<table class="fam-tabla"><tbody>`
-          + actual.columnas.map((col,i)=>{
-                const n=(actual.notas[i]||'').trim();
+          + (actual.columnas||[]).map((col,i)=>{
+                const n=String((actual.notas||[])[i]||'').trim();
                 const v=n?parseFloat(n.replace(',','.')):null;
-                return `<tr><td>${e(col||'')}</td><td class="${isNaN(v)||v===null?'':estadoNota(v)}">${n?e(n):'—'}</td></tr>`;
+                return `<tr><td>${e(col||'')}</td><td class="${(v===null||isNaN(v))?'':estadoNota(v)}">${n?e(n):'—'}</td></tr>`;
             }).join('')
           + `<tr class="fam-prom"><td>${es?'Promedio del periodo':'Period average'}</td><td class="${estadoNota(promNum)}">${promNum===null?'—':promNum.toFixed(1)}</td></tr>`
           + `</tbody></table>`
@@ -6820,32 +6896,33 @@ function pintarBoletinFamilia(d,es){
     if(!as.tomadas){
         h+=`<p class="fam-nota">${es?'Aún no hay registros de asistencia.':'No attendance records yet.'}</p>`;
     }else{
-        h+=`<p class="fam-nota">${es?`Asistió a <b>${as.presentes}</b> de ${as.tomadas} clases registradas · <b>${as.ausencias}</b> ausencia(s).`:`Attended <b>${as.presentes}</b> of ${as.tomadas} recorded classes · <b>${as.ausencias}</b> absence(s).`}</p>`
+        h+=`<p class="fam-nota">${es?`Asistió a <b>${Number(as.presentes)||0}</b> de ${Number(as.tomadas)||0} clases registradas · <b>${Number(as.ausencias)||0}</b> ausencia(s).`:`Attended <b>${Number(as.presentes)||0}</b> of ${Number(as.tomadas)||0} recorded classes · <b>${Number(as.ausencias)||0}</b> absence(s).`}</p>`
           + `<ul class="fam-dias">`+(as.ultimas||[]).map(r=>{
                 const [a,m,dd]=String(r.f||'').split('-').map(Number);
                 const txt=(a&&m&&dd)?new Date(a,m-1,dd).toLocaleDateString(es?'es-CO':'en-US',{weekday:'short',day:'numeric',month:'short'}):e(r.f||'');
-                return `<li class="${r.e==='p'?'si':'no'}"><span>${r.e==='p'?'✓':'✗'}</span>${txt}</li>`;
+                return `<li class="${r.e==='p'?'si':'no'}"><span>${r.e==='p'?'✓':'✗'}</span>${e(txt)}</li>`;
             }).join('')+`</ul>`;
     }
     h+=`</section>`;
 
-    h+=`<section class="fam-bloque"><h2>🏅 ${es?'Insignias':'Badges'}</h2>`;
+    h+=`<section class="fam-bloque"><h2>🏅 ${es?'Insignias ganadas':'Badges earned'}</h2>`;
     const lista=Array.isArray(ins.lista)?ins.lista:[];
     h+= lista.length
         ? `<ul class="fam-insignias">`+lista.map(b=>`<li><span class="fam-ico">${e(b.icono||'🏅')}</span>${e(b.nombre||'')}<b>×${Number(b.cantidad)||0}</b></li>`).join('')+`</ul>`
         : `<p class="fam-nota">${es?'Todavía no tiene insignias.':'No badges yet.'}</p>`;
     h+=`</section>`;
 
-    if((d.comentario||'').trim()){
+    if(String(d.comentario||'').trim()){
         h+=`<section class="fam-bloque"><h2>💬 ${es?'Comentario del docente':'Teacher\'s comment'}</h2><p class="fam-comentario">${e(d.comentario)}</p></section>`;
     }
-    h+=`<footer class="fam-pie">${fecha?`${es?'Actualizado el':'Updated on'} ${e(fecha)} · `:''}${es?'Boletín de solo lectura':'Read-only report'} · Learners Track</footer>`;
+    h+=`<footer class="fam-pie">${fecha?`${es?'Actualizado el':'Updated on'} ${e(fecha)} · `:''}${es?'Solo lectura':'Read only'} · Learners Track</footer>`;
     hoja.innerHTML=h;
 }
 window.famCambiarPeriodo=function(p){
     _famPeriodo=p;
     if(_famDatos) pintarBoletinFamilia(_famDatos,_famEs);
 };
+
 // === SESION PERSISTENTE ===
 // Firebase ya recordaba al usuario, pero la app arrancaba siempre en la pantalla de
 // login: habia que reescribir la contrasena en cada recarga. Ahora se restaura sola.
@@ -6857,10 +6934,10 @@ let _authRestoreDone = false;
 function keepSessionEnabled(){ return localStorage.getItem('learnersTrackKeepSession')==='1'; }
 function setKeepSession(on){ try{ localStorage.setItem('learnersTrackKeepSession', on?'1':'0'); }catch(e){} }
 function initAuthPersistence(){
-  // Enlace de familia: no hay login ni aula, solo el boletin de ese estudiante.
-  if(typeof _familiaPedida!=='undefined' && _familiaPedida){
+  // Enlace de clase para padres: no hay login de docente, va directo al buscador.
+  if(typeof _invitadoCodigoURL!=='undefined' && _invitadoCodigoURL){
     if(window.__closeBootLoader) window.__closeBootLoader();
-    abrirPantallaFamilia();
+    abrirInvitado(_invitadoCodigoURL);
     return;
   }
   // Sin nube no hay nada que esperar: se retira la pantalla de carga enseguida.
