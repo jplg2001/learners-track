@@ -2452,19 +2452,41 @@ function escapeHtml(value) {
 }
 // Saneador para el HTML que devuelve la IA: conserva el formato util y elimina scripts/eventos.
 const AI_ALLOWED_TAGS = ['H3','H4','H5','P','UL','OL','LI','B','STRONG','I','EM','BR','HR','SPAN','DIV','TABLE','THEAD','TBODY','TR','TH','TD','CODE','SMALL'];
+// Limpia el HTML que devuelve la IA antes de mostrarlo.
+//
+// SEGURIDAD. La version anterior cargaba la respuesta en un <div> del documento
+// real y despues quitaba lo peligroso. Pero al cargarla el navegador ya ejecutaba
+// cosas como <img src=x onerror=...> o <details ontoggle=...>, antes de limpiar.
+// Una respuesta manipulada (por ejemplo, un documento subido con instrucciones
+// ocultas para la IA) podia correr codigo dentro de la sesion del docente.
+//
+// Ahora se analiza con DOMParser, que produce un documento inerte: ahi no se
+// cargan imagenes ni se disparan eventos. Y en vez de borrar lo malo se copia
+// solo lo bueno: etiquetas de una lista cerrada, SIN ningun atributo, y texto.
+const AI_ETIQUETAS_SIN_CONTENIDO = ['SCRIPT','STYLE','TEMPLATE','NOSCRIPT','IFRAME','OBJECT','EMBED','SVG','MATH','TITLE','TEXTAREA','SELECT','OPTION','HEAD','META','LINK','BASE','FORM','INPUT','BUTTON','AUDIO','VIDEO','SOURCE','IMG','PICTURE','CANVAS','FRAME','FRAMESET'];
 function sanitizeAiHtml(html) {
-    try {
-        const tpl = document.createElement('div');
-        tpl.innerHTML = String(html==null?'':html);
-        tpl.querySelectorAll('*').forEach(el=>{
-            if(!AI_ALLOWED_TAGS.includes(el.tagName)) { el.replaceWith(...el.childNodes); return; }
-            [...el.attributes].forEach(attr=>{
-                const n = attr.name.toLowerCase();
-                if(n.startsWith('on') || n==='href' || n==='src' || n==='style' || n==='srcset') el.removeAttribute(attr.name);
-            });
+    let doc;
+    try { doc = new DOMParser().parseFromString('<!doctype html><body>' + String(html==null?'':html), 'text/html'); }
+    catch(e) { return escapeHtml(html); }
+    const raiz = document.createElement('div');
+    const copiar = (origen, destino, profundidad) => {
+        if(profundidad > 40) return;   // anidamientos absurdos no se siguen
+        origen.childNodes.forEach(n => {
+            if(n.nodeType === 3){ destino.appendChild(document.createTextNode(n.nodeValue)); return; }
+            if(n.nodeType !== 1) return;
+            const tag = n.tagName.toUpperCase();
+            if(AI_ETIQUETAS_SIN_CONTENIDO.includes(tag)) return;
+            if(AI_ALLOWED_TAGS.includes(tag)){
+                const el = document.createElement(tag.toLowerCase());
+                copiar(n, el, profundidad+1);
+                destino.appendChild(el);
+            } else {
+                copiar(n, destino, profundidad+1);   // etiqueta desconocida: se queda su texto
+            }
         });
-        return tpl.innerHTML;
-    } catch(e) { return escapeHtml(html); }
+    };
+    copiar(doc.body, raiz, 0);
+    return raiz.innerHTML;
 }
 
 // === IMAGENES: comprimir antes de guardar ===
@@ -2685,7 +2707,7 @@ function updateUIText() {
     ];
     ph.forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.placeholder=val; });
     const uw = document.getElementById('userWelcome');
-    if(uw) uw.innerHTML = `${t.userWelcome} <span id="teacherNameDisplay">${userProfile.name}</span>`;
+    if(uw) uw.innerHTML = `${escapeHtml(t.userWelcome)} <span id="teacherNameDisplay">${escapeHtml(userProfile.name||'')}</span>`;
     const es = currentLanguage==='es';
     weekDays = es ? ["Lunes","Martes","Miércoles","Jueves","Viernes"]
                   : ["Monday","Tuesday","Wednesday","Thursday","Friday"];
@@ -4932,7 +4954,7 @@ function renderGradeOptions(){
     const go=document.getElementById('gradeOptions');if(!go)return;go.innerHTML='';
     grades.forEach(g=>{
         const opt=document.createElement('div');opt.className='grade-option';opt.dataset.gradeId=g.id;
-        opt.innerHTML=`<span class="grade-name">${g.name}</span><div class="grade-actions"><button class="grade-edit-btn" onclick="event.stopPropagation();openEditGradeModal(${g.id})">✏️</button><button class="grade-delete-btn" onclick="event.stopPropagation();deleteGrade(${g.id})">🗑️</button></div>`;
+        opt.innerHTML=`<span class="grade-name">${escapeHtml(g.name||'')}</span><div class="grade-actions"><button class="grade-edit-btn" onclick="event.stopPropagation();openEditGradeModal(${Number(g.id)})">✏️</button><button class="grade-delete-btn" onclick="event.stopPropagation();deleteGrade(${Number(g.id)})">🗑️</button></div>`;
         opt.onclick=()=>selectGrade(g.id);
         go.appendChild(opt);
     });
@@ -5983,7 +6005,9 @@ async function extractTextFromFile(file){
     if(nombre.endsWith('.pdf')){
         const pdfjs=await loadScriptOnce(LP_PDFJS_URL,'pdfjsLib');
         pdfjs.GlobalWorkerOptions.workerSrc=LP_PDFJS_WORKER;
-        const doc=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+        // isEvalSupported:false cierra CVE-2024-4367: en pdf.js < 4.2.67 un PDF armado
+        // para eso podia ejecutar codigo en la pagina a traves de sus fuentes.
+        const doc=await pdfjs.getDocument({data:await file.arrayBuffer(), isEvalSupported:false}).promise;
         let texto='';
         for(let i=1;i<=doc.numPages;i++){
             const page=await doc.getPage(i);
