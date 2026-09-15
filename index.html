@@ -3487,6 +3487,48 @@ async function authenticateUser(email,password) {
 }
 
 // === LOGOUT ===
+// SEGURIDAD. Cierre de sesion pensado para computadores compartidos del colegio.
+// Firestore guarda en el navegador una copia de los datos del salon para funcionar
+// sin internet, y la clave de Gemini queda en el almacenamiento local: el siguiente
+// que use el equipo podria sacarlas. Al cerrar sesion:
+//  1. se sube lo pendiente y se espera a que llegue a la nube;
+//  2. si no llego (sin internet), NO se borra nada sin preguntar: se perderian
+//     esos cambios. Se quedan y suben la proxima vez que se entre en este equipo;
+//  3. si llego, se borra la copia de Firestore y, si el equipo no es de confianza
+//     ("mantener la sesion" apagado), tambien la clave de Gemini;
+//  4. se recarga la pagina, porque Firestore queda inservible tras limpiarlo.
+function esperaMs(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function cerrarSesionSegura(){
+    const es=currentLanguage==='es';
+    const nube = !!(window.FIREBASE_ON && db && currentUser);
+    let limpiarCopia = nube;
+    if(nube){
+        try{ if(typeof showAppLoader==='function') showAppLoader(es?'Guardando y cerrando sesión…':'Saving and signing out…'); }catch(e){}
+        try{
+            clearTimeout(_cloudTimer);
+            if(firebase.auth().currentUser) pushToCloud();
+            const subio = await Promise.race([ db.waitForPendingWrites().then(()=>true), esperaMs(6000).then(()=>false) ]);
+            if(!subio){
+                try{ if(typeof hideAppLoader==='function') hideAppLoader(); }catch(e){}
+                const seguir = confirm(es
+                    ? 'Hay cambios que todavía no llegaron a la nube (¿sin internet?).\n\nSi cierras sesión ahora se quedan guardados en este equipo y se subirán la próxima vez que entres aquí.\n\n¿Cerrar sesión de todos modos?'
+                    : 'Some changes have not reached the cloud yet (no internet?).\n\nIf you sign out now they stay saved on this device and will upload the next time you sign in here.\n\nSign out anyway?');
+                if(!seguir) return;
+                limpiarCopia=false;
+            }
+        }catch(e){ console.warn('cerrar sesion',e); limpiarCopia=false; }
+    }
+    const equipoCompartido = !keepSessionEnabled();
+    logout();
+    if(equipoCompartido && limpiarCopia){
+        GEMINI_API_KEY='';
+        try{ localStorage.removeItem('learnersTrackGeminiApiKey'); }catch(e){}
+    }
+    if(limpiarCopia){
+        try{ await db.terminate(); await db.clearPersistence(); }catch(e){ console.warn('limpiar copia local',e); }
+        location.reload();
+    }
+}
 function logout() {
     if(typeof ocultarAvisoNube==='function') ocultarAvisoNube();
     // Se corta el mando: al salir de la cuenta nadie debe seguir mandando ordenes.
@@ -5142,7 +5184,7 @@ async function handleRegister(event){
     if(!name||!email||!password||!confirmPassword||!school){showNotification(currentLanguage==='es'?"Por favor completa todos los campos":"Please fill in all fields","error");return;}
     const emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if(!emailValid){showNotification(currentLanguage==='es'?"Ingresa un correo válido":"Enter a valid email address","error");return;}
-    if(password.length<6){showNotification(currentLanguage==='es'?"La contraseña debe tener al menos 6 caracteres":"Password must be at least 6 characters long","error");return;}
+    if(password.length<8){showNotification(currentLanguage==='es'?"La contraseña debe tener al menos 8 caracteres":"Password must be at least 8 characters long","error");return;}
     if(password!==confirmPassword){showNotification(currentLanguage==='es'?"Las contraseñas no coinciden":"Passwords do not match","error");return;}
     if(await registerUser(name,email,password,school)){
         persistRememberedEmails();
@@ -5741,7 +5783,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
     const ttb=document.getElementById('themeToggleBtn'),lb=document.getElementById('logoutBtn'),epb=document.getElementById('exportPdfBtn');
     if(ttb)ttb.addEventListener('click',toggleTheme);
-    if(lb)lb.addEventListener('click',logout);
+    if(lb)lb.addEventListener('click',cerrarSesionSegura);
     if(epb)epb.addEventListener('click',exportToPDF);
     const addWeekBtn=document.getElementById('addWeekBtn'); if(addWeekBtn) addWeekBtn.addEventListener('click',window.addWeek);
     const ssInput=document.getElementById('studentSearchInput');
@@ -5799,11 +5841,14 @@ function saveApiKeySettings(){
   GEMINI_API_KEY=(i.value||'').trim();
   if(GEMINI_API_KEY)localStorage.setItem('learnersTrackGeminiApiKey',GEMINI_API_KEY);
   else localStorage.removeItem('learnersTrackGeminiApiKey');
+  // Se guarda tambien en la cuenta: asi al cerrar sesion se puede borrar de este
+  // equipo sin tener que volver a escribirla la proxima vez.
+  if(window.FIREBASE_ON && currentUser && typeof scheduleCloudPush==='function') scheduleCloudPush();
   const a=document.getElementById('aiAnonymizeToggle'); if(a)setAiAnonymize(a.checked);
   hideModal('apiKeySettingsModal');
   showNotification(currentLanguage==='es'?'Configuración de IA guardada':'AI settings saved','success');
 }
-function clearStoredApiKey(){GEMINI_API_KEY='';localStorage.removeItem('learnersTrackGeminiApiKey');const i=document.getElementById('geminiApiKeyInput');if(i)i.value='';showNotification(currentLanguage==='es'?'API key eliminada':'API key cleared','info');}
+function clearStoredApiKey(){GEMINI_API_KEY='';localStorage.removeItem('learnersTrackGeminiApiKey');if(window.FIREBASE_ON&&currentUser&&typeof scheduleCloudPush==='function')scheduleCloudPush();const i=document.getElementById('geminiApiKeyInput');if(i)i.value='';showNotification(currentLanguage==='es'?'API key eliminada':'API key cleared','info');}
 function hasApiKey(){return !!(GEMINI_API_KEY&&GEMINI_API_KEY.trim());}
 function ensureAiKey(){if(hasApiKey())return true;showNotification(currentLanguage==='es'?'Configura tu API key de Gemini para usar IA avanzada':'Configure your Gemini API key to use advanced AI','error');openApiKeySettingsModal();return false;}
 
@@ -6848,6 +6893,7 @@ function construirClase(){
     const logo=userProfile.institutionLogo;
     const datos={
         v:2,
+        activo:true,
         owner:firebase.auth().currentUser.uid,
         salon:String(c.name||''),
         institucion:String(userProfile.school||''),
@@ -6867,6 +6913,14 @@ function construirClase(){
 }
 
 let _claseHuella=null, _claseTimer=null, _claseSinPermiso=false, _enlacesViejosLimpios=false;
+// SEGURIDAD. Un codigo que se desactiva o se cambia NO se borra: se deja una lapida
+// vacia con el docente como dueno. Si se borrara, cualquiera que conociera el codigo
+// podria crear un documento con ese mismo nombre y mostrarles notas falsas a los
+// padres. La regla de Firestore solo deja crear si no existe, y actualizar al dueno.
+function lapidaDeClase(){
+    return { v:2, activo:false, owner:firebase.auth().currentUser.uid, salon:'', institucion:'', docente:'',
+             logo:null, aprobacion:BOLETIN_APROBACION, alumnos:[], actualizado:Date.now() };
+}
 // Se llama desde saveData: publica cuatro segundos despues del ultimo cambio, y
 // solo si algo cambio de verdad, para no escribir en Firestore con cada insignia.
 function programarClaseInvitados(){
@@ -7018,7 +7072,7 @@ window.cambiarCodigoClase=async function(){
     c.codigoInvitado=nuevoCodigoClase();
     try{
         await publicarClase(true);
-        const ref=claseRef(viejo); if(ref) await ref.delete().catch(()=>{});
+        const ref=claseRef(viejo); if(ref) await ref.set(lapidaDeClase()).catch(()=>{});
         saveData();
         showNotification(es?'↻ Código nuevo listo; el anterior ya no funciona':'↻ New code ready; the old one no longer works','success');
     }catch(err){
@@ -7035,7 +7089,7 @@ window.desactivarInvitados=async function(){
     if(!confirm(es?'Las familias ya no podrán consultar este salón. ¿Desactivar el acceso?'
                   :'Families will no longer be able to look up this classroom. Turn off access?')) return;
     try{
-        const ref=claseRef(c.codigoInvitado); if(ref) await ref.delete();
+        const ref=claseRef(c.codigoInvitado); if(ref) await ref.set(lapidaDeClase());
         c.invitadosActivos=false;
         _claseHuella=null;
         saveData();
@@ -7102,11 +7156,12 @@ async function abrirInvitado(codigo){
     }
     try{
         const doc=await ref.get();
-        if(!doc.exists){
+        const datosClase = doc.exists ? (doc.data()||{}) : null;
+        if(!datosClase || datosClase.activo===false){
             hoja.innerHTML=`<div class="fam-vacio">🔢 ${es?'Ese código no corresponde a ninguna clase, o el docente desactivó el acceso. Revisa que esté bien escrito.':'That code does not match any class, or the teacher turned off access. Check that it is typed correctly.'}${volver}</div>`;
             return;
         }
-        _claseInvitado=doc.data()||{};
+        _claseInvitado=datosClase;
         _codigoInvitado=codigo;
         let recordado=null;
         try{ recordado=JSON.parse(localStorage.getItem(INVITADO_RECORDADO_KEY)||'null'); }catch(e){}
@@ -7552,7 +7607,7 @@ function firebaseRegister(){
   const rn=document.getElementById('registerName'), re=document.getElementById('registerEmail'), rp=document.getElementById('registerPassword'), rc=document.getElementById('registerConfirmPassword'), rs=document.getElementById('registerSchool');
   const name=(rn?rn.value:'').trim(), email=(re?re.value:'').trim().toLowerCase(), pw=rp?rp.value:'', pw2=rc?rc.value:'', school=(rs?rs.value:'').trim();
   if(!name||!email||!pw||!pw2||!school){ showNotification(es?'Por favor completa todos los campos':'Please fill in all fields','error'); return; }
-  if(pw.length<6){ showNotification(es?'La contraseña debe tener al menos 6 caracteres':'Password must be at least 6 characters long','error'); return; }
+  if(pw.length<8){ showNotification(es?'La contraseña debe tener al menos 8 caracteres':'Password must be at least 8 characters long','error'); return; }
   if(pw!==pw2){ showNotification(es?'Las contraseñas no coinciden':'Passwords do not match','error'); return; }
   const emailValid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if(!emailValid){ showNotification(es?'Ingresa un correo válido':'Enter a valid email address','error'); return; }
@@ -7594,6 +7649,11 @@ function loadUserFromCloud(uid,email){
     groupSize=(typeof d.groupSize==="number")?d.groupSize:7;
     lessonPlans=Array.isArray(d.lessonPlans)?d.lessonPlans:[];
     teachingStyleProfile=d.teachingStyleProfile||null;
+    // La clave de Gemini vuelve desde la cuenta si en este equipo no estaba.
+    if(typeof d.geminiKey==='string' && d.geminiKey && !GEMINI_API_KEY){
+        GEMINI_API_KEY=d.geminiKey;
+        try{ localStorage.setItem('learnersTrackGeminiApiKey',GEMINI_API_KEY); }catch(e){}
+    }
     userProfile.name=currentUser.name||'Teacher'; userProfile.email=currentUser.email; userProfile.avatar=currentUser.avatar;
     userProfile.school=currentUser.school; userProfile.grade=currentUser.grade; userProfile.institutionLogo=currentUser.institutionLogo;
     // Los grados tambien viajan a la nube: antes solo vivian en el dispositivo,
@@ -8248,11 +8308,26 @@ window.copiarReglaControl=function(){
 };
 // Ejecuta en el computador lo que se pulso en el celular.
 function remoteEjecutar(c){
-    const p=c.args||{};
+    if(!c || typeof c!=='object' || typeof c.action!=='string') return;
+    // SEGURIDAD. Los argumentos llegan de un documento de Firestore: se validan uno
+    // por uno y cualquier valor inesperado se descarta en vez de usarse tal cual.
+    const a=(c&&typeof c.args==='object'&&c.args)||{};
+    const entero=(v)=>{ const n=Number(v); return Number.isInteger(n)?n:null; };
+    const p={
+        modo: ['rows','grid','scores'].includes(a.modo) ? a.modo : null,
+        studentId: entero(a.studentId),
+        badgeId: (typeof a.badgeId==='string'||typeof a.badgeId==='number') ? String(a.badgeId).slice(0,80) : null,
+        ci: (entero(a.ci)!==null && a.ci>=0 && a.ci<500) ? entero(a.ci) : 0,
+        soloUno: a.soloUno===true,
+        estado: (a.estado==='p'||a.estado==='a') ? a.estado : null,
+        que: ['abrir','cerrar','mover'].includes(a.que) ? a.que : null,
+        delta: a.delta===-1 ? -1 : 1,
+        dir: a.dir===-1 ? -1 : 1
+    };
     try{
         switch(c.action){
             case 'view':
-                if(typeof setViewMode==='function') setViewMode(p.modo);
+                if(p.modo && typeof setViewMode==='function') setViewMode(p.modo);
                 break;
             case 'focus':
                 remoteEnfocarAlumno(p.studentId);
@@ -8267,6 +8342,7 @@ function remoteEjecutar(c){
                 break;
             }
             case 'att': {
+                if(p.studentId===null || !p.estado) return;
                 const sel='.att-group[data-student-id="'+p.studentId+'"] .'+(p.estado==='p'?'att-yes':'att-no');
                 const btn=document.querySelector(sel);
                 if(btn) btn.click(); else marcarAsistencia(p.studentId,p.estado,null);
@@ -8502,7 +8578,7 @@ function pushToCloud(){
     const u = firebase.auth().currentUser;
     if(!u){ if(currentUser && window.FIREBASE_ON) avisarSesionNubeCerrada(); return; }
     if(!currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, noteColumnsByPeriod:noteColumnsByPeriod, activePeriod:activePeriod, pesosPeriodos:pesosPeriodos, topeRecuperacion:topeRecuperacion, notaMinimaAnual:notaMinimaAnual, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize };
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, noteColumnsByPeriod:noteColumnsByPeriod, activePeriod:activePeriod, pesosPeriodos:pesosPeriodos, topeRecuperacion:topeRecuperacion, notaMinimaAnual:notaMinimaAnual, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize, geminiKey:GEMINI_API_KEY||'' };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
     // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
