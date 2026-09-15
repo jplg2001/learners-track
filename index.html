@@ -3,6 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- SEGURIDAD. Politica de contenido: de donde puede cargar y a donde puede hablar
+     la pagina. 'unsafe-inline' en scripts hace falta por los onclick del marcado,
+     pero lo que mas protege esta abajo: connect-src e img-src cortan el envio de
+     datos robados a servidores ajenos, y object-src, base-uri, form-action y
+     frame-src cierran otras vias clasicas de ataque. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' data: blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; frame-src https://learners-track.firebaseapp.com; manifest-src 'self'; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<!-- Hacia otros sitios solo viaja el dominio, nunca la direccion completa con codigos. -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- SEGURIDAD. Contra el clickjacking: si otra pagina mete la plataforma dentro de un
+     marco para engañar al docente y hacerle pulsar botones, la pagina no se muestra.
+     GitHub Pages no deja enviar la cabecera que lo haria desde el servidor. -->
+<style id="antiEncuadre">html{display:none !important}</style>
+<script>
+if(window.self===window.top){ var __ae=document.getElementById('antiEncuadre'); __ae.parentNode.removeChild(__ae); }
+else { try{ window.top.location.replace(window.self.location.href); }catch(e){} }
+</script>
 <meta name="description" content="Learners Track: plataforma gratuita para docentes de inglés. Insignias, asistencia, notas por periodo, nota final, certificados y acceso para padres con un código de clase.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#6d5efc">
@@ -46,7 +62,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Montserrat:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Montserrat:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
 <style>
 :root {
 /* --- Superficies --- */
@@ -2162,15 +2178,16 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 </div>
 
 <!-- Librerías externas -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js" integrity="sha512-03CCNkeosDFN2zCCu4vLpu3pJfZcrL48F3yB8k87ejT+OVMwco7IH3FW02vtbGhdncS6gyYZ/duYaC/K62xQPQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA==" crossorigin="anonymous"></script>
 <!-- JSZip: empaqueta los certificados en un .zip (al abrirlo aparece la carpeta) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
+<!-- Chart.js con version fija: sin version, la CDN podia servir otra distinta cualquier dia y romper la huella. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha512-WoViKhKD4qI2WruSZqv9+kvM4WfFhUMQCLN4QlDTt5aU56fLQy2gYoxWIqlEnXqJy/+Ac5q/hk1oWfqnMDhwMA==" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js" integrity="sha512-/1KY5qSSsF87mmE6mMZHYot6vpolLFPwVMq7/oDoM7wSBvTBwzG4z6qjXTt/Yni3YZ32JMkOMsWwrMSD0EQCiw==" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js" integrity="sha512-zvf3lwbhSVP51oT7l9x2Ms9w86Sy+swNtHY2XJffA5E0N6wmFieg81ARAAkOBHV6JnBj8wA7hLi2UtW4L6GeiA==" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js" integrity="sha512-85uV9vfAa3ic3zRCh627wUWNMxEALYzrgr/+loBCUP9l2LctP3Nq/j9c3uP8WbMN/oVQFYV/gELdOG4Jo9LiHA==" crossorigin="anonymous"></script>
 <script>
 // =================== ESTADO, CONSTANTES Y UTILIDADES ==================
 let classrooms = [];
@@ -5975,6 +5992,8 @@ function updateChatMessageSafe(id,text){
 const LP_MAMMOTH_URL='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
 const LP_PDFJS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 const LP_PDFJS_WORKER='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// Huellas de integridad de las librerias que se cargan bajo demanda.
+const SRI_BAJO_DEMANDA={"https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js": "sha512-sG5Q7boJL+ft/weuz6Mmi9XBD+bEzE9AI2FMP4YMFxp3FpTFUQSQQm5K5cSgJCyed6bWs3W8f8h0lp36lHXhQA==","https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js": "sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==","https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js": "sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="};
 function loadScriptOnce(url,globalName){
     return new Promise((resolve,reject)=>{
         if(globalName&&window[globalName]) return resolve(window[globalName]);
@@ -5986,6 +6005,7 @@ function loadScriptOnce(url,globalName){
         }
         s=document.createElement('script');
         s.src=url; s.async=true; s.dataset.lazy=url;
+        if(SRI_BAJO_DEMANDA[url]){ s.integrity=SRI_BAJO_DEMANDA[url]; s.crossOrigin='anonymous'; }
         s.onload=()=>resolve(window[globalName]);
         s.onerror=()=>reject(new Error('No se pudo cargar la librería necesaria'));
         document.head.appendChild(s);
@@ -8296,6 +8316,15 @@ function remoteLeerPeticion(){
     }catch(e){}
 }
 remoteLeerPeticion();
+// SEGURIDAD. Ya leidos el codigo de clase y el del mando, se quitan de la barra de
+// direcciones: asi no quedan en el historial, en favoritos ni en una captura.
+(function(){
+    try{
+        const u=new URL(location.href); let cambio=false;
+        ['clase','remote','familia'].forEach(k=>{ if(u.searchParams.has(k)){ u.searchParams.delete(k); cambio=true; } });
+        if(cambio) history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);
+    }catch(e){}
+})();
 function revisarModoControl(){
     if(!_remotePedido) return;
     entrarModoControl();

@@ -5,7 +5,10 @@
  * cuando la red no responde. Los datos no dependen de esto: ya viven en el
  * dispositivo, y Firestore se encarga de subir lo pendiente al volver la senal.
  */
-const VERSION = 'learners-track-v1';
+// v2: las librerias se cargan ahora con huella de integridad (SRI). Las copias de la
+// v1 podian estar guardadas como respuestas opacas, que fallan esa verificacion y
+// dejarian la app sin librerias; cambiar la version borra esa cache vieja.
+const VERSION = 'learners-track-v2';
 
 // Lo minimo para que la aplicacion arranque sin red.
 const BASE = [
@@ -24,7 +27,7 @@ const LIBRERIAS = [
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
-  'https://cdn.jsdelivr.net/npm/chart.js',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js',
   'https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js',
   'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js'
@@ -98,7 +101,8 @@ self.addEventListener('fetch', event => {
     if (guardado) return guardado;
     try {
       const res = await fetch(req);
-      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
+      // Solo respuestas normales: una opaca no pasa la verificacion de integridad.
+      if (res && res.ok) cache.put(req, res.clone());
       return res;
     } catch (err) {
       return new Response('', { status: 504 });
