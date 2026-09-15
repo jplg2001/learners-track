@@ -690,6 +690,44 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .fam-rapido { width:100%; margin-top:12px; font-family:inherit; font-size:.92rem; color:var(--fg); text-align:left; background:var(--badge-bg); border:1px solid var(--badge-border); border-radius:12px; padding:12px 14px; cursor:pointer; }
 .fam-vacio-acciones { margin-top:18px; }
 .fam-olvidar { font-family:inherit; font-size:inherit; color:var(--fg-muted); background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; }
+/* === NOTA FINAL DEL ANO === */
+.periodo-final { width:auto !important; padding:0 12px; }
+.final-ajustes { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin:0 0 14px; }
+.final-pesos,.final-reglas { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.final-reglas { margin-top:10px; }
+.final-etq { font-size:.85rem; font-weight:700; color:var(--fg-muted); }
+.final-peso,.final-reglas label { display:inline-flex; align-items:center; gap:5px; font-size:.84rem; font-weight:700; color:var(--fg); }
+.final-peso input { width:58px; }
+.final-reglas input { width:66px; }
+.final-peso input,.final-reglas input { font-family:inherit; font-size:.88rem; font-weight:700; text-align:center; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:8px; padding:5px 4px; }
+.final-peso span { color:var(--fg-muted); }
+.final-suma { font-size:.8rem; font-weight:800; padding:4px 9px; border-radius:999px; }
+.final-suma.ok { color:var(--success); background:rgba(34,197,94,.12); }
+.final-suma.mal { color:var(--danger); background:rgba(239,68,103,.1); }
+.final-ayuda { margin:10px 0 0; font-size:.8rem; line-height:1.5; color:var(--fg-muted); }
+.final-tabla th small { display:block; font-size:.7rem; font-weight:600; opacity:.7; text-transform:none; letter-spacing:0; }
+.final-celda { text-align:center; vertical-align:middle; }
+.final-celda.vacia { color:var(--fg-muted); }
+.final-valor { display:flex; align-items:center; justify-content:center; gap:4px; font-family:'Montserrat',sans-serif; font-size:.95rem; }
+.final-valor .bien,.final-nota.bien { color:var(--success); }
+.final-valor .baja,.final-nota.baja { color:var(--danger); }
+.final-orig { text-decoration:line-through; color:var(--fg-muted); font-size:.85rem; }
+.final-flecha { color:var(--fg-muted); font-size:.8rem; }
+.final-rec { width:56px; margin-top:5px; font-family:inherit; font-size:.82rem; font-weight:700; text-align:center; color:var(--fg); background:var(--bg-alt); border:1px dashed var(--danger); border-radius:7px; padding:4px 3px; }
+.final-rec:focus { outline:2px solid var(--accent); border-style:solid; }
+.final-nota { font-family:'Montserrat',sans-serif; font-size:1.15rem; }
+.final-parcial { display:inline-flex; flex-direction:column; align-items:center; font-weight:700; color:var(--fg-muted); }
+.final-parcial small { font-size:.68rem; font-weight:600; }
+.final-estado { font-size:.8rem; font-weight:700; white-space:nowrap; text-align:left; }
+.final-estado.bien { color:var(--success); }
+.final-estado.baja { color:var(--danger); }
+.final-estado.curso { color:var(--accent-strong); }
+.fam-final { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+.fam-final b { font-family:'Montserrat',sans-serif; font-size:2.2rem; line-height:1; color:var(--fg); }
+.fam-final b.bien { color:var(--success); }
+.fam-final b.baja { color:var(--danger); }
+.fam-final span { font-size:.84rem; font-weight:700; color:var(--fg-muted); }
+.fam-estado.curso { color:var(--accent-strong); background:rgba(99,102,241,.1); }
 /* === PLANILLA DE ASISTENCIA === */
 #attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
 #attendancePage.show { display:block; animation:fadeIn .3s; }
@@ -3382,7 +3420,7 @@ function saveUserProfile() {
     currentUser.name=userProfile.name; currentUser.avatar=userProfile.avatar; currentUser.school=userProfile.school;
     currentUser.grade=userProfile.grade; currentUser.institutionLogo=userProfile.institutionLogo;
     currentUser.classrooms=classrooms; currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles;
-    currentUser.noteColumns=noteColumns; currentUser.noteColumnsByPeriod=noteColumnsByPeriod; currentUser.activePeriod=activePeriod; currentUser.activeClassroomIndex=activeClassroomIndex;
+    currentUser.noteColumns=noteColumns; currentUser.noteColumnsByPeriod=noteColumnsByPeriod; currentUser.activePeriod=activePeriod; currentUser.pesosPeriodos=pesosPeriodos; currentUser.topeRecuperacion=topeRecuperacion; currentUser.notaMinimaAnual=notaMinimaAnual; currentUser.activeClassroomIndex=activeClassroomIndex;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
     currentUser.groupSize=groupSize;
     currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
@@ -3413,7 +3451,7 @@ function saveData() {
     // Antes de guardar nada, lo que hay en pantalla se archiva en su periodo.
     if(typeof guardarPeriodoActivo==="function") guardarPeriodoActivo();
     currentUser.classrooms=classrooms; currentUser.activeClassroomIndex=activeClassroomIndex;
-    currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles; currentUser.noteColumns=noteColumns; currentUser.noteColumnsByPeriod=noteColumnsByPeriod; currentUser.activePeriod=activePeriod;
+    currentUser.gridWeeks=gridWeeks; currentUser.weekTitles=weekTitles; currentUser.noteColumns=noteColumns; currentUser.noteColumnsByPeriod=noteColumnsByPeriod; currentUser.activePeriod=activePeriod; currentUser.pesosPeriodos=pesosPeriodos; currentUser.topeRecuperacion=topeRecuperacion; currentUser.notaMinimaAnual=notaMinimaAnual;
     currentUser.badgePointsEnabled=badgePointsEnabled; currentUser.badgePointValue=badgePointValue;
     currentUser.groupSize=groupSize;
     currentUser.lessonPlans=lessonPlans; currentUser.teachingStyleProfile=teachingStyleProfile;
@@ -3536,7 +3574,7 @@ window.deleteStudent=function(sid) {
     const c=classrooms[activeClassroomIndex]; const i=c.students.findIndex(s=>s.id===sid);
     if(i!==-1){c.students.splice(i,1);c.students.forEach((s,j)=>s.id=j+1);saveData();loadActiveClassroom();}
 };
-function updateNoteButtons() { const a=document.getElementById('addNoteColBtn'),r=document.getElementById('removeNoteColBtn'); if(a)a.disabled=noteColumns.length>=10; if(r)r.disabled=noteColumns.length<=1; syncBadgePointsControls(); }
+function updateNoteButtons() { const a=document.getElementById('addNoteColBtn'),r=document.getElementById('removeNoteColBtn'); if(a){a.disabled=noteColumns.length>=10; a.style.display=vistaFinal?'none':'';} if(r){r.disabled=noteColumns.length<=1; r.style.display=vistaFinal?'none':'';} syncBadgePointsControls(); }
 // El control de tamaño de grupo solo tiene sentido en la vista de grupos.
 function syncGroupSizeControl(){
     const box=document.getElementById('groupSizeBox'), inp=document.getElementById('groupSizeInput');
@@ -3675,7 +3713,8 @@ function migrarPeriodos(){
 }
 window.cambiarPeriodo=function(p){
     p=periodoValido(p);
-    if(p===activePeriod){ renderPeriodoTabs(); return; }
+    const veniaDeFinal=vistaFinal; vistaFinal=false;
+    if(p===activePeriod){ renderPeriodoTabs(); if(veniaDeFinal){ renderCurrentView(); updateNoteButtons(); } return; }
     guardarPeriodoActivo();
     activePeriod=p;
     cargarPeriodo(p);
@@ -3690,17 +3729,197 @@ function renderPeriodoTabs(){
     const et=document.getElementById('periodoLabel');
     if(et) et.textContent=es?'Periodo:':'Period:';
     caja.innerHTML=PERIODOS.map(p=>{
-        const activo=p===activePeriod;
+        const activo=p===activePeriod && !vistaFinal;
         const cuantas=(currentStudents||[]).reduce((a,s)=>a+notasDePeriodo(s,p).filter(n=>String(n).trim()).length,0);
         return `<button type="button" class="periodo-btn${activo?' on':''}" aria-pressed="${activo}"`
              + ` title="${es?'Notas del periodo ':'Scores for period '}${p}${cuantas?` · ${cuantas} ${es?'notas':'scores'}`:''}"`
              + ` onclick="cambiarPeriodo(${p})">${p}${cuantas?`<span class="periodo-punto" aria-hidden="true"></span>`:''}</button>`;
-    }).join('');
+    }).join('')
+    + `<button type="button" class="periodo-btn periodo-final${vistaFinal?' on':''}" aria-pressed="${vistaFinal}" title="${es?'Nota final del año: junta los cuatro periodos':'Final grade of the year: combines the four periods'}" onclick="verNotaFinal()">${es?'Final':'Final'}</button>`;
 }
 // Opciones para los selectores de periodo de los certificados.
 function opcionesDePeriodo(sel){
     const es=currentLanguage==='es';
-    return PERIODOS.map(p=>`<option value="${p}"${p===(sel||activePeriod)?' selected':''}>${es?'Periodo':'Period'} ${p}</option>`).join('');
+    const elegido = sel==='anual' ? 'anual' : (sel||activePeriod);
+    return PERIODOS.map(p=>`<option value="${p}"${p===elegido?' selected':''}>${es?'Periodo':'Period'} ${p}</option>`).join('')
+        + `<option value="anual"${elegido==='anual'?' selected':''}>🎓 ${es?'Año completo (nota final)':'Whole year (final grade)'}</option>`;
+}
+// Valor de un selector de periodo de certificado: un numero de periodo o 'anual'.
+function periodoDeCertificado(v){ return v==='anual' ? 'anual' : periodoValido(v||activePeriod); }
+// === NOTA FINAL DEL ANO ==================================================
+// Junta los cuatro periodos en la definitiva. Cada periodo pesa lo que diga el
+// colegio (25% por defecto), y el periodo perdido se puede recuperar con una
+// nota que tiene tope, normalmente 3.0.
+//
+// Criterio de recuperacion: la nota recuperada solo reemplaza a la original si
+// la original no alcanzaba el minimo, se corta en el tope, y nunca baja la
+// nota: si en la recuperacion saca menos, se queda con la que tenia.
+let pesosPeriodos={1:25,2:25,3:25,4:25};
+let topeRecuperacion=3.0;
+let notaMinimaAnual=3.0;
+let vistaFinal=false;       // en SCORES se esta viendo la nota final, no un periodo
+
+function redondear1(v){ return Math.round(v*10)/10; }
+function restaurarAjustesAnuales(u){
+    pesosPeriodos=(u&&u.pesosPeriodos&&typeof u.pesosPeriodos==='object')?Object.assign({1:25,2:25,3:25,4:25},u.pesosPeriodos):{1:25,2:25,3:25,4:25};
+    topeRecuperacion=(u&&typeof u.topeRecuperacion==='number')?u.topeRecuperacion:3.0;
+    notaMinimaAnual=(u&&typeof u.notaMinimaAnual==='number')?u.notaMinimaAnual:3.0;
+    vistaFinal=false;
+}
+function pesoDe(p){ const v=Number((pesosPeriodos||{})[p]); return (isFinite(v)&&v>=0)?v:25; }
+function sumaPesos(){ return PERIODOS.reduce((a,p)=>a+pesoDe(p),0); }
+function numeroDeNota(t){
+    const v=parseFloat(String(t==null?'':t).replace(',','.'));
+    return isFinite(v) ? Math.max(0,Math.min(5,v)) : null;
+}
+function notaEfectivaDePeriodo(s,p){
+    const prom=promedioDePeriodo(s,p);
+    const original = prom==='-' ? null : parseFloat(prom);
+    const recuperacion = numeroDeNota((s.recuperaciones||{})[p]);
+    if(original===null) return { original:null, recuperacion:recuperacion, efectiva:null, recuperada:false, perdida:false };
+    const perdida = original<notaMinimaAnual;
+    if(perdida && recuperacion!==null){
+        const efectiva=Math.max(original, Math.min(recuperacion, topeRecuperacion));
+        return { original:original, recuperacion:recuperacion, efectiva:efectiva, recuperada:efectiva>original, perdida:true };
+    }
+    return { original:original, recuperacion:recuperacion, efectiva:original, recuperada:false, perdida:perdida };
+}
+function resumenAnual(s){
+    const det=PERIODOS.map(p=>Object.assign({ p:p, peso:pesoDe(p) }, notaEfectivaDePeriodo(s,p)));
+    const con=det.filter(d=>d.efectiva!==null);
+    const total=sumaPesos();
+    const pesoCon=con.reduce((a,d)=>a+d.peso,0);
+    const puntos=con.reduce((a,d)=>a+d.efectiva*d.peso,0);
+    const completo = total>0 && con.length===PERIODOS.length;
+    const definitiva = completo ? redondear1(puntos/total) : null;
+    const parcial = (!completo && pesoCon>0) ? redondear1(puntos/pesoCon) : null;
+    // Lo que le hace falta, en promedio, en los periodos que quedan para llegar
+    // al minimo del ano. Se redondea hacia arriba: mejor avisar de mas que de menos.
+    let necesita=null;
+    const pesoFalta=total-pesoCon;
+    if(!completo && pesoFalta>0 && total>0){
+        necesita=Math.ceil(((notaMinimaAnual*total - puntos)/pesoFalta)*10-1e-9)/10;
+    }
+    let estado;
+    if(completo) estado = definitiva>=notaMinimaAnual ? 'aprobo' : 'reprobo';
+    else if(!con.length) estado='sin-notas';
+    else if(necesita!==null && necesita<=0) estado='asegurado';
+    else if(necesita!==null && necesita>5) estado='no-alcanza';
+    else estado='en-curso';
+    return { det:det, completo:completo, definitiva:definitiva, parcial:parcial,
+             necesita:(necesita===null?null:Math.max(0,necesita)), estado:estado,
+             periodosConNota:con.map(d=>d.p), minimo:notaMinimaAnual };
+}
+function textoEstadoAnual(r,es){
+    switch(r.estado){
+        case 'aprobo':     return es?'✅ Aprobó el año':'✅ Passed the year';
+        case 'reprobo':    return es?'❌ No aprobó el año':'❌ Did not pass the year';
+        case 'asegurado':  return es?'🟢 Ya tiene el año asegurado':'🟢 The year is already secured';
+        case 'no-alcanza': return es?'🔴 Ya no alcanza sin recuperación':'🔴 Cannot reach it without recovery';
+        case 'en-curso':   return es?`⏳ Necesita ${r.necesita.toFixed(1)} en lo que falta`:`⏳ Needs ${r.necesita.toFixed(1)} in what is left`;
+        default:           return es?'Sin notas':'No scores';
+    }
+}
+function claseEstadoAnual(r){
+    return ({aprobo:'bien', asegurado:'bien', reprobo:'baja', 'no-alcanza':'baja', 'en-curso':'curso'})[r.estado]||'';
+}
+
+// --- Vista "Final" dentro de SCORES ----------------------------------------
+window.verNotaFinal=function(){
+    guardarPeriodoActivo();
+    vistaFinal=true;
+    renderPeriodoTabs(); renderCurrentView(); updateNoteButtons();
+};
+function renderNotaFinal(){
+    const sc=document.getElementById('classroomScoresView'); if(!sc) return;
+    const es=currentLanguage==='es';
+    if(!(currentStudents||[]).length){ sc.innerHTML=emptyClassroomHtml(); return; }
+    const suma=sumaPesos();
+    const ajustes=
+        `<div class="final-ajustes">`
+        + `<div class="final-pesos"><span class="final-etq">${es?'Peso de cada periodo:':'Weight of each period:'}</span>`
+        + PERIODOS.map(p=>`<label class="final-peso">P${p}<input type="number" min="0" max="100" step="1" value="${pesoDe(p)}" inputmode="numeric" aria-label="${es?'Peso del periodo ':'Weight of period '}${p}" onchange="cambiarPesoPeriodo(${p},this.value)"><span>%</span></label>`).join('')
+        + `<span class="final-suma ${suma===100?'ok':'mal'}">${es?'Suma':'Total'}: ${suma}%${suma===100?'':(es?' · debería ser 100%':' · should be 100%')}</span></div>`
+        + `<div class="final-reglas">`
+        +   `<label>${es?'Nota mínima para aprobar':'Passing grade'} <input type="number" min="0" max="5" step="0.1" value="${notaMinimaAnual}" inputmode="decimal" onchange="cambiarMinimoAnual(this.value)"></label>`
+        +   `<label>${es?'Tope de la recuperación':'Recovery cap'} <input type="number" min="0" max="5" step="0.1" value="${topeRecuperacion}" inputmode="decimal" onchange="cambiarTopeRecuperacion(this.value)"></label>`
+        + `</div>`
+        + `<p class="final-ayuda">${es
+            ? 'Cuando un periodo queda por debajo del mínimo aparece la casilla de <b>recuperación</b>. La nota recuperada reemplaza a la original hasta el tope, y nunca la baja.'
+            : 'When a period is below the passing grade a <b>recovery</b> box appears. The recovery grade replaces the original up to the cap, and never lowers it.'}</p>`
+        + `</div>`;
+    const cab=`<tr><th>${es?'Estudiante':'Student'}</th>`
+        + PERIODOS.map(p=>`<th>P${p}<small>${pesoDe(p)}%</small></th>`).join('')
+        + `<th>${es?'Nota final':'Final grade'}</th><th>${es?'Estado':'Status'}</th></tr>`;
+    const filas=currentStudents.map(s=>{
+        const r=resumenAnual(s);
+        const celdas=r.det.map(d=>{
+            if(d.original===null) return `<td class="final-celda vacia">—</td>`;
+            const recVal=(s.recuperaciones&&s.recuperaciones[d.p]!=null)?escapeHtml(String(s.recuperaciones[d.p])):'';
+            const input=d.perdida
+                ? `<input type="text" inputmode="decimal" class="final-rec" data-sid="${s.id}" data-p="${d.p}" value="${recVal}" placeholder="${es?'Rec.':'Rec.'}" title="${es?'Nota de recuperación (tope ':'Recovery grade (cap '}${topeRecuperacion.toFixed(1)})" aria-label="${es?'Recuperación del periodo ':'Recovery for period '}${d.p} — ${escapeHtml(s.name||'')}" onchange="guardarRecuperacion(${s.id},${d.p},this.value)">`
+                : '';
+            const valor = d.recuperada
+                ? `<span class="final-orig">${d.original.toFixed(1)}</span><span class="final-flecha">→</span><b class="bien">${d.efectiva.toFixed(1)}</b>`
+                : `<b class="${d.perdida?'baja':''}">${d.original.toFixed(1)}</b>`;
+            return `<td class="final-celda"><div class="final-valor">${valor}</div>${input}</td>`;
+        }).join('');
+        const nota = r.completo
+            ? `<b class="final-nota ${r.definitiva>=notaMinimaAnual?'bien':'baja'}">${r.definitiva.toFixed(1)}</b>`
+            : (r.parcial!==null
+                ? `<span class="final-parcial">${r.parcial.toFixed(1)}<small>${es?'parcial':'partial'} · P${r.periodosConNota.join(', P')}</small></span>`
+                : '<span class="final-parcial">—</span>');
+        return `<tr>${studentNameCellHtml(s,{att:false})}${celdas}<td class="final-celda">${nota}</td><td class="final-estado ${claseEstadoAnual(r)}">${textoEstadoAnual(r,es)}</td></tr>`;
+    }).join('');
+    sc.innerHTML=ajustes+`<div class="table-scroll"><table class="notes-table final-tabla"><thead>${cab}</thead><tbody>${filas}</tbody></table></div>`;
+}
+window.guardarRecuperacion=function(sid,p,valor){
+    const s=(currentStudents||[]).find(x=>x.id===sid); if(!s) return;
+    if(!s.recuperaciones||typeof s.recuperaciones!=='object') s.recuperaciones={};
+    const limpio=String(valor||'').trim();
+    if(limpio && numeroDeNota(limpio)===null){
+        showNotification(currentLanguage==='es'?'Escribe una nota de 0 a 5':'Enter a grade from 0 to 5','error');
+        return;
+    }
+    if(limpio) s.recuperaciones[p]=limpio; else delete s.recuperaciones[p];
+    saveData();
+    // Se redibuja y se devuelve el foco a la siguiente casilla de recuperacion,
+    // para poder pasar varias seguidas con Tab.
+    const activo=document.activeElement;
+    const siguiente = activo && activo.classList && activo.classList.contains('final-rec') ? {sid:activo.dataset.sid,p:activo.dataset.p} : null;
+    renderNotaFinal();
+    if(siguiente){
+        const el=document.querySelector(`.final-rec[data-sid="${siguiente.sid}"][data-p="${siguiente.p}"]`);
+        if(el) el.focus();
+    }
+};
+window.cambiarPesoPeriodo=function(p,v){
+    const n=parseInt(v,10);
+    pesosPeriodos=Object.assign({},pesosPeriodos,{ [p]:(isFinite(n)&&n>=0&&n<=100)?n:25 });
+    saveData(); renderNotaFinal();
+};
+window.cambiarMinimoAnual=function(v){
+    const n=numeroDeNota(v); if(n!==null) notaMinimaAnual=n;
+    saveData(); renderNotaFinal();
+};
+window.cambiarTopeRecuperacion=function(v){
+    const n=numeroDeNota(v); if(n!==null) topeRecuperacion=n;
+    saveData(); renderNotaFinal();
+};
+// Tabla plana para exportar la nota final a PDF y Excel.
+function tablaNotaFinal(){
+    const es=currentLanguage==='es';
+    const head=[es?'Estudiante':'Student', ...PERIODOS.map(p=>`P${p} (${pesoDe(p)}%)`), es?'Nota final':'Final grade', es?'Estado':'Status'];
+    const body=(currentStudents||[]).map(s=>{
+        const r=resumenAnual(s);
+        return [
+            s.name||'',
+            ...r.det.map(d=> d.original===null ? '' : (d.recuperada ? `${d.original.toFixed(1)} → ${d.efectiva.toFixed(1)} (R)` : d.original.toFixed(1))),
+            r.completo ? r.definitiva.toFixed(1) : (r.parcial!==null ? `${r.parcial.toFixed(1)} (${es?'parcial':'partial'})` : ''),
+            textoEstadoAnual(r,es).replace(/^[^\p{L}]+/u,'')
+        ];
+    });
+    return { title:es?'Nota final del año':'Final grade of the year', head:head, body:body };
 }
 function computeBadgeBonus(student,notas){
     const totalBadges = countStudentBadges(student);
@@ -4185,6 +4404,7 @@ function renderClassroomRows() {
     attachDragAndDropListeners();
 }
 function renderClassroomScores() {
+    if(vistaFinal){ renderNotaFinal(); return; }
     const sc=document.getElementById('classroomScoresView'); if(!sc)return; sc.innerHTML='';
     if(currentStudents.length===0){sc.innerHTML=emptyClassroomHtml();return;}
     const es=currentLanguage==='es';
@@ -4364,6 +4584,7 @@ window.useProfileLogoForCert=function(){
 };
 window.clearCertLogo=function(){ certificateLogoDataUrl=''; renderCertLogoPreview(); };
 
+let _certAlumnoId=null;
 function openCertificateModal(sid=null){
     // Arranca con el logo de la institucion ya cargado, si existe.
     certificateLogoDataUrl = userProfile.institutionLogo || '';
@@ -4376,7 +4597,8 @@ function openCertificateModal(sid=null){
     if(cs)cs.value=s?s.name:'';
     if(cm)cm.value=sharedCertificateComment;
     // El certificado se emite POR PERIODO: empieza en el que se esta trabajando.
-    const cp=document.getElementById("certPeriod"); if(cp) cp.innerHTML=opcionesDePeriodo(activePeriod);
+    _certAlumnoId = sid;
+    const cp=document.getElementById("certPeriod"); if(cp) cp.innerHTML=opcionesDePeriodo(vistaFinal?'anual':activePeriod);
     const cpl=document.getElementById("certPeriodLabel"); if(cpl) cpl.textContent=(currentLanguage==="es"?"Periodo:":"Period:");
     renderCertLogoPreview();
     showModal('certificateModal');
@@ -4401,7 +4623,7 @@ function closeCertificateModal(){hideModal('certificateModal');}
 // Se extrajo de generateCertificate para poder reutilizarlo en la generacion masiva.
 function drawCertificatePage(pdf,data){
     const t=translations[currentLanguage];
-    const {studentName,institution,course,date,comment,teacher,logo,periodo}=data;
+    const {studentName,institution,course,date,comment,teacher,logo,periodo,anual}=data;
     const PW=297,PH=210;
     pdf.setFillColor(255,255,255);pdf.rect(0,0,PW,PH,'F');
     // La marca de agua va primero, para que el texto quede por encima.
@@ -4422,7 +4644,14 @@ function drawCertificatePage(pdf,data){
     pdf.setFontSize(16);pdf.setFont('helvetica','normal');pdf.setTextColor(60,60,60);pdf.text(t.hasSuccessfully,148.5,110,{align:'center'});
     pdf.setFontSize(20);pdf.setFont('helvetica','bold');pdf.text(course,148.5,124,{align:'center'});
     // El periodo, debajo del curso: un certificado sin periodo no dice de que corte es.
-    if(periodo){
+    if(anual){
+        // Certificado del ano: en lugar del periodo, el ano lectivo y la definitiva.
+        const es=currentLanguage==='es';
+        pdf.setFontSize(13);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);
+        const linea = `${es?'Año lectivo':'School year'} ${anual.anio}` + (anual.nota!=null ? ` · ${es?'Nota definitiva':'Final grade'}: ${Number(anual.nota).toFixed(1)}` : '');
+        pdf.text(linea,148.5,134,{align:'center'});
+        pdf.setTextColor(60,60,60);
+    } else if(periodo){
         const es=currentLanguage==='es';
         pdf.setFontSize(13);pdf.setFont('helvetica','bold');pdf.setTextColor(102,126,234);
         pdf.text(`${es?'Periodo':'Period'} ${periodo}`,148.5,134,{align:'center'});
@@ -4438,7 +4667,7 @@ function certificateFileName(studentName,date,periodo){
         .normalize('NFD').replace(/[̀-ͯ]/g,'')  // quita acentos
         .replace(/[^A-Za-z0-9 _-]/g,'')                   // quita caracteres no validos en nombres de archivo
         .trim().replace(/\s+/g,'_') || 'Estudiante';
-    return `Certificado_${limpio}${periodo?('_P'+periodo):''}_${date}.pdf`;
+    return `Certificado_${limpio}${periodo==='anual'?'_Anual':(periodo?('_P'+periodo):'')}_${date}.pdf`;
 }
 function generateCertificate(){
     const t=translations[currentLanguage];
@@ -4449,8 +4678,14 @@ function generateCertificate(){
     if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}
     try{
         const{jsPDF}=window.jspdf; const pdf=new jsPDF('l','mm','a4');
-        const per=periodoValido((document.getElementById('certPeriod')||{}).value||activePeriod);
-        drawCertificatePage(pdf,{studentName:sn,institution:inst,course:crs,date:dt,comment:com,teacher:teach,logo:certificateLogoDataUrl,periodo:per});
+        const per=periodoDeCertificado((document.getElementById('certPeriod')||{}).value);
+        let anual=null;
+        if(per==='anual'){
+            const alumno=(currentStudents||[]).find(x=>x.id===_certAlumnoId);
+            const r=alumno?resumenAnual(alumno):null;
+            anual={ anio:String(dt||'').slice(0,4)||String(new Date().getFullYear()), nota:(r&&r.completo)?r.definitiva:null };
+        }
+        drawCertificatePage(pdf,{studentName:sn,institution:inst,course:crs,date:dt,comment:com,teacher:teach,logo:certificateLogoDataUrl,periodo:per==='anual'?null:per,anual});
         pdf.save(certificateFileName(sn,dt,per));
         showNotification(t.certificateGenerated,"success"); closeCertificateModal();
     }catch(err){console.error(err);showNotification("Error generating certificate.","error");}
@@ -4462,8 +4697,17 @@ if(_certForm)_certForm.addEventListener('submit',e=>{e.preventDefault();generate
 // Clasifica al salon segun la nota minima. El promedio usado es el mismo que se ve
 // en la app, asi que si los puntos por insignia estan activos, ya vienen incluidos.
 function classifyStudentsForCertificates(minGrade,periodo){
-    const p=periodoValido(periodo||activePeriod);
     const aprueban=[], reprueban=[], sinNotas=[];
+    if(periodo==='anual'){
+        // El del ano solo se entrega con los cuatro periodos cerrados.
+        (currentStudents||[]).forEach(s=>{
+            const r=resumenAnual(s);
+            if(!r.completo){ sinNotas.push({student:s, average:null}); return; }
+            (r.definitiva>=minGrade ? aprueban : reprueban).push({student:s, average:r.definitiva});
+        });
+        return {aprueban, reprueban, sinNotas};
+    }
+    const p=periodoValido(periodo||activePeriod);
     (currentStudents||[]).forEach(s=>{
         const avg=promedioDePeriodo(s,p);
         if(avg==="-"){ sinNotas.push({student:s, average:null}); return; }
@@ -4475,7 +4719,7 @@ function classifyStudentsForCertificates(minGrade,periodo){
 // Periodo elegido en el modal de certificados del curso.
 function getBulkPeriodo(){
     const el=document.getElementById('bulkCertPeriod');
-    return periodoValido(el?el.value:activePeriod);
+    return periodoDeCertificado(el?el.value:activePeriod);
 }
 function getBulkMinGrade(){
     const el=document.getElementById('bulkCertMinGrade');
@@ -4492,12 +4736,12 @@ function renderBulkCertPreview(){
         `<div class="bulk-cert-count">`
         + `<span class="ok">✅ ${es?'Aprueban':'Passing'}: ${aprueban.length}</span>`
         + `<span class="no">❌ ${es?'No aprueban':'Not passing'}: ${reprueban.length}</span>`
-        + (sinNotas.length?`<span class="na">➖ ${es?'Sin notas':'No scores'}: ${sinNotas.length}</span>`:'')
+        + (sinNotas.length?`<span class="na">➖ ${getBulkPeriodo()==='anual'?(es?'Año incompleto':'Year incomplete'):(es?'Sin notas':'No scores')}: ${sinNotas.length}</span>`:'')
         + `</div>`
         + `<ul class="bulk-cert-list">`
         + aprueban.map(i=>fila(i,'aprueba','')).join('')
         + reprueban.map(i=>fila(i,'reprueba','')).join('')
-        + sinNotas.map(i=>fila(i,'sin-notas',es?'sin notas':'no scores')).join('')
+        + sinNotas.map(i=>fila(i,'sin-notas',getBulkPeriodo()==='anual'?(es?'año incompleto':'year incomplete'):(es?'sin notas':'no scores'))).join('')
         + `</ul>`;
     const btn=document.getElementById('bulkCertGenerateBtn');
     if(btn) btn.disabled = aprueban.length===0;
@@ -4515,7 +4759,7 @@ window.openBulkCertModal=function(){
     setV('bulkCertTeacher', userProfile.name || '');
     setV('bulkCertComment', sharedCertificateComment || '');
     const prog=document.getElementById('bulkCertProgress'); if(prog){prog.style.display='none';prog.innerHTML='';}
-    const bp=document.getElementById('bulkCertPeriod'); if(bp) bp.innerHTML=opcionesDePeriodo(activePeriod);
+    const bp=document.getElementById('bulkCertPeriod'); if(bp) bp.innerHTML=opcionesDePeriodo(vistaFinal?'anual':activePeriod);
     const bpl=document.getElementById('bulkCertPeriodLabel'); if(bpl) bpl.textContent=es?'Periodo:':'Period:';
     renderBulkCertPreview();
     showModal('bulkCertModal');
@@ -4560,7 +4804,9 @@ window.generateBulkCertificates=async function(){
             const s=aprueban[i].student;
             pintar(i,aprueban.length,`${es?'Generando':'Generating'} ${i+1}/${aprueban.length}: ${s.name||''}`);
             const comment = (usarPropio && s.comment && s.comment.trim()) ? s.comment : comentarioGeneral;
-            const datos={ studentName:s.name||`Estudiante ${s.id}`, institution, course, date, comment, teacher, logo:certificateLogoDataUrl, periodo };
+            const datos={ studentName:s.name||`Estudiante ${s.id}`, institution, course, date, comment, teacher, logo:certificateLogoDataUrl,
+                periodo: periodo==='anual'?null:periodo,
+                anual: periodo==='anual' ? { anio:String(date||'').slice(0,4), nota:aprueban[i].average } : null };
             if(hayZip){
                 const pdf=new jsPDF('l','mm','a4');
                 drawCertificatePage(pdf,datos);
@@ -4577,7 +4823,7 @@ window.generateBulkCertificates=async function(){
             if(i%3===2) await new Promise(r=>setTimeout(r,0));
         }
 
-        const carpeta=`Certificados_${String(course||'Curso').replace(/[^A-Za-z0-9]+/g,'_')}_P${periodo}_${date}`;
+        const carpeta=`Certificados_${String(course||'Curso').replace(/[^A-Za-z0-9]+/g,'_')}_${periodo==='anual'?'Anual':'P'+periodo}_${date}`;
         if(hayZip){
             pintar(aprueban.length,aprueban.length,es?'Comprimiendo...':'Compressing...');
             const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
@@ -4777,6 +5023,7 @@ async function handleLogin(event){
             noteColumns=user.noteColumns||["Evaluation 1","Evaluation 2"];
             noteColumnsByPeriod=(user.noteColumnsByPeriod&&typeof user.noteColumnsByPeriod==="object")?user.noteColumnsByPeriod:{};
             activePeriod=periodoValido(user.activePeriod||1);
+            restaurarAjustesAnuales(user);
             badgePointsEnabled=!!user.badgePointsEnabled;
             badgePointValue=(typeof user.badgePointValue==='number')?user.badgePointValue:0.2;
             groupSize=(typeof user.groupSize==="number")?user.groupSize:7;
@@ -4982,6 +5229,7 @@ function getInstitutionalInfo(){return{institution:document.getElementById('scho
 // Tabla de notas. Con puntos activos incluye la nota original, la bonificada y los
 // puntos ganados, para que el boletin sea auditable.
 function buildScoresTable(){
+    if(vistaFinal) return tablaNotaFinal();
     const es=currentLanguage==='es', t=translations[currentLanguage];
     const head=[es?'Estudiante':'Student', ...noteColumns];
     if(badgePointsEnabled){
@@ -5029,8 +5277,8 @@ function safeSheetName(name,fallback){
 }
 function exportCurrentViewPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);const vt=viewMode==='rows'?t.weeklyRows:viewMode==='grid'?t.weeklyGrid:t.scores;pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${vt} - ${new Date().toLocaleString()}`,105,60,{align:'center'});buildCurrentViewTables().forEach((tb,idx)=>{let sy=65;if(idx>0){pdf.addPage();sy=20;}pdf.setTextColor(102,126,234);pdf.setFontSize(12);pdf.text(tb.title,105,sy,{align:'center'});pdf.autoTable({head:[tb.head],body:tb.body,startY:sy+5,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});});pdf.save(`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportCurrentViewExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();buildCurrentViewTables().forEach((tb,idx)=>{const data=[[t.institutionHeader,info.institution],[t.teacherHeader,info.teacher],[t.classroomHeader,info.classroom],[t.dateHeader,info.date],[],[tb.title],tb.head,...tb.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(tb.title,(currentLanguage==='es'?'Vista ':'View ')+(idx+1)));});window.XLSX.writeFile(wb,`CurrentView_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportScoresPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.scores} · ${currentLanguage==='es'?'Periodo':'Period'} ${activePeriod} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const _st=buildScoresTable();const headers=[_st.head];const data=_st.body;pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Scores_P${activePeriod}_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
-function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const _st=buildScoresTable();const data=[_st.head,..._st.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(`${t.scores} P${activePeriod}`,'Scores'));window.XLSX.writeFile(wb,`Scores_P${activePeriod}_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportScoresPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.scores} · ${vistaFinal?(currentLanguage==='es'?'Nota final del año':'Final grade of the year'):((currentLanguage==='es'?'Periodo':'Period')+' '+activePeriod)} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const _st=buildScoresTable();const headers=[_st.head];const data=_st.body;pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Scores_${vistaFinal?'Final':'P'+activePeriod}_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
+function exportScoresExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const _st=buildScoresTable();const data=[_st.head,..._st.body];const ws=window.XLSX.utils.aoa_to_sheet(data);window.XLSX.utils.book_append_sheet(wb,ws,safeSheetName(vistaFinal?`${t.scores} Final`:`${t.scores} P${activePeriod}`,'Scores'));window.XLSX.writeFile(wb,`Scores_${vistaFinal?'Final':'P'+activePeriod}_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportBadgesPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.availableBadges} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const headers=[[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon']];const data=currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️']);pdf.autoTable({head:headers,body:data,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3}});let y=pdf.lastAutoTable.finalY+15;pdf.setFontSize(12);pdf.text(currentLanguage==='es'?'Insignias por Estudiante:':'Badges per Student:',10,y);y+=10;const bd=currentStudents.map(s=>[s.name,s.gridBadges.flat().length]);pdf.autoTable({head:[[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges']],body:bd,startY:y,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:8,cellPadding:2}});pdf.save(`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportBadgesExcel(){if(!window.XLSX){showNotification("Excel Library not loaded.","error");return;}try{const t=translations[currentLanguage];const info=getInstitutionalInfo();const wb=window.XLSX.utils.book_new();const bh=[currentLanguage==='es'?'ID':'ID',currentLanguage==='es'?'Nombre':'Name',currentLanguage==='es'?'Ícono':'Icon'];const bd=[bh,...currentBadges.map(b=>[b.id,b.name,b.icon||'🖼️'])];const bw=window.XLSX.utils.aoa_to_sheet(bd);window.XLSX.utils.book_append_sheet(wb,bw,currentLanguage==='es'?'Insignias':'Badges');const sh=[currentLanguage==='es'?'Estudiante':'Student',currentLanguage==='es'?'Total Insignias':'Total Badges'];const sd=[sh,...currentStudents.map(s=>[s.name,s.gridBadges.flat().length])];const sw=window.XLSX.utils.aoa_to_sheet(sd);window.XLSX.utils.book_append_sheet(wb,sw,currentLanguage==='es'?'Por Estudiante':'Per Student');window.XLSX.writeFile(wb,`Badges_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
 function exportStatisticsPDF(){if(!window.jspdf){showNotification("PDF Library not loaded.","error");return;}try{const{jsPDF}=window.jspdf;const pdf=new jsPDF();const info=getInstitutionalInfo();const t=translations[currentLanguage];pdf.setFillColor(102,126,234);pdf.rect(0,0,210,30,'F');if(userProfile.institutionLogo)addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:175,y:5,width:25,height:20});pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(t.appTitle,105,15,{align:'center'});pdf.setFontSize(10);pdf.text(`${t.institutionHeader}: ${info.institution}`,10,35);pdf.text(`${t.teacherHeader}: ${info.teacher}`,10,40);pdf.text(`${t.classroomHeader}: ${info.classroom}`,10,45);pdf.text(`${t.dateHeader}: ${info.date}`,10,50);pdf.setTextColor(102,126,234);pdf.setFontSize(14);pdf.text(`${t.statisticsTitle} - ${new Date().toLocaleString()}`,105,60,{align:'center'});const ne=currentStudents.length,ni=currentStudents.reduce((a,s)=>a+s.gridBadges.reduce((x,y)=>x+y.length,0),0),ai=ne>0?(ni/ne).toFixed(2):0,nc=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;const sd=[[t.studentsLabel,ne],[t.badgesAwardedLabel,ni],[t.avgBadgesLabel,ai],[t.commentsLabel,nc]];pdf.autoTable({body:sd,startY:65,theme:'grid',headStyles:{fillColor:[102,126,234]},styles:{fontSize:10,cellPadding:3},columnStyles:{0:{fontStyle:'bold'}}});pdf.save(`Statistics_${info.classroom.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);showNotification(t.exportSuccess,"success");}catch(e){console.error(e);showNotification(translations[currentLanguage].exportError,"error");}}
@@ -6484,7 +6732,13 @@ function reporteDeAlumno(s){
             ultimas:registros.slice(0,12).map(r=>({ f:r[0], e:r[1] }))
         },
         insignias:{ total:insignias.reduce((a,x)=>a+x.cantidad,0), lista:insignias.slice(0,24) },
-        comentario:String(s.comment||'')
+        comentario:String(s.comment||''),
+        final:(function(){
+            const r=resumenAnual(s);
+            return { completo:r.completo, definitiva:r.definitiva, parcial:r.parcial, necesita:r.necesita,
+                     estado:r.estado, periodos:r.periodosConNota, minimo:r.minimo,
+                     recuperados:r.det.filter(d=>d.recuperada).map(d=>d.p) };
+        })()
     };
 }
 function construirClase(){
@@ -6833,7 +7087,8 @@ window.verAlumnoInvitado=function(id){
     const datos={
         alumno:a.nombre, salon:d.salon, institucion:d.institucion, docente:d.docente, logo:d.logo,
         aprobacion:d.aprobacion, actualizado:d.actualizado,
-        periodos:r.periodos||[], asistencia:r.asistencia||{}, insignias:r.insignias||{}, comentario:r.comentario||''
+        periodos:r.periodos||[], asistencia:r.asistencia||{}, insignias:r.insignias||{}, comentario:r.comentario||'',
+        final:r.final||null
     };
     _famPeriodo=null;
     _famBarra=`<div class="fam-barra"><button type="button" class="fam-barra-btn" onclick="pintarBuscadorInvitado()">← ${es?'Buscar otro estudiante':'Find another student'}</button><button type="button" class="fam-barra-btn" onclick="salirInvitado()">${es?'Salir':'Sign out'}</button></div>`;
@@ -6891,6 +7146,30 @@ function pintarBoletinFamilia(d,es){
                 : (es?`⚠️ Está por debajo de ${apr.toFixed(1)}. Conviene hablar con el docente.`:`⚠️ Below ${apr.toFixed(1)}. It is worth talking to the teacher.`)}</p>`);
     }
     h+=`</section>`;
+
+    // Nota final del ano: la definitiva si ya estan los cuatro periodos, o lo que
+    // lleva y lo que necesita en lo que falta.
+    const fin=d.final;
+    if(fin && fin.estado && fin.estado!=='sin-notas'){
+        const min=Number(fin.minimo)||apr;
+        const numero = fin.completo ? Number(fin.definitiva) : Number(fin.parcial);
+        const clase = fin.completo ? (numero>=min?'bien':'baja') : ({asegurado:'bien','no-alcanza':'baja'})[fin.estado]||'';
+        let explica='';
+        if(fin.completo){
+            explica = numero>=min ? (es?'✅ Aprobó el año.':'✅ Passed the year.') : (es?`❌ No alcanzó el mínimo de ${min.toFixed(1)}. Conviene hablar con el docente.`:`❌ Did not reach ${min.toFixed(1)}. It is worth talking to the teacher.`);
+        } else if(fin.estado==='asegurado'){
+            explica = es?'🟢 Con lo que lleva, ya tiene el año asegurado.':'🟢 With what they have, the year is already secured.';
+        } else if(fin.estado==='no-alcanza'){
+            explica = es?'🔴 Ya no le alcanza con los periodos que faltan; necesita recuperar. Habla con el docente.':'🔴 The remaining periods are not enough; they need to recover. Talk to the teacher.';
+        } else {
+            explica = es?`⏳ Para aprobar el año necesita en promedio <b>${Number(fin.necesita).toFixed(1)}</b> en los periodos que faltan.`:`⏳ To pass the year they need an average of <b>${Number(fin.necesita).toFixed(1)}</b> in the remaining periods.`;
+        }
+        const recup=(fin.recuperados||[]).length ? `<p class="fam-nota">${es?'Recuperó':'Recovered'}: ${fin.recuperados.map(p=>(es?'Periodo ':'Period ')+Number(p)).join(', ')}.</p>` : '';
+        h+=`<section class="fam-bloque"><h2>🎓 ${es?'Nota final del año':'Final grade of the year'}</h2>`
+          + `<div class="fam-final"><b class="${clase}">${isFinite(numero)?numero.toFixed(1):'—'}</b>`
+          + `<span>${fin.completo?(es?'Definitiva':'Final'):(es?`Parcial · con ${(fin.periodos||[]).length} de 4 periodos`:`Partial · ${(fin.periodos||[]).length} of 4 periods`)}</span></div>`
+          + `<p class="fam-estado ${clase||'curso'}">${explica}</p>${recup}</section>`;
+    }
 
     h+=`<section class="fam-bloque"><h2>📅 ${es?'Asistencia':'Attendance'}</h2>`;
     if(!as.tomadas){
@@ -7101,6 +7380,9 @@ function loadUserFromCloud(uid,email){
       noteColumns:Array.isArray(d.noteColumns)?d.noteColumns:["Evaluation 1","Evaluation 2"],
       noteColumnsByPeriod:(d.noteColumnsByPeriod&&typeof d.noteColumnsByPeriod==="object")?d.noteColumnsByPeriod:{},
       activePeriod:d.activePeriod||1,
+      pesosPeriodos:(d.pesosPeriodos&&typeof d.pesosPeriodos==="object")?d.pesosPeriodos:null,
+      topeRecuperacion:(typeof d.topeRecuperacion==="number")?d.topeRecuperacion:null,
+      notaMinimaAnual:(typeof d.notaMinimaAnual==="number")?d.notaMinimaAnual:null,
       activeClassroomIndex:d.activeClassroomIndex||0,
       badgePointsEnabled:!!d.badgePointsEnabled,
       badgePointValue:(typeof d.badgePointValue==='number')?d.badgePointValue:0.2
@@ -7121,6 +7403,7 @@ function loadUserFromCloud(uid,email){
       gridWeeks=currentUser.gridWeeks||1; weekTitles=currentUser.weekTitles||["Week 1"]; noteColumns=currentUser.noteColumns||["Evaluation 1","Evaluation 2"];
       noteColumnsByPeriod=(currentUser.noteColumnsByPeriod&&typeof currentUser.noteColumnsByPeriod==="object")?currentUser.noteColumnsByPeriod:{};
       activePeriod=periodoValido(currentUser.activePeriod||1);
+      restaurarAjustesAnuales(currentUser);
       updateUIWithProfile(); hideProfileSetup(); loadActiveClassroom();
     } else {
       classrooms=[]; activeClassroomIndex=0; updateUIWithProfile(); showProfileSetup();
@@ -8006,7 +8289,7 @@ function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_clou
 function pushToCloud(){
   try{
     const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
-    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, noteColumnsByPeriod:noteColumnsByPeriod, activePeriod:activePeriod, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize };
+    const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, noteColumnsByPeriod:noteColumnsByPeriod, activePeriod:activePeriod, pesosPeriodos:pesosPeriodos, topeRecuperacion:topeRecuperacion, notaMinimaAnual:notaMinimaAnual, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
     // para que el docente sepa por que dejo de sincronizar y pueda liberar espacio.
