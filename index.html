@@ -1342,6 +1342,51 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   .voc-pistas { grid-template-columns:1fr; }
 }
 
+/* === RULETA DEL BINGO === */
+.voc-barra .btn-ai { padding:8px 14px; border:none; border-radius:var(--radius-sm); cursor:pointer; font:inherit; font-weight:700; }
+#ruletaModal { z-index:2100; }
+.ruleta-modal { width:min(1180px,98vw); max-height:96vh; padding:22px 24px; background:radial-gradient(circle at 25% 15%, #3b3486 0%, #1e1b4b 55%, #120f2e 100%); color:#fff; border:none; }
+.ruleta-modal:fullscreen { width:100vw; max-width:100vw; height:100vh; max-height:100vh; border-radius:0; display:flex; flex-direction:column; justify-content:center; }
+.ruleta-modal .modal-close-btn { color:#fff; z-index:3; }
+.rul-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:30px; align-items:center; }
+.rul-rueda { position:relative; width:min(100%, 74vh); aspect-ratio:1; margin:0 auto; }
+.rul-rueda canvas { width:100%; height:100%; display:block; filter:drop-shadow(0 18px 40px rgba(0,0,0,.45)); }
+.rul-puntero { position:absolute; top:-10px; left:50%; width:0; height:0; border-left:19px solid transparent; border-right:19px solid transparent; border-top:36px solid #fbbf24; transform:translateX(-50%); transform-origin:50% 0; filter:drop-shadow(0 3px 4px rgba(0,0,0,.45)); z-index:2; }
+.rul-puntero.tic { animation:rulTic .13s var(--ease-out); }
+@keyframes rulTic { 40% { transform:translateX(-50%) rotate(-16deg); } }
+.rul-cab { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; padding-right:30px; }
+.rul-cab h3 { margin:0; font-family:'Montserrat',sans-serif; font-size:1.5rem; color:#fff; }
+.rul-tema { opacity:.7; font-size:.95rem; }
+.rul-cuenta { margin:12px 0 0; font-size:1rem; }
+.rul-cuenta b { font-size:1.5rem; color:#fbbf24; }
+.rul-barra { height:6px; margin-top:6px; border-radius:99px; background:rgba(255,255,255,.15); overflow:hidden; }
+.rul-barra span { display:block; height:100%; background:linear-gradient(90deg,#f59e0b,#ec4899); transform-origin:left; transition:transform .5s var(--ease-out); }
+.rul-carta { min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); border-radius:22px; padding:18px; margin:14px 0; }
+.rul-palabra { font-family:'Montserrat',sans-serif; font-size:clamp(2.2rem,5.2vw,4rem); font-weight:800; line-height:1.05; overflow-wrap:anywhere; }
+.rul-pista { font-size:1.15rem; opacity:.82; margin-top:8px; }
+.rul-espera { margin:0; opacity:.7; font-size:1.05rem; }
+.rul-repetir { margin-top:10px; background:transparent; border:1px solid rgba(255,255,255,.3); color:#fff; border-radius:999px; padding:5px 14px; font:inherit; font-size:.85rem; cursor:pointer; }
+.rul-carta.nueva .rul-palabra { animation:rulPop .55s var(--ease-out-back); }
+@keyframes rulPop { from { transform:scale(.35); opacity:0; } }
+.rul-girar { display:block; width:100%; padding:18px; font-family:'Montserrat',sans-serif; font-size:1.7rem; font-weight:800; letter-spacing:.1em; border:none; border-radius:18px; background:linear-gradient(135deg,#f59e0b,#ec4899); color:#fff; cursor:pointer; box-shadow:0 10px 26px rgba(236,72,153,.4); transition:transform .15s var(--ease-out), filter .2s var(--ease-out), opacity .2s; }
+.rul-girar:hover:not(:disabled) { filter:brightness(1.08); }
+.rul-girar:active:not(:disabled) { transform:scale(.97); }
+.rul-girar:disabled { opacity:.55; cursor:not-allowed; }
+.rul-historial { margin-top:16px; }
+.rul-historial h4 { margin:0 0 8px; font-size:.9rem; opacity:.75; font-weight:600; }
+.rul-historial ol { list-style:none; display:flex; flex-wrap:wrap; gap:6px; padding:0; margin:0; max-height:20vh; overflow:auto; }
+.rul-historial li { background:rgba(255,255,255,.13); border-radius:999px; padding:4px 11px; font-size:.9rem; }
+.rul-historial li:first-child { background:#fbbf24; color:#1f2340; font-weight:700; }
+.rul-historial li b { opacity:.6; margin-right:5px; font-weight:700; }
+.rul-vacio { margin:0; opacity:.6; font-size:.9rem; }
+.rul-controles { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.rul-controles button { background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.22); border-radius:10px; padding:8px 12px; font:inherit; font-size:.86rem; font-weight:600; cursor:pointer; }
+.rul-controles button:hover:not(:disabled) { background:rgba(255,255,255,.18); }
+.rul-controles button:disabled { opacity:.4; cursor:not-allowed; }
+.rul-controles button[aria-pressed="false"] { opacity:.5; text-decoration:line-through; }
+@media (max-width:760px){ .rul-grid { grid-template-columns:1fr; gap:16px; } .rul-rueda { width:min(100%,56vh); } .rul-girar { font-size:1.35rem; padding:14px; } }
+@media (prefers-reduced-motion: reduce){ .rul-puntero.tic, .rul-carta.nueva .rul-palabra { animation:none; } .rul-barra span { transition:none; } }
+
 /* === COMENTARIOS DEL BOLETIN CON IA === */
 .bia-modal { width:min(820px,96vw); }
 .bia-opciones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px; }
@@ -2310,6 +2355,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
       <div class="voc-vista-col">
         <div class="voc-barra">
           <button type="button" class="btn-secondary" id="vocOtraBtn" onclick="vocOtraVersion()">🔀 Otra versión</button>
+          <button type="button" class="btn-ai" id="vocRuletaBtn" data-para="bingo" hidden onclick="abrirRuletaBingo()">🎡 Ruleta para jugar</button>
           <label class="voc-check" data-para-no="bingo"><input type="checkbox" id="vocSolucion" onchange="vocVerSolucion(this.checked)"> <span id="vocSolucionLbl">Ver solución</span></label>
         </div>
         <div class="voc-vista" id="vocVista" aria-live="polite"></div>
@@ -2319,6 +2365,20 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
     <div class="voc-acciones">
       <button type="button" class="btn-secondary" id="vocCerrarBtn" onclick="cerrarJuegosVocabulario()">Cerrar</button>
       <button type="button" class="btn-primary" id="vocPdfBtn" onclick="vocDescargarPdf()" disabled>📄 Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ruleta para jugar el bingo en el proyector -->
+<div class="modal" id="ruletaModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content ruleta-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarRuletaBingo()">&times;</button>
+    <div class="rul-grid">
+      <div class="rul-rueda">
+        <div class="rul-puntero" id="ruletaPuntero"></div>
+        <canvas id="ruletaCanvas" width="600" height="600" role="img" aria-label="Ruleta"></canvas>
+      </div>
+      <div id="ruletaPanel"></div>
     </div>
   </div>
 </div>
@@ -9355,11 +9415,238 @@ function vocDescargarPdf(){
         else if(res.tipo==='cruci'){ vocPdfCruci(pdf,res,titulo,instr); pdf.save(vocNombreArchivo('Crossword')); }
         else { vocPdfBingo(pdf,res,titulo,instr); pdf.save(vocNombreArchivo('Bingo')); }
         vocRecordar();
-        showNotification(res.tipo==='bingo'
-            ? (es?`📄 PDF listo: ${res.cartones.length} cartones y, al final, tu lista para cantar.`:`📄 PDF ready: ${res.cartones.length} cards and, at the end, your caller list.`)
-            : (es?'📄 PDF listo. La última hoja trae las respuestas.':'📄 PDF ready. The last page has the answers.'),'success');
+        if(res.tipo==='bingo'){
+            showNotification(es?`📄 PDF listo: ${res.cartones.length} cartones y tu lista para cantar.`:`📄 PDF ready: ${res.cartones.length} cards and your caller list.`,
+                'success', { texto: es?'🎡 Abrir ruleta':'🎡 Open wheel', onClick: abrirRuletaBingo });
+        } else {
+            showNotification(es?'📄 PDF listo. La última hoja trae las respuestas.':'📄 PDF ready. The last page has the answers.','success');
+        }
     }catch(e){ console.error(e); showNotification(es?'No se pudo crear el PDF.':'Could not create the PDF.','error'); }
 }
+// --- Ruleta para jugar el bingo -------------------------------------------------
+// Se arma con las mismas palabras de los cartones. Cada giro saca una palabra que
+// no haya salido, la dice en voz alta en ingles y la quita de la rueda. Si se cierra
+// y se vuelve a abrir con las mismas palabras, la partida sigue donde iba.
+const RUL_COLORES=['#6366f1','#ec4899','#f59e0b','#10b981','#06b6d4','#8b5cf6','#ef4467','#84cc16'];
+const RUL_VUELTA=Math.PI*2;
+let _rul={ firma:'', todas:[], salieron:[], visibles:[], rot:0, girando:false, destacada:-1, raf:0, audio:null, sonido:true, voz:true, timer:null };
+function rulNorm(a){ return ((a%RUL_VUELTA)+RUL_VUELTA)%RUL_VUELTA; }
+function rulAbierta(){ const m=document.getElementById('ruletaModal'); return !!(m && m.style.display==='flex'); }
+function rulQuedan(){ const s=new Set(_rul.salieron.map(w=>w.letras)); return _rul.todas.filter(w=>!s.has(w.letras)); }
+
+function abrirRuletaBingo(){
+    const es=currentLanguage==='es';
+    const res=_voc.resultado;
+    if(!res || res.tipo!=='bingo'){ showNotification(es?'Primero arma el bingo':'Build the bingo first','error'); return; }
+    const lista=res.llamado.slice();
+    const firma=lista.map(w=>w.letras).sort().join('|');
+    if(firma!==_rul.firma){
+        _rul.firma=firma; _rul.todas=lista; _rul.salieron=[]; _rul.rot=0;
+    } else {
+        // Mismas palabras: se conserva la partida, con las pistas al dia por si se editaron.
+        const m={}; lista.forEach(w=>{ m[w.letras]=w; });
+        _rul.todas=_rul.todas.map(w=>m[w.letras]||w);
+        _rul.salieron=_rul.salieron.map(w=>m[w.letras]||w);
+    }
+    try{ _rul.sonido=localStorage.getItem('lt_rulSonido')!=='0'; _rul.voz=localStorage.getItem('lt_rulVoz')!=='0'; }catch(e){}
+    _rul.visibles=rulQuedan(); _rul.destacada=-1;
+    showModal('ruletaModal');
+    rulPanel(false);
+    requestAnimationFrame(rulDibujar);
+}
+function cerrarRuletaBingo(){
+    cancelAnimationFrame(_rul.raf); _rul.girando=false;
+    try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    hideModal('ruletaModal');
+}
+function rulDibujar(){
+    const cv=document.getElementById('ruletaCanvas'); if(!cv) return;
+    const lado=cv.clientWidth; if(!lado) return;
+    const dpr=window.devicePixelRatio||1;
+    if(cv.width!==Math.round(lado*dpr)){ cv.width=Math.round(lado*dpr); cv.height=Math.round(lado*dpr); }
+    const ctx=cv.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,lado,lado);
+    const cx=lado/2, cy=lado/2, R=lado/2-8;
+    const q=_rul.visibles;
+    if(!q.length){
+        ctx.beginPath(); ctx.arc(cx,cy,R,0,RUL_VUELTA); ctx.fillStyle='rgba(255,255,255,.1)'; ctx.fill();
+        ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.font=`800 ${Math.round(R*0.16)}px Montserrat, sans-serif`;
+        ctx.fillText(currentLanguage==='es'?'¡Salieron todas!':'All words out!', cx, cy);
+        return;
+    }
+    const seg=RUL_VUELTA/q.length;
+    q.forEach((w,i)=>{
+        const a0=_rul.rot+i*seg;
+        let color=RUL_COLORES[i%RUL_COLORES.length];
+        // Que el ultimo gajo no quede del mismo color que el primero.
+        if(i===q.length-1 && i>0 && i%RUL_COLORES.length===0) color=RUL_COLORES[3];
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,a0,a0+seg); ctx.closePath();
+        ctx.fillStyle=color; ctx.fill();
+        ctx.lineWidth=q.length>40?1:2; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke();
+        if(i===_rul.destacada){ ctx.save(); ctx.clip(); ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fillRect(0,0,lado,lado); ctx.restore(); }
+        ctx.save();
+        // En la mitad izquierda el texto se voltea para que no quede de cabeza.
+        const medio=rulNorm(a0+seg/2), izquierda=medio>Math.PI/2 && medio<Math.PI*1.5;
+        ctx.translate(cx,cy); ctx.rotate(izquierda?medio+Math.PI:medio);
+        ctx.textAlign=izquierda?'left':'right'; ctx.textBaseline='middle'; ctx.fillStyle='#fff';
+        const fs=Math.max(9, Math.min(R*0.1, R*seg*0.5));
+        ctx.font=`700 ${fs}px Montserrat, sans-serif`;
+        let t=w.palabra;
+        const max=R*0.7;
+        while(ctx.measureText(t).width>max && t.length>4) t=t.slice(0,-2)+'…';
+        ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=3;
+        ctx.fillText(t, izquierda?-(R-12):R-12, 0);
+        ctx.restore();
+    });
+    ctx.beginPath(); ctx.arc(cx,cy,R+3,0,RUL_VUELTA); ctx.lineWidth=6; ctx.strokeStyle='#fff'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,R*0.14,0,RUL_VUELTA); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.lineWidth=5; ctx.strokeStyle='#312e81'; ctx.stroke();
+}
+function rulAudio(){
+    if(_rul.audio) return _rul.audio;
+    try{ const AC=window.AudioContext||window.webkitAudioContext; if(AC) _rul.audio=new AC(); }catch(e){}
+    return _rul.audio;
+}
+function rulTono(freq, dur, vol, tipo, retraso){
+    if(!_rul.sonido) return;
+    const ac=rulAudio(); if(!ac) return;
+    try{
+        const t=ac.currentTime+(retraso||0);
+        const o=ac.createOscillator(), g=ac.createGain();
+        o.type=tipo||'square'; o.frequency.value=freq;
+        g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+        o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+dur+0.02);
+    }catch(e){}
+}
+function rulTic(){
+    const p=document.getElementById('ruletaPuntero');
+    if(p){ p.classList.remove('tic'); void p.offsetWidth; p.classList.add('tic'); }
+    rulTono(1250,0.035,0.04,'square');
+}
+function rulHablar(w){
+    if(!_rul.voz || !w || !('speechSynthesis' in window)) return;
+    try{
+        speechSynthesis.cancel();
+        const u=new SpeechSynthesisUtterance(w.palabra);
+        u.lang='en-US'; u.rate=0.85;
+        const voces=speechSynthesis.getVoices();
+        const v=voces.find(x=>/^en[-_]US/i.test(x.lang)) || voces.find(x=>/^en/i.test(x.lang));
+        if(v) u.voice=v;
+        speechSynthesis.speak(u);
+    }catch(e){}
+}
+function rulGirar(){
+    if(_rul.girando) return;
+    clearTimeout(_rul.timer);
+    // Lo que se ve en la rueda pasa a ser lo que queda de verdad.
+    _rul.visibles=rulQuedan(); _rul.destacada=-1;
+    const q=_rul.visibles, n=q.length;
+    if(!n){ rulDibujar(); return; }
+    rulAudio();
+    if(_rul.audio && _rul.audio.state==='suspended') _rul.audio.resume().catch(()=>{});
+    const seg=RUL_VUELTA/n;
+    const gana=Math.floor(Math.random()*n);
+    const centro=(gana+0.5)*seg+(Math.random()-0.5)*seg*0.6;
+    const delta=rulNorm(-Math.PI/2-centro-_rul.rot);
+    const reducido=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const vueltas=reducido?1:5, dur=reducido?1400:5200;
+    const ini=_rul.rot, fin=ini+delta+vueltas*RUL_VUELTA, t0=performance.now();
+    _rul.girando=true;
+    rulPanel(false);
+    let ultimo=-1;
+    const paso=(ahora)=>{
+        if(!rulAbierta()){ _rul.girando=false; _rul.rot=rulNorm(_rul.rot); return; }
+        const p=Math.min(1,(ahora-t0)/dur);
+        const e=1-Math.pow(1-p,4);
+        _rul.rot=ini+(fin-ini)*e;
+        rulDibujar();
+        const idx=Math.floor(rulNorm(-Math.PI/2-_rul.rot)/seg)%n;
+        if(idx!==ultimo){ if(ultimo!==-1) rulTic(); ultimo=idx; }
+        if(p<1){ _rul.raf=requestAnimationFrame(paso); return; }
+        _rul.rot=rulNorm(_rul.rot); _rul.girando=false;
+        const w=q[gana];
+        _rul.salieron.push(w);
+        _rul.destacada=gana; rulDibujar();
+        rulTono(784,0.18,0.08,'triangle'); rulTono(1047,0.3,0.08,'triangle',0.12);
+        rulPanel(true);
+        rulHablar(w);
+        // Un momento para ver el gajo ganador; despues sale de la rueda.
+        _rul.timer=setTimeout(()=>{ if(_rul.girando) return; _rul.visibles=rulQuedan(); _rul.destacada=-1; rulDibujar(); }, 1800);
+    };
+    _rul.raf=requestAnimationFrame(paso);
+}
+function rulDeshacer(){
+    if(_rul.girando || !_rul.salieron.length) return;
+    clearTimeout(_rul.timer);
+    _rul.salieron.pop();
+    _rul.visibles=rulQuedan(); _rul.destacada=-1;
+    rulDibujar(); rulPanel(false);
+}
+function rulReiniciar(){
+    const es=currentLanguage==='es';
+    if(_rul.girando) return;
+    if(_rul.salieron.length && !confirm(es?'¿Empezar una partida nueva? Todas las palabras vuelven a la ruleta.':'Start a new game? All words go back on the wheel.')) return;
+    clearTimeout(_rul.timer);
+    _rul.salieron=[]; _rul.todas=barajar(_rul.todas);
+    _rul.visibles=rulQuedan(); _rul.destacada=-1;
+    rulDibujar(); rulPanel(false);
+}
+function rulAlternar(que){
+    _rul[que]=!_rul[que];
+    try{ localStorage.setItem(que==='voz'?'lt_rulVoz':'lt_rulSonido', _rul[que]?'1':'0'); }catch(e){}
+    if(que==='voz' && !_rul.voz){ try{ speechSynthesis.cancel(); }catch(e){} }
+    rulPanel(false);
+}
+function rulPantallaCompleta(){
+    const m=document.querySelector('#ruletaModal .ruleta-modal'); if(!m) return;
+    try{
+        if(document.fullscreenElement) document.exitFullscreen();
+        else if(m.requestFullscreen) m.requestFullscreen().then(()=>setTimeout(rulDibujar,120)).catch(()=>{});
+    }catch(e){}
+}
+function rulPanel(nueva){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('ruletaPanel'); if(!caja) return;
+    const total=_rul.todas.length, salieron=_rul.salieron.length;
+    const ultima=_rul.salieron[salieron-1];
+    const modoPistas=(document.getElementById('vocBingoContenido')||{}).value==='pistas';
+    const titulo=((document.getElementById('vocTitulo')||{}).value||'').trim();
+    let carta;
+    if(_rul.girando) carta=`<p class="rul-espera">${es?'Girando…':'Spinning…'}</p>`;
+    else if(ultima) carta=`<div class="rul-palabra">${escapeHtml(ultima.palabra)}</div>`
+        + (ultima.pista?`<div class="rul-pista">${modoPistas?(es?'En el cartón: ':'On the card: '):''}${escapeHtml(ultima.pista)}</div>`:'')
+        + `<button type="button" class="rul-repetir" onclick="rulHablarUltima()">🔊 ${es?'Repetir':'Say again'}</button>`;
+    else carta=`<p class="rul-espera">${es?'Pulsa GIRAR o la barra espaciadora':'Press SPIN or the space bar'}</p>`;
+    const fin=salieron>=total && total>0;
+    caja.innerHTML=
+        `<div class="rul-cab"><h3>🎡 ${es?'Ruleta del bingo':'Bingo wheel'}</h3>${titulo?`<span class="rul-tema">${escapeHtml(titulo)}</span>`:''}</div>`
+        + `<div class="rul-cuenta"><b>${salieron}</b> ${es?'de':'of'} ${total} ${es?'palabras':'words'}<div class="rul-barra"><span style="transform:scaleX(${total?salieron/total:0})"></span></div></div>`
+        + `<div class="rul-carta${nueva?' nueva':''}" aria-live="polite">${carta}</div>`
+        + `<button type="button" class="rul-girar" onclick="rulGirar()" ${_rul.girando||fin?'disabled':''}>${fin?(es?'¡Salieron todas!':'All words out!'):(es?'GIRAR':'SPIN')}</button>`
+        + `<div class="rul-historial"><h4>${es?'Ya salieron':'Already called'}</h4>`
+        + (salieron ? `<ol>${_rul.salieron.map((w,i)=>`<li><b>${i+1}</b>${escapeHtml(w.palabra)}</li>`).reverse().join('')}</ol>` : `<p class="rul-vacio">${es?'Todavía ninguna.':'None yet.'}</p>`)
+        + `</div>`
+        + `<div class="rul-controles">`
+        +   `<button type="button" aria-pressed="${_rul.voz}" onclick="rulAlternar('voz')">🗣️ ${es?'Voz':'Voice'}</button>`
+        +   `<button type="button" aria-pressed="${_rul.sonido}" onclick="rulAlternar('sonido')">🔔 ${es?'Sonido':'Sound'}</button>`
+        +   `<button type="button" onclick="rulDeshacer()" ${salieron&&!_rul.girando?'':'disabled'}>↩ ${es?'Deshacer':'Undo'}</button>`
+        +   `<button type="button" onclick="rulReiniciar()" ${_rul.girando?'disabled':''}>⟲ ${es?'Nueva partida':'New game'}</button>`
+        +   `<button type="button" onclick="rulPantallaCompleta()">⛶ ${es?'Pantalla completa':'Full screen'}</button>`
+        + `</div>`;
+}
+function rulHablarUltima(){ rulHablar(_rul.salieron[_rul.salieron.length-1]); }
+document.addEventListener('keydown',e=>{
+    if(!rulAbierta()) return;
+    if(e.code==='Space' || e.key===' '){
+        // Sobre un boton, la barra ya lo pulsa: no se gira dos veces.
+        if(e.target && /^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+        e.preventDefault(); rulGirar();
+    }
+});
+window.addEventListener('resize',()=>{ if(rulAbierta()) rulDibujar(); });
+document.addEventListener('fullscreenchange',()=>{ if(rulAbierta()) setTimeout(rulDibujar,120); });
 function textosJuegosVocabulario(){
     const es=currentLanguage==='es';
     const t=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
@@ -9382,6 +9669,7 @@ function textosJuegosVocabulario(){
     t('vocInstrLbl', es?'Instrucción para los estudiantes':'Instruction for students');
     t('vocSolucionLbl', es?'Ver solución':'Show answers');
     t('vocOtraBtn', es?'🔀 Otra versión':'🔀 Shuffle');
+    t('vocRuletaBtn', es?'🎡 Ruleta para jugar':'🎡 Play with the wheel');
     t('vocCerrarBtn', es?'Cerrar':'Close');
     t('vocPdfBtn', es?'📄 Descargar PDF':'📄 Download PDF');
     const pb=document.getElementById('vocPistasBtn'); if(pb && !pb.disabled) pb.innerHTML='✨ '+(es?'Completar pistas con IA':'Fill in clues with AI');
