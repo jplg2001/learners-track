@@ -3,10 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Learners Track: plataforma educativa para el seguimiento, la evaluación y el reconocimiento de estudiantes.">
+<meta name="description" content="Learners Track: plataforma gratuita para docentes de inglés. Insignias, asistencia, notas por periodo, nota final, certificados y acceso para padres con un código de clase.">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#6d5efc">
-<title>Learners Track</title>
+<title>Learners Track · Plataforma para docentes de inglés</title>
+<!-- Para buscadores y para cuando el enlace se comparte por WhatsApp o redes -->
+<link rel="canonical" href="https://jplg2001.github.io/learners-track/">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Learners Track">
+<meta property="og:title" content="Learners Track · Plataforma para docentes de inglés">
+<meta property="og:description" content="Insignias, asistencia, notas por periodo, certificados y acceso para padres con un código de clase.">
+<meta property="og:url" content="https://jplg2001.github.io/learners-track/">
+<meta property="og:image" content="https://jplg2001.github.io/learners-track/icon-512.png">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Learners Track","url":"https://jplg2001.github.io/learners-track/","description":"Plataforma para docentes de inglés: insignias, asistencia, notas por periodo, nota final, certificados y acceso para padres.","applicationCategory":"EducationalApplication","operatingSystem":"Web","inLanguage":"es","isAccessibleForFree":true}
+</script>
+<script>
+// Las direcciones con codigo de clase o de mando no deben aparecer en Google:
+// un codigo publicado en un resultado de busqueda abriria ese salon a cualquiera.
+(function(){
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.has('clase')||q.has('remote')||q.has('familia')){
+      var m=document.createElement('meta'); m.name='robots'; m.content='noindex, nofollow';
+      var r=document.querySelector('meta[name="robots"]'); if(r) r.parentNode.removeChild(r);
+      document.head.appendChild(m);
+    }
+  }catch(e){}
+})();
+</script>
 <!-- Instalable y con copia local: la plataforma abre aunque no haya internet -->
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
