@@ -1091,6 +1091,88 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 @keyframes juyuEarL { 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(5deg); } }
 .juyu-tongue { transform-origin:60px 68px; animation:juyuTongue 2.2s ease-in-out infinite; }
 @keyframes juyuTongue { 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(1.4); } }
+
+/* ---- Movimientos nuevos de YUJU ---- */
+/* Adornos que flotan sobre YUJU (notas, corazones, zetas). Van fuera del botón
+   para no girar con él; se alejan hacia el centro de la pantalla. */
+.juyu-fx { --dir:-1; position:absolute; left:50%; top:-4px; width:0; height:0; pointer-events:none; }
+.juyu-mascot.on-left .juyu-fx { --dir:1; }
+.juyu-fx i { position:absolute; left:-8px; top:0; font-style:normal; font-weight:800; font-family:'Baloo 2','Montserrat',sans-serif; font-size:1.15rem; color:var(--accent-strong); text-shadow:0 2px 6px rgba(31,35,64,.25); opacity:0; }
+.juyu-mascot.act-dance .juyu-fx i,.juyu-mascot.act-love .juyu-fx i,.juyu-mascot.act-sleep .juyu-fx i { animation:juyuFloat 1.8s var(--ease-out) infinite; }
+.juyu-fx i:nth-child(2) { animation-delay:.6s !important; }
+.juyu-fx i:nth-child(3) { animation-delay:1.2s !important; }
+@keyframes juyuFloat {
+  0%   { opacity:0; transform:translate(0,4px) scale(.6) rotate(0deg); }
+  20%  { opacity:1; }
+  100% { opacity:0; transform:translate(calc(var(--dir) * 26px),-46px) scale(1.15) rotate(calc(var(--dir) * 16deg)); }
+}
+.juyu-mascot.act-sleep .juyu-fx i { font-size:1rem; color:var(--fg-muted); animation-duration:2.4s; }
+.juyu-mascot.act-sleep .juyu-fx i:nth-child(2) { font-size:1.2rem; animation-delay:.8s !important; }
+.juyu-mascot.act-sleep .juyu-fx i:nth-child(3) { font-size:1.4rem; animation-delay:1.6s !important; }
+
+/* Saltar dando una voltereta: se agacha, gira en el aire y amortigua al caer */
+.juyu-mascot.act-jump .juyu-btn { animation:juyuJump 1.5s var(--ease-in-out) 2; }
+@keyframes juyuJump {
+  0%   { transform:translateY(0) scale(1,1) rotate(0deg); }
+  14%  { transform:translateY(4px) scale(1.1,.86) rotate(0deg); }
+  42%  { transform:translateY(-54px) scale(.95,1.05) rotate(-180deg); }
+  66%  { transform:translateY(0) scale(1,1) rotate(-360deg); }
+  76%  { transform:translateY(3px) scale(1.12,.86) rotate(-360deg); }
+  88%,100% { transform:translateY(0) scale(1,1) rotate(-360deg); }
+}
+.juyu-mascot.act-jump .juyu-ear-l,.juyu-mascot.act-jump .juyu-ear-r { animation:juyuEarFlap .375s ease-in-out infinite; }
+.juyu-mascot.act-jump .juyu-tail { animation:juyuTail .22s ease-in-out infinite; }
+
+/* Bailar */
+.juyu-mascot.act-dance .juyu-btn { animation:juyuDance .8s ease-in-out infinite; }
+@keyframes juyuDance { 0%,50%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-9px) rotate(-11deg); } 75%{ transform:translateY(-9px) rotate(11deg); } }
+.juyu-mascot.act-dance .juyu-head { animation:juyuDanceHead .8s ease-in-out infinite; }
+@keyframes juyuDanceHead { 0%,50%,100%{ transform:rotate(0deg); } 25%{ transform:rotate(9deg); } 75%{ transform:rotate(-9deg); } }
+.juyu-mascot.act-dance .juyu-leg-l { animation:juyuStepA .8s ease-in-out infinite; }
+.juyu-mascot.act-dance .juyu-leg-r { animation:juyuStepB .8s ease-in-out infinite; }
+.juyu-mascot.act-dance .juyu-paw { animation:juyuPaw .8s ease-in-out infinite; }
+.juyu-mascot.act-dance .juyu-tail { animation:juyuTail .4s ease-in-out infinite; }
+
+/* Dormir: cierra los ojos, baja la cabeza y respira despacio */
+.juyu-mascot.act-sleep .juyu-btn { animation:juyuBreath 2.4s ease-in-out infinite; }
+@keyframes juyuBreath { 0%,100%{ transform:scale(1,1); } 50%{ transform:scale(1.04,.96) translateY(2px); } }
+.juyu-mascot.act-sleep .juyu-eye { animation:juyuSleepEye 7s var(--ease-out) forwards; }
+@keyframes juyuSleepEye { 0%{ transform:scaleY(1); } 8%,92%{ transform:scaleY(.1); } 100%{ transform:scaleY(1); } }
+.juyu-mascot.act-sleep .juyu-head { animation:juyuSleepHead 7s var(--ease-in-out) forwards; }
+@keyframes juyuSleepHead { 0%,100%{ transform:rotate(0deg) translateY(0); } 10%,90%{ transform:rotate(11deg) translateY(7px); } }
+.juyu-mascot.act-sleep .juyu-tongue { animation:none; transform:scaleY(0); }
+.juyu-mascot.act-sleep .juyu-tail { animation:juyuTail 3.2s ease-in-out infinite; }
+.juyu-mascot.act-sleep .juyu-paw { animation:none; }
+
+/* Perseguir su cola: tres vueltas y queda mareado */
+.juyu-mascot.act-spin .juyu-btn { animation:juyuChase .9s var(--ease-in-out) 3, juyuDizzy .5s ease-in-out 2.75s 2; }
+@keyframes juyuChase { 0%{ transform:rotate(0deg) translateY(0); } 50%{ transform:rotate(-180deg) translateY(-6px); } 100%{ transform:rotate(-360deg) translateY(0); } }
+@keyframes juyuDizzy { 0%,100%{ transform:rotate(0deg); } 30%{ transform:rotate(-8deg) translateX(-3px); } 70%{ transform:rotate(7deg) translateX(3px); } }
+.juyu-mascot.act-spin .juyu-head { animation:juyuSpinHead .9s ease-in-out 3; }
+@keyframes juyuSpinHead { 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(16deg); } }
+.juyu-mascot.act-spin .juyu-tail { animation:juyuTail .16s ease-in-out infinite; }
+
+/* Pedir cariño: se para en dos patas, entrecierra los ojos y salen corazones */
+.juyu-mascot.act-love .juyu-btn { animation:juyuBeg 1.2s ease-in-out infinite; }
+@keyframes juyuBeg { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-10px) rotate(-5deg); } }
+.juyu-mascot.act-love .juyu-eye { animation:none; transform:scaleY(.45); }
+.juyu-mascot.act-love .juyu-paw { animation:juyuPaw .6s ease-in-out infinite; }
+.juyu-mascot.act-love .juyu-tail { animation:juyuTail .24s ease-in-out infinite; }
+.juyu-mascot.act-love .juyu-fx i { color:#ef4467; }
+
+/* Olfatear el suelo, de un lado a otro */
+.juyu-mascot.act-sniff .juyu-head { animation:juyuSniffHead 1.6s ease-in-out infinite; }
+@keyframes juyuSniffHead { 0%,100%{ transform:rotate(0deg) translate(0,0); } 25%{ transform:rotate(13deg) translate(-6px,11px); } 50%{ transform:rotate(9deg) translate(0,13px); } 75%{ transform:rotate(-12deg) translate(6px,11px); } }
+.juyu-mascot.act-sniff .juyu-btn { animation:juyuSniffBody .4s ease-in-out infinite; }
+@keyframes juyuSniffBody { 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(0,2px) scale(1.01,.99); } }
+.juyu-mascot.act-sniff .juyu-ear-l,.juyu-mascot.act-sniff .juyu-ear-r { animation:juyuEarFlap .8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion:reduce){
+  .juyu-mascot[class*="act-"] .juyu-btn,.juyu-mascot[class*="act-"] .juyu-head,.juyu-mascot[class*="act-"] .juyu-eye,
+  .juyu-mascot[class*="act-"] .juyu-paw,.juyu-mascot[class*="act-"] .juyu-tail,.juyu-mascot[class*="act-"] .juyu-leg-l,
+  .juyu-mascot[class*="act-"] .juyu-leg-r,.juyu-mascot[class*="act-"] .juyu-ear-l,.juyu-mascot[class*="act-"] .juyu-ear-r,
+  .juyu-mascot[class*="act-"] .juyu-fx i { animation:none; }
+}
 /* Burbuja de consejo */
 .juyu-bubble { pointer-events:auto; position:absolute; bottom:calc(100% + 12px); right:0; width:max-content; max-width:255px; background:var(--bg-alt); border:1px solid var(--border); border-radius:16px 16px 4px 16px; box-shadow:var(--shadow-lg); padding:13px 15px 13px 14px; font-size:.85rem; line-height:1.5; color:var(--fg); opacity:0; transform:translateY(8px) scale(.94); transition:var(--transition); visibility:hidden; transform-origin:100% 100%; }
 .juyu-bubble.show { opacity:1; transform:translateY(0) scale(1); visibility:visible; }
@@ -1106,6 +1188,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   .juyu-bubble { max-width:190px; font-size:.79rem; padding:11px 13px; }
   .juyu-bark { font-size:.74rem; left:-38px; padding:4px 9px; }
   .juyu-ball { width:19px; height:19px; left:-24px; }
+  .juyu-fx i { font-size:.9rem; }
 }
 @media (prefers-reduced-motion:reduce){
   .juyu-tail,.juyu-head,.juyu-eye,.juyu-paw,.juyu-ear-l,.juyu-ear-r,.juyu-tongue,.juyu-badge { animation:none; }
@@ -1521,6 +1604,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
         <button type="button" class="juyu-bubble-close" id="juyuHideBtn" onclick="hideJuyuForever()" aria-label="Ocultar a YUJU">&times;</button>
         <p id="juyuText"></p>
     </div>
+    <span class="juyu-fx" id="juyuFx" aria-hidden="true"><i></i><i></i><i></i></span>
     <button type="button" class="juyu-btn" id="juyuBtn" onclick="toggleJuyuTip()" aria-label="YUJU: consejos">
         <span class="juyu-hint" id="juyuHint" aria-hidden="true">?</span>
         <span class="juyu-bark" id="juyuBark" aria-hidden="true">¡Guau!</span>
@@ -3049,12 +3133,13 @@ window.toggleJuyuTip=function(){
         + `<br><span class="juyu-tip-hint">${es
             ? 'Puedes arrastrarme a donde quieras.'
             : 'You can drag me anywhere you like.'}</span>`
+        + `<br><button type="button" class="juyu-free-btn" onclick="juyuTruco()">${es?'🎾 ¡Haz un truco!':'🎾 Do a trick!'}</button>`
         + (_juyuFijado
-            ? `<br><button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
+            ? ` <button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
             : '');
     // Se interrumpe lo que estuviera haciendo: el consejo debe leerse quieto.
     clearTimeout(_juyuAccionTimer);
-    m?.classList.remove('act-run','act-bark','act-scratch','act-ball','busy','facing-left');
+    m?.classList.remove(...JUYU_ACCIONES.map(a=>'act-'+a),'busy','facing-left');
     b.classList.add('show'); m?.classList.add('tip-open');
     document.getElementById('juyuBtn')?.querySelector('.juyu-badge')?.remove();
     clearTimeout(window._juyuTimer);
@@ -3238,8 +3323,15 @@ window.toggleProjectorFullscreen=function(){
 // Ese reposo entre acciones es la pausa: sin ella agotaría la vista.
 const JUYU_CICLO_MS = 30000;  // una acción cada 30 s
 const JUYU_PRIMERA_MS = 6000; // la primera pronto, para que se vea que está vivo
-// Se recorren en orden en vez de al azar: así se ven las cuatro sí o sí.
-const JUYU_ORDEN = ['run','bark','scratch','ball'];
+// Se recorren en orden en vez de al azar: así se ven todas sí o sí. Correr va
+// repartido entre las demás para que no se pase el rato quieto en una esquina.
+const JUYU_ORDEN = ['run','bark','jump','scratch','dance','run','ball','sleep','spin','run','love','sniff'];
+const JUYU_ACCIONES = ['run','bark','scratch','ball','jump','dance','sleep','spin','love','sniff'];
+// Cuanto dura cada una. Largas a proposito: si dura un parpadeo, no se ve.
+// Las de animacion con fin (saltar, dormir, girar) coinciden con su CSS.
+const JUYU_DURACION = { bark:3000, scratch:3800, ball:5200, jump:3000, dance:4800, sleep:7000, spin:3800, love:4600, sniff:4800 };
+// Lo que flota sobre YUJU en algunas acciones.
+const JUYU_ADORNOS = { dance:['♪','♫','♪'], love:['❤','❤','❤'], sleep:['z','z','Z'] };
 let _juyuVidaTimer=null, _juyuAccionTimer=null, _juyuPos=0, _juyuAccionIdx=0, _juyuArrancado=false;
 
 function juyuSpots(){
@@ -3356,7 +3448,9 @@ function juyuHayModalAbierto(){
 function juyuAccion(nombre,duracion){
     const m=document.getElementById('juyuMascot'); if(!m) return;
     clearTimeout(_juyuAccionTimer);
-    m.classList.remove('act-run','act-bark','act-scratch','act-ball');
+    m.classList.remove(...JUYU_ACCIONES.map(a=>'act-'+a));
+    const adornos=JUYU_ADORNOS[nombre];
+    document.querySelectorAll('#juyuFx i').forEach((el,i)=>{ el.textContent=adornos?adornos[i]:''; });
     void m.offsetWidth;                                                  // reinicia las animaciones
     m.classList.add('act-'+nombre,'busy');
     _juyuAccionTimer=setTimeout(()=>{
@@ -3383,10 +3477,18 @@ window.juyuDoAction=function(nombre){
         juyuAccion('run',2100);
         juyuMoverA(destino);
     }
-    // Duraciones largas a propósito: si la acción dura un parpadeo, no se ve.
-    else if(nombre==='bark')    juyuAccion('bark',3000);
-    else if(nombre==='scratch') juyuAccion('scratch',3800);
-    else if(nombre==='ball')    juyuAccion('ball',5200);
+    else if(JUYU_DURACION[nombre]) juyuAccion(nombre,JUYU_DURACION[nombre]);
+};
+// Desde la burbuja: cierra el consejo y hace el siguiente truco de la lista.
+let _juyuTrucoIdx=0;
+window.juyuTruco=function(){
+    const b=document.getElementById('juyuBubble'), m=document.getElementById('juyuMascot');
+    clearTimeout(window._juyuTimer);
+    b?.classList.remove('show'); m?.classList.remove('tip-open');
+    const trucos=['jump','dance','sleep','spin','love','sniff','bark','scratch','ball'];   // primero las nuevas
+    const nombre=trucos[_juyuTrucoIdx % trucos.length];
+    _juyuTrucoIdx++;
+    setTimeout(()=>juyuDoAction(nombre),260);   // deja que la burbuja termine de irse
 };
 function juyuVida(){
     // Solo se arranca una vez: updateUIText puede llamarse varias veces y
