@@ -970,14 +970,14 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .proj-dot.active { background:#ffd166; transform:scale(1.25); }
 @media (prefers-reduced-motion:reduce){ .proj-title,.podium-spot,.today-card { animation:none; } }
 
-/* ====== JUYU, LA MASCOTA ====== */
+/* ====== YUJU, LA MASCOTA ====== */
 /* Anclado abajo-izquierda y colocado con transform: así se puede pasear
    con aceleración por hardware sin recalcular el diseño de la página. */
 /* El contenedor mide exactamente lo que el botón: la burbuja va en posición
-   absoluta. Si ocupara sitio en el diseño, empujaría a JUYU fuera de pantalla
+   absoluta. Si ocupara sitio en el diseño, empujaría a YUJU fuera de pantalla
    al colocarlo contra el borde derecho. */
 .juyu-mascot { position:fixed; left:0; bottom:0; z-index:2600; width:76px; pointer-events:none; transform:translate(calc(100vw - 94px), -14px); transition:transform 1.9s cubic-bezier(.45,.05,.35,1); }
-/* Con JUYU en la mitad izquierda, la burbuja se ancla al otro lado. */
+/* Con YUJU en la mitad izquierda, la burbuja se ancla al otro lado. */
 .juyu-mascot.on-left .juyu-bubble { right:auto; left:0; border-radius:16px 16px 16px 4px; transform-origin:0% 100%; }
 .juyu-mascot.facing-left .juyu-svg { transform:scaleX(-1); }
 .juyu-svg { display:block; transition:transform .4s ease; }
@@ -1008,10 +1008,10 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 }
 /* Mientras el consejo está abierto la pista sobra. */
 .juyu-mascot.tip-open .juyu-hint { display:none; }
-/* La interrogación tampoco debe estorbar mientras JUYU hace sus cosas. */
+/* La interrogación tampoco debe estorbar mientras YUJU hace sus cosas. */
 .juyu-mascot.busy .juyu-hint { display:none; }
 
-/* ---- Acciones de JUYU ---- */
+/* ---- Acciones de YUJU ---- */
 /* En reposo el hocico está cerrado y la pata trasera guardada. */
 .juyu-mouth { transform-origin:60px 66px; transform:scaleY(0); }
 .juyu-hind { transform-origin:32px 100px; opacity:0; }
@@ -1471,7 +1471,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
           </g>
         </g>
       </svg>
-      <!-- Escena 3: JUYU saludando en inglés -->
+      <!-- Escena 3: YUJU saludando en inglés -->
       <svg class="loader-scene scene-3" viewBox="0 0 200 160" aria-hidden="true">
         <ellipse cx="100" cy="150" rx="46" ry="7" fill="#4f46e5" opacity=".13"/>
         <g class="float-slow" transform="translate(60 16) scale(.66)">
@@ -1515,13 +1515,13 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   </div>
 </div>
 
-<!-- ====== JUYU, LA MASCOTA ====== -->
+<!-- ====== YUJU, LA MASCOTA ====== -->
 <div id="juyuMascot" class="juyu-mascot" aria-live="polite">
     <div class="juyu-bubble" id="juyuBubble" role="status">
-        <button type="button" class="juyu-bubble-close" id="juyuHideBtn" onclick="hideJuyuForever()" aria-label="Ocultar a JUYU">&times;</button>
+        <button type="button" class="juyu-bubble-close" id="juyuHideBtn" onclick="hideJuyuForever()" aria-label="Ocultar a YUJU">&times;</button>
         <p id="juyuText"></p>
     </div>
-    <button type="button" class="juyu-btn" id="juyuBtn" onclick="toggleJuyuTip()" aria-label="JUYU: consejos">
+    <button type="button" class="juyu-btn" id="juyuBtn" onclick="toggleJuyuTip()" aria-label="YUJU: consejos">
         <span class="juyu-hint" id="juyuHint" aria-hidden="true">?</span>
         <span class="juyu-bark" id="juyuBark" aria-hidden="true">¡Guau!</span>
         <span class="juyu-ball" id="juyuBall" aria-hidden="true"></span>
@@ -2074,7 +2074,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
             <div class="form-group"><label>Your Name:</label><input type="text" id="profileTeacherName" placeholder="e.g: John Doe" required></div>
             <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;"><button type="button" class="btn-secondary" onclick="closeProfileModal()">Cancel</button><button type="submit" class="btn-primary">Save Changes</button></div>
             <hr style="margin:20px 0;border:none;border-top:1px solid var(--badge-border);">
-            <button type="button" class="btn-secondary" id="juyuRestoreBtn" onclick="showJuyuAgain()" style="width:100%;margin-bottom:10px;">🐾 Mostrar a JUYU</button>
+            <button type="button" class="btn-secondary" id="juyuRestoreBtn" onclick="showJuyuAgain()" style="width:100%;margin-bottom:10px;">🐾 Mostrar a YUJU</button>
             <button type="button" class="btn-danger" onclick="resetApplication()" style="width:100%;">🗑️ Reset Application (Delete all data)</button>
         </form>
     </div>
@@ -2659,7 +2659,7 @@ ILLUS.liberty = `<svg viewBox="0 0 100 100" aria-hidden="true">
   <path d="M67.5 8c1.4 2 2 3.6 2 5a2 2 0 0 1-4 0c0-1.4.8-3 2-5Z" fill="#fff3c4"/>
 </svg>`;
 
-// --- JUYU, la mascota de la plataforma ---
+// --- YUJU, la mascota de la plataforma ---
 ILLUS.juyu = `<svg viewBox="0 0 120 136" aria-hidden="true">
   <g class="juyu-tail"><path d="M90 104c11-3 18-13 15-22" stroke="#c89159" stroke-width="9" fill="none" stroke-linecap="round"/></g>
   <ellipse cx="60" cy="106" rx="29" ry="25" fill="#e9be86"/>
@@ -3001,11 +3001,11 @@ function renderAvatarFrames(){
     });
 }
 
-// === JUYU: LA MASCOTA ===
+// === YUJU: LA MASCOTA ===
 // Acompaña en toda la plataforma y da un consejo distinto según dónde estés.
 const JUYU_TIPS = {
   es: {
-    login:   '¡Guau! Soy <b>JUYU</b> 🐾 Entra con tu correo y te ayudo a llevar el seguimiento de tu clase de inglés.',
+    login:   '¡Guau! Soy <b>YUJU</b> 🐾 Entra con tu correo y te ayudo a llevar el seguimiento de tu clase de inglés.',
     setup:   '¡Bienvenido! Elige tu grado y, si quieres, sube el logo de tu colegio. Puedes cambiarlo después.',
     rows:    'Aquí la insignia es del GRUPO: se la llevan todos sus integrantes. Con <b>Shift</b> se la das a uno solo.',
     grid:    'Vista individual: la insignia va solo a ese estudiante. Aquí el ranking del proyector es persona a persona.',
@@ -3016,7 +3016,7 @@ const JUYU_TIPS = {
     empty:   'Tu salón está vacío. Pega la lista desde Excel con <b>Importar lista</b> y empezamos.'
   },
   en: {
-    login:   'Woof! I am <b>JUYU</b> 🐾 Sign in with your email and I will help you track your English class.',
+    login:   'Woof! I am <b>YUJU</b> 🐾 Sign in with your email and I will help you track your English class.',
     setup:   'Welcome! Pick your grade and, if you like, upload your school logo. You can change it later.',
     rows:    'Here a badge belongs to the GROUP: every member gets it. Hold <b>Shift</b> to give it to just one.',
     grid:    'Individual view: the badge goes only to that student. Here the projector ranking is per person.',
@@ -3065,14 +3065,14 @@ window.hideJuyuForever=function(){
     if(m) m.classList.add('is-hidden');
     try{ localStorage.setItem('learnersTrackHideJuyu','1'); }catch(e){}
     showNotification(currentLanguage==='es'
-        ? 'JUYU se escondió. Puedes traerlo de vuelta desde Perfil.'
-        : 'JUYU is hidden. You can bring it back from Profile.','info');
+        ? 'YUJU se escondió. Puedes traerlo de vuelta desde Perfil.'
+        : 'YUJU is hidden. You can bring it back from Profile.','info');
 };
 window.showJuyuAgain=function(){
     const m=document.getElementById('juyuMascot');
     if(m) m.classList.remove('is-hidden');
     try{ localStorage.removeItem('learnersTrackHideJuyu'); }catch(e){}
-    showNotification(currentLanguage==='es'?'¡JUYU volvió! 🐾':'JUYU is back! 🐾','success');
+    showNotification(currentLanguage==='es'?'¡YUJU volvió! 🐾':'YUJU is back! 🐾','success');
 };
 // === MODO PROYECTOR ===
 // Pantalla para el tablero del salón: lo que la clase ve, no el docente.
@@ -3233,7 +3233,7 @@ window.toggleProjectorFullscreen=function(){
     });
 };
 
-// === VIDA PROPIA DE JUYU ===
+// === VIDA PROPIA DE YUJU ===
 // Cada minuto elige una acción, la hace unos segundos y vuelve al reposo.
 // Ese reposo entre acciones es la pausa: sin ella agotaría la vista.
 const JUYU_CICLO_MS = 30000;  // una acción cada 30 s
@@ -3259,7 +3259,7 @@ function juyuSpots(){
     ];
 }
 let _juyuXY={x:0,y:14};
-// Coloca a JUYU en unas coordenadas concretas, sin salirse de la pantalla.
+// Coloca a YUJU en unas coordenadas concretas, sin salirse de la pantalla.
 function juyuColocar(x,y,girar){
     const m=document.getElementById('juyuMascot'); if(!m) return;
     const btn=document.getElementById('juyuBtn');
@@ -3279,7 +3279,7 @@ function juyuMoverA(indice){
     juyuColocar(destino.x,destino.y,true);
     _juyuPos=indice%spots.length;
 }
-// --- Arrastrar a JUYU donde uno quiera ---
+// --- Arrastrar a YUJU donde uno quiera ---
 let _juyuFijado=false, _juyuDrag=null;
 function guardarPosJuyu(){
     try{ localStorage.setItem('learnersTrackJuyuPos',JSON.stringify({x:_juyuXY.x,y:_juyuXY.y})); }catch(e){}
@@ -3296,7 +3296,7 @@ window.soltarJuyu=function(){
     try{ localStorage.removeItem('learnersTrackJuyuPos'); }catch(e){}
     document.getElementById('juyuMascot')?.classList.remove('pinned');
     juyuMoverA(0);
-    showNotification(currentLanguage==='es'?'JUYU vuelve a pasear solo 🐾':'JUYU roams freely again 🐾','success');
+    showNotification(currentLanguage==='es'?'YUJU vuelve a pasear solo 🐾':'YUJU roams freely again 🐾','success');
 };
 function initJuyuDrag(){
     const m=document.getElementById('juyuMascot'), btn=document.getElementById('juyuBtn');
@@ -3334,8 +3334,8 @@ function initJuyuDrag(){
             btn.dataset.suppressClick='1';
             setTimeout(()=>{ delete btn.dataset.suppressClick; },80);
             showNotification(currentLanguage==='es'
-                ? 'JUYU se queda aquí. Para que vuelva a pasear, tócalo y pulsa «Que pasee».'
-                : 'JUYU stays here. Tap him and press “Let him roam” to free him.','info');
+                ? 'YUJU se queda aquí. Para que vuelva a pasear, tócalo y pulsa «Que pasee».'
+                : 'YUJU stays here. Tap him and press “Let him roam” to free him.','info');
         }
     };
     btn.addEventListener('pointerup',terminar);
@@ -3390,7 +3390,7 @@ window.juyuDoAction=function(nombre){
 };
 function juyuVida(){
     // Solo se arranca una vez: updateUIText puede llamarse varias veces y
-    // reiniciar el temporizador dejaría a JUYU sin actuar nunca.
+    // reiniciar el temporizador dejaría a YUJU sin actuar nunca.
     if(_juyuArrancado) return;
     _juyuArrancado=true;
     clearTimeout(_juyuVidaTimer);
@@ -3402,7 +3402,7 @@ function juyuVida(){
         _juyuVidaTimer=setTimeout(ciclo,JUYU_CICLO_MS);
     },JUYU_PRIMERA_MS);
 }
-// Al cambiar el tamaño de la ventana JUYU podría quedar fuera de la pantalla.
+// Al cambiar el tamaño de la ventana YUJU podría quedar fuera de la pantalla.
 window.addEventListener('resize',()=>{ clearTimeout(window._juyuResize); window._juyuResize=setTimeout(()=>juyuMoverA(_juyuPos),250); });
 
 function initJuyu(){
@@ -3423,7 +3423,7 @@ function initJuyu(){
     }catch(e){}
     initJuyuDrag();
     // Solo se recoloca la primera vez: si no, cualquier cambio de idioma
-    // devolvería a JUYU a la esquina en mitad de un paseo.
+    // devolvería a YUJU a la esquina en mitad de un paseo.
     if(!_juyuArrancado){
         // Si el docente ya lo había colocado a mano, se respeta su sitio.
         if(cargarPosJuyu()) document.getElementById('juyuMascot')?.classList.add('pinned');
@@ -5883,8 +5883,8 @@ function updateNewFeaturesText(){
     fillStaticIllustrations();
     initJuyu();
     renderAvatarFrames();
-    const jb=document.getElementById('juyuRestoreBtn'); if(jb)jb.textContent=es?'🐾 Mostrar a JUYU':'🐾 Show JUYU';
-    const jh=document.getElementById('juyuHideBtn'); if(jh)jh.setAttribute('aria-label',es?'Ocultar a JUYU':'Hide JUYU');
+    const jb=document.getElementById('juyuRestoreBtn'); if(jb)jb.textContent=es?'🐾 Mostrar a YUJU':'🐾 Show YUJU';
+    const jh=document.getElementById('juyuHideBtn'); if(jh)jh.setAttribute('aria-label',es?'Ocultar a YUJU':'Hide YUJU');
     setTxt('lpTitle','📝 Planeaciones con IA','📝 AI Lesson Plans');
     setTxt('lpIntro','Sube tus planeaciones para que la IA aprenda tu estilo, y genera la de la próxima clase en Word.','Upload your lesson plans so the AI learns your style, then generate the next class as a Word file.');
     setTxt('lpTabMineText','Mis planeaciones','My lesson plans');
