@@ -690,6 +690,13 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .fam-rapido { width:100%; margin-top:12px; font-family:inherit; font-size:.92rem; color:var(--fg); text-align:left; background:var(--badge-bg); border:1px solid var(--badge-border); border-radius:12px; padding:12px 14px; cursor:pointer; }
 .fam-vacio-acciones { margin-top:18px; }
 .fam-olvidar { font-family:inherit; font-size:inherit; color:var(--fg-muted); background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; }
+/* === AVISO DE SESION DE LA NUBE CAIDA === */
+.aviso-nube { position:fixed; left:50%; top:12px; transform:translateX(-50%); z-index:3500; width:min(760px,calc(100vw - 24px)); box-sizing:border-box; display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px; background:#fff7e6; color:#7a4b00; border:1px solid #f5c26b; box-shadow:var(--shadow-lg); font-size:.88rem; line-height:1.45; }
+.aviso-nube[hidden] { display:none; }
+.aviso-nube span { flex:1 1 auto; }
+.aviso-nube button { flex:0 0 auto; font-family:inherit; font-size:.85rem; font-weight:800; color:#fff; background:#d97706; border:none; border-radius:10px; padding:8px 13px; cursor:pointer; }
+.reconectar-modal { max-width:420px; }
+.reconectar-modal h3 { margin:0 0 8px; }
 /* === NOTA FINAL DEL ANO === */
 .periodo-final { width:auto !important; padding:0 12px; }
 .final-ajustes { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin:0 0 14px; }
@@ -1761,6 +1768,26 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
       <button class="btn-secondary" type="button" id="preguntasCancelar" onclick="cerrarPreguntas()">Cancelar</button>
       <button class="btn-primary" type="button" id="preguntasGuardar" onclick="guardarPreguntas()">Guardar</button>
     </div>
+  </div>
+</div>
+<!-- Aviso de sesion de la nube caida -->
+<div id="avisoNube" class="aviso-nube" role="alert" hidden>
+  <span id="avisoNubeTxt"></span>
+  <button type="button" id="avisoNubeBtn" onclick="abrirReconectarNube()">🔄 Reconectar</button>
+</div>
+<div class="modal" id="reconectarModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content reconectar-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarReconectarNube()">&times;</button>
+    <h3 id="reconectarTitulo">🔄 Reconectar con la nube</h3>
+    <p class="familia-nota" id="reconectarAyuda"></p>
+    <form onsubmit="event.preventDefault();reconectarNube();" autocomplete="on">
+      <div class="form-group"><label for="reconectarEmail">Email</label><input type="email" id="reconectarEmail" autocomplete="username" readonly></div>
+      <div class="form-group"><label for="reconectarClave">Contraseña</label><input type="password" id="reconectarClave" autocomplete="current-password"></div>
+      <div class="invitados-acciones" style="gap:8px;">
+        <button type="button" class="btn-secondary" id="reconectarCancelar" onclick="cerrarReconectarNube()">Ahora no</button>
+        <button type="submit" class="btn-primary" id="reconectarBtn">🔄 <span id="reconectarBtnTxt">Reconectar</span></button>
+      </div>
+    </form>
   </div>
 </div>
 <!-- Acceso de los padres a un salon con un codigo -->
@@ -3392,6 +3419,7 @@ async function authenticateUser(email,password) {
 
 // === LOGOUT ===
 function logout() {
+    if(typeof ocultarAvisoNube==='function') ocultarAvisoNube();
     // Se corta el mando: al salir de la cuenta nadie debe seguir mandando ordenes.
     if(typeof desconectarControl==="function"){ try{ desconectarControl(); }catch(e){} }
     if(window.FIREBASE_ON){ try{ firebase.auth().signOut(); }catch(e){} }
@@ -6817,8 +6845,11 @@ function htmlReglasInvitados(){
         + `<button type="button" class="btn-secondary" onclick="copiarTextoInvitados(REGLAS_FIRESTORE_COMPLETAS,'${es?'Reglas copiadas':'Rules copied'}')">📋 ${es?'Copiar reglas':'Copy rules'}</button>`
         + `</details>`;
 }
-window.abrirInvitados=function(){
+window.abrirInvitados=async function(){
     showModal('invitadosModal');
+    const caja=document.getElementById('invitadosCuerpo');
+    if(caja && !docenteConectado()) caja.innerHTML=`<p class="familia-nota">⏳ ${currentLanguage==='es'?'Comprobando la conexión con la nube…':'Checking the cloud connection…'}</p>`;
+    await esperarSesionNube(2500);
     pintarInvitados();
 };
 window.cerrarInvitados=function(){ hideModal('invitadosModal'); };
@@ -6830,7 +6861,15 @@ function pintarInvitados(){
     const c=classrooms[activeClassroomIndex];
     if(!c){ caja.innerHTML=''; return; }
     if(!docenteConectado()){
-        caja.innerHTML=`<p class="familia-nota">${es?'Esto necesita la nube: entra con tu correo y contraseña.':'This needs cloud mode: sign in with your email and password.'}</p>`;
+        if(!window.FIREBASE_ON){
+            caja.innerHTML=`<p class="familia-nota">📶 ${es?'La nube no cargó en este navegador: puede que no haya internet o que la red la bloquee. Recarga la página con conexión.':'The cloud did not load in this browser: there may be no internet or the network may block it. Reload the page with a connection.'}</p>`;
+        } else if(currentUser){
+            caja.innerHTML=`<p class="familia-nota">⚠️ ${es?'<b>Tu sesión en la nube se cerró</b>, aunque sigas viendo tus salones. Suele pasar al cerrar sesión en otra pestaña. Reconecta para activar el acceso de padres; no se pierde nada de lo que hiciste.':'<b>Your cloud session ended</b>, even though you still see your classrooms. It usually happens after signing out in another tab. Reconnect to turn on parent access; nothing you did is lost.'}</p>`
+                + `<div class="invitados-acciones"><button type="button" class="btn-primary" onclick="cerrarInvitados();abrirReconectarNube()">🔄 ${es?'Reconectar':'Reconnect'}</button></div>`;
+            avisarSesionNubeCerrada();
+        } else {
+            caja.innerHTML=`<p class="familia-nota">${es?'Esto necesita la nube: entra con tu correo y contraseña.':'This needs cloud mode: sign in with your email and password.'}</p>`;
+        }
         return;
     }
     const aviso=`<p class="familia-aviso">🔒 ${es
@@ -7202,6 +7241,94 @@ window.famCambiarPeriodo=function(p){
     if(_famDatos) pintarBoletinFamilia(_famDatos,_famEs);
 };
 
+// === SESION DE LA NUBE CAIDA =============================================
+// La sesion de Firebase se comparte entre pestanas: si el docente cierra sesion
+// en otra (por ejemplo, para probar la entrada de padres), en esta pestana siguen
+// sus salones en pantalla pero Firebase ya no tiene usuario. Antes nada lo decia,
+// y lo que cambiaba se quedaba solo en el equipo sin que se enterara.
+//
+// Reconectar NO vuelve a descargar los datos de la nube: eso borraria lo hecho
+// mientras tanto. Se vuelve a entrar con la misma cuenta y se sube lo de pantalla.
+let _avisoNubeVisible=false;
+function sesionNubeCaida(){
+    try{ return !!(window.FIREBASE_ON && currentUser && !firebase.auth().currentUser); }catch(e){ return false; }
+}
+function avisarSesionNubeCerrada(){
+    if(!sesionNubeCaida() || document.body.classList.contains('modo-familia')) return;
+    const caja=document.getElementById('avisoNube'); if(!caja) return;
+    const es=currentLanguage==='es';
+    const txt=document.getElementById('avisoNubeTxt');
+    if(txt) txt.innerHTML = es
+        ? '⚠️ <b>Tu sesión en la nube se cerró.</b> Lo que hagas ahora se guarda solo en este equipo. Suele pasar al cerrar sesión en otra pestaña.'
+        : '⚠️ <b>Your cloud session ended.</b> What you do now is saved on this device only. It usually happens after signing out in another tab.';
+    const btn=document.getElementById('avisoNubeBtn'); if(btn) btn.textContent = es?'🔄 Reconectar':'🔄 Reconnect';
+    caja.hidden=false;
+    _avisoNubeVisible=true;
+}
+function ocultarAvisoNube(){
+    const caja=document.getElementById('avisoNube'); if(caja) caja.hidden=true;
+    _avisoNubeVisible=false;
+}
+// Espera a que Firebase termine de saber si hay sesion (al abrir la pagina tarda
+// un instante), para no decir "no hay nube" solo por preguntar demasiado pronto.
+function esperarSesionNube(ms){
+    return new Promise(resolve=>{
+        if(!window.FIREBASE_ON) return resolve(null);
+        try{
+            const a=firebase.auth();
+            if(a.currentUser) return resolve(a.currentUser);
+            let listo=false, quitar=null;
+            quitar=a.onAuthStateChanged(u=>{ if(listo) return; listo=true; try{ quitar&&quitar(); }catch(e){} resolve(u||null); });
+            setTimeout(()=>{ if(listo) return; listo=true; try{ quitar&&quitar(); }catch(e){} resolve(a.currentUser||null); }, ms||2500);
+        }catch(e){ resolve(null); }
+    });
+}
+window.abrirReconectarNube=function(){
+    const es=currentLanguage==='es';
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('reconectarTitulo', es?'🔄 Reconectar con la nube':'🔄 Reconnect to the cloud');
+    t('reconectarAyuda', es?'Escribe tu contraseña. No se pierde nada: lo que hiciste mientras estabas desconectado se sube a la nube.':'Enter your password. Nothing is lost: what you did while disconnected is uploaded to the cloud.');
+    t('reconectarBtnTxt', es?'Reconectar':'Reconnect');
+    t('reconectarCancelar', es?'Ahora no':'Not now');
+    const em=document.getElementById('reconectarEmail'); if(em) em.value=(currentUser&&currentUser.email)||'';
+    const pw=document.getElementById('reconectarClave'); if(pw) pw.value='';
+    showModal('reconectarModal');
+    setTimeout(()=>{ if(pw) pw.focus(); },60);
+};
+window.cerrarReconectarNube=function(){ hideModal('reconectarModal'); };
+window.reconectarNube=async function(){
+    const es=currentLanguage==='es';
+    if(!currentUser) return;
+    const email=String(currentUser.email||'').trim().toLowerCase();
+    const pw=(document.getElementById('reconectarClave')||{}).value||'';
+    if(!pw){ showNotification(es?'Escribe tu contraseña':'Enter your password','error'); return; }
+    const btn=document.getElementById('reconectarBtn'); if(btn) btn.disabled=true;
+    try{
+        _manualAuthInFlight=true;
+        const cred=await firebase.auth().signInWithEmailAndPassword(email,pw);
+        // Tiene que ser LA MISMA cuenta: subir estos salones a otra la pisaria.
+        if(currentUser.id && cred.user.uid!==currentUser.id){
+            await firebase.auth().signOut().catch(()=>{});
+            showNotification(es?'Esa no es la cuenta con la que estabas trabajando':'That is not the account you were working with','error');
+            return;
+        }
+        const pwEl=document.getElementById('reconectarClave'); if(pwEl) pwEl.value='';
+        hideModal('reconectarModal');
+        ocultarAvisoNube();
+        pushToCloud();
+        if(typeof programarClaseInvitados==='function') programarClaseInvitados();
+        showNotification(es?'✅ Reconectado. Tus cambios se están subiendo a la nube.':'✅ Reconnected. Your changes are being uploaded.','success');
+        const mi=document.getElementById('invitadosModal');
+        if(mi && getComputedStyle(mi).display!=='none' && typeof pintarInvitados==='function') pintarInvitados();
+    }catch(err){
+        console.warn('reconectar',err);
+        showNotification((es?'No se pudo reconectar: ':'Could not reconnect: ')+fbErr(err),'error');
+    }finally{
+        _manualAuthInFlight=false;
+        if(btn) btn.disabled=false;
+    }
+};
+
 // === SESION PERSISTENTE ===
 // Firebase ya recordaba al usuario, pero la app arrancaba siempre en la pantalla de
 // login: habia que reescribir la contrasena en cada recarga. Ahora se restaura sola.
@@ -7225,7 +7352,8 @@ function initAuthPersistence(){
     firebase.auth().onAuthStateChanged(function(user){
       // Ya sabemos si había sesión: se puede retirar la pantalla de carga.
       if(!user || !keepSessionEnabled()){ if(window.__closeBootLoader) window.__closeBootLoader(); }
-      if(!user){ _authRestoreDone=true; return; }
+      if(!user){ _authRestoreDone=true; if(currentUser) avisarSesionNubeCerrada(); return; }
+      if(currentUser && _avisoNubeVisible && (!currentUser.id || user.uid===currentUser.id)) ocultarAvisoNube();
       // Si el usuario acaba de pulsar "Iniciar sesion"/"Registrarse", esa ruta ya carga los datos.
       if(_manualAuthInFlight || _authRestoreDone || currentUser) return;
       _authRestoreDone = true;
@@ -8288,7 +8416,9 @@ let _cloudTimer=null;
 function scheduleCloudPush(){ if(!window.FIREBASE_ON) return; clearTimeout(_cloudTimer); _cloudTimer=setTimeout(pushToCloud,1200); }
 function pushToCloud(){
   try{
-    const u = firebase.auth().currentUser; if(!u || !currentUser || !db) return;
+    const u = firebase.auth().currentUser;
+    if(!u){ if(currentUser && window.FIREBASE_ON) avisarSesionNubeCerrada(); return; }
+    if(!currentUser || !db) return;
     const payload={ name:currentUser.name||userProfile.name||'', school:currentUser.school||'', avatar:currentUser.avatar||'', grade:currentUser.grade||'', institutionLogo:currentUser.institutionLogo||null, classrooms:classrooms, gridWeeks:gridWeeks, weekTitles:weekTitles, noteColumns:noteColumns, noteColumnsByPeriod:noteColumnsByPeriod, activePeriod:activePeriod, pesosPeriodos:pesosPeriodos, topeRecuperacion:topeRecuperacion, notaMinimaAnual:notaMinimaAnual, activeClassroomIndex:activeClassroomIndex, grades:grades, badgePointsEnabled:badgePointsEnabled, badgePointValue:badgePointValue, lessonPlans:lessonPlans, teachingStyleProfile:teachingStyleProfile, groupSize:groupSize };
     const serialized=JSON.stringify(payload);
     // Firestore no acepta documentos de mas de 1 MiB. Avisamos antes de intentar el envio
