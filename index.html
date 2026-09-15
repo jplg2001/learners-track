@@ -1290,6 +1290,91 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 :focus-visible { outline:3px solid var(--accent-strong); outline-offset:2px; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
+/* === JUEGOS DE VOCABULARIO === */
+.sb-ico.rose { background:rgba(236,72,153,.14); }
+.voc-modal { width:min(980px,96vw); }
+.voc-modal [hidden], .bia-modal [hidden] { display:none !important; }
+.voc-intro, .bia-intro { margin:-6px 0 14px; font-size:.9rem; color:var(--fg-muted); line-height:1.5; }
+.voc-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.voc-tab { border:1.5px solid var(--border); background:var(--bg-card); color:var(--fg); border-radius:999px; padding:8px 16px; font:inherit; font-weight:600; font-size:.9rem; cursor:pointer; transition:background-color .2s var(--ease-out), border-color .2s var(--ease-out), color .2s var(--ease-out); }
+.voc-tab:hover { border-color:var(--accent); }
+.voc-tab.activo { background:var(--accent-strong); border-color:var(--accent-strong); color:#fff; }
+.voc-tab:active { transform:scale(.97); }
+.voc-cols { display:grid; grid-template-columns:minmax(0,340px) minmax(0,1fr); gap:20px; align-items:start; }
+.voc-panel .form-group { margin-bottom:11px; }
+.voc-cuenta { font-weight:500; color:var(--accent-strong); margin-left:4px; }
+.voc-ayuda { display:block; margin-top:5px; font-size:.78rem; color:var(--fg-muted); }
+.voc-ia { display:flex; flex-direction:column; gap:6px; margin:0 0 12px; padding:10px; border-radius:var(--radius-sm); background:var(--accent-soft); }
+.voc-ia-btn { padding:9px 12px; border:none; border-radius:var(--radius-sm); cursor:pointer; font:inherit; font-weight:700; font-size:.88rem; }
+.voc-mini { display:flex; align-items:center; gap:8px; font-size:.82rem; color:var(--fg-muted); }
+.voc-mini select { flex:1; min-width:0; padding:6px 8px; border:1px solid var(--border); border-radius:8px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.84rem; }
+.voc-opciones { display:grid; grid-template-columns:1fr 1fr; gap:0 10px; }
+.voc-opciones .voc-check { grid-column:1 / -1; margin-bottom:10px; }
+.voc-check { display:flex; align-items:center; gap:8px; font-size:.86rem; cursor:pointer; color:var(--fg); }
+.voc-check input { width:auto; margin:0; }
+.voc-vista-col { min-width:0; }
+.voc-barra { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.voc-barra .btn-secondary { padding:8px 14px; }
+.voc-vista { border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:16px; min-height:320px; overflow:auto; }
+.voc-vacio { display:grid; place-items:center; text-align:center; min-height:290px; color:var(--fg-muted); font-size:.95rem; line-height:2; }
+.voc-avisos p { margin:8px 0 0; font-size:.82rem; color:#b45309; background:rgba(245,158,11,.1); border-radius:8px; padding:7px 10px; }
+.voc-sopa { display:grid; grid-template-columns:repeat(var(--n),minmax(0,1fr)); gap:1px; max-width:min(100%,520px); margin:0 auto; font-family:'Montserrat',sans-serif; font-weight:700; }
+.voc-sopa span { aspect-ratio:1; display:grid; place-items:center; font-size:clamp(.6rem,2.4vw,1rem); border-radius:5px; color:var(--fg); transition:background-color .25s var(--ease-out), color .25s var(--ease-out); }
+.voc-sopa span.si { background:#c7d2fe; color:#312e81; }
+.voc-palabras { list-style:none; padding:0; margin:14px 0 0; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.voc-palabras li { background:var(--bg-alt); border:1px solid var(--border); border-radius:999px; padding:3px 11px; font-size:.84rem; }
+.voc-cruci { display:grid; grid-template-columns:repeat(var(--c),minmax(0,1fr)); max-width:min(100%, calc(var(--c) * 30px)); margin:0 auto; }
+.voc-cruci span { aspect-ratio:1; position:relative; display:grid; place-items:center; font-weight:700; font-size:clamp(.55rem,1.8vw,.95rem); }
+.voc-cruci .letra { background:#fff; color:#1f2340; box-shadow:inset 0 0 0 1px #1f2340; }
+.voc-cruci .letra i { position:absolute; top:1px; left:2px; font-style:normal; font-size:.5rem; color:var(--accent-strong); line-height:1; }
+.voc-pistas { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; font-size:.84rem; }
+.voc-pistas h4 { margin:0 0 6px; color:var(--accent-strong); }
+.voc-pistas ol { list-style:none; margin:0; padding:0; display:grid; gap:4px; }
+.voc-pistas small { color:var(--fg-muted); }
+.voc-sin { color:var(--danger); }
+.voc-nota { text-align:center; font-size:.84rem; color:var(--fg-muted); margin:0 0 10px; }
+.voc-bingo { display:grid; grid-template-columns:repeat(var(--n),minmax(0,1fr)); max-width:420px; margin:0 auto; border:2px solid var(--accent-strong); border-radius:10px; overflow:hidden; }
+.voc-bingo span { aspect-ratio:1; display:grid; place-items:center; text-align:center; padding:4px; font-weight:700; font-size:clamp(.62rem,1.7vw,.88rem); background:var(--bg-alt); box-shadow:inset 0 0 0 .5px var(--badge-border); overflow-wrap:anywhere; }
+.voc-bingo .libre { background:var(--accent-soft); color:var(--accent-strong); }
+.voc-acciones { display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:16px; }
+@media (max-width:760px){
+  .voc-cols { grid-template-columns:1fr; }
+  .voc-pistas { grid-template-columns:1fr; }
+}
+
+/* === COMENTARIOS DEL BOLETIN CON IA === */
+.bia-modal { width:min(820px,96vw); }
+.bia-opciones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px; }
+@media (max-width:600px){ .bia-opciones { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.bia-opciones label { display:flex; flex-direction:column; gap:4px; font-size:.8rem; font-weight:600; color:var(--fg-muted); }
+.bia-opciones select { padding:8px 9px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.88rem; }
+.bia-extra { margin-bottom:10px; }
+.bia-progreso { margin:4px 0 12px; }
+.bia-barra { height:6px; border-radius:99px; background:var(--accent-soft); overflow:hidden; }
+.bia-barra span { display:block; height:100%; background:var(--ai-gradient); transform-origin:left; transform:scaleX(0); transition:transform .5s var(--ease-out); }
+.bia-progreso p { margin:6px 0 0; font-size:.84rem; color:var(--fg-muted); }
+.bia-lista { display:grid; gap:10px; max-height:46vh; overflow-y:auto; padding-right:4px; }
+.bia-vacio { text-align:center; padding:26px 10px; color:var(--fg-muted); }
+.bia-fila { border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:var(--radius-sm); background:var(--bg-card); padding:10px 12px; }
+.bia-fila.bia-bajo { border-left-color:var(--warning); }
+.bia-cab { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+.bia-check { display:flex; align-items:center; gap:8px; cursor:pointer; }
+.bia-check input { width:auto; margin:0; transform:scale(1.1); }
+.bia-chips { display:flex; gap:5px; flex-wrap:wrap; }
+.bia-chips span { font-size:.76rem; background:var(--bg-alt); border:1px solid var(--border); border-radius:999px; padding:2px 8px; white-space:nowrap; }
+.bia-fila textarea { width:100%; box-sizing:border-box; min-height:64px; resize:vertical; padding:8px 10px; border:1.5px solid var(--border); border-radius:9px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.9rem; line-height:1.5; }
+.bia-fila textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.bia-actual { margin-top:6px; font-size:.8rem; color:var(--fg-muted); }
+.bia-actual summary { cursor:pointer; }
+.bia-actual p { margin:4px 0 0; white-space:pre-wrap; }
+.bia-pie { display:flex; align-items:center; gap:10px; margin-top:6px; flex-wrap:wrap; }
+.bia-otra { border:1px solid var(--border); background:var(--bg-alt); color:var(--fg); border-radius:8px; padding:5px 10px; font:inherit; font-size:.8rem; font-weight:600; cursor:pointer; }
+.bia-otra:hover:not(:disabled) { border-color:var(--accent); }
+.bia-otra:disabled { opacity:.55; cursor:not-allowed; }
+.bia-ok { font-size:.8rem; color:var(--success); font-weight:700; }
+.bia-err { font-size:.8rem; color:var(--danger); }
+.bia-privacidad { margin:10px 0 0; font-size:.78rem; color:var(--fg-muted); }
+@media (prefers-reduced-motion: reduce){ .bia-barra span, .voc-sopa span, .voc-tab { transition:none; } }
 </style>
 </head>
 <body>
@@ -1623,6 +1708,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
                 <button class="side-btn" onclick="openImportModal()"><span class="sb-ico green">📋</span><span id="importStudentsBtnText">Import list</span></button>
                 <button class="side-btn" onclick="goToStatisticsPage()"><span class="sb-ico blue">📊</span><span id="statisticsBtnText">Course Statistics</span></button>
                 <button class="side-btn" onclick="openProjector()"><span class="sb-ico violet">📺</span><span id="projectorBtnText">Modo proyector</span></button>
+                <button class="side-btn" onclick="abrirJuegosVocabulario()"><span class="sb-ico rose">🧩</span><span id="vocBtnText">Juegos de vocabulario</span></button>
                 <button class="side-btn" id="exportPdfBtn"><span class="sb-ico slate">📄</span><span id="exportPdfBtnText">Export Full Report PDF</span></button>
             </div>
 
@@ -1631,6 +1717,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
                 <button class="side-btn" onclick="openLessonPlanModal()"><span class="sb-ico amber">📝</span><span id="lessonPlanBtnText">Planeaciones (IA)</span></button>
                 <button class="side-btn" onclick="openAIAnalysisModal()"><span class="sb-ico violet">🤖</span><span id="aiAnalysisBtnText">AI Classroom Analysis</span></button>
                 <button class="side-btn" onclick="weeklySummaryAI()"><span class="sb-ico teal">📅</span><span id="weeklySummaryBtnText">Weekly summary (AI)</span></button>
+                <button class="side-btn" onclick="abrirComentariosBoletin()"><span class="sb-ico rose">✍️</span><span id="biaBtnText">Comentarios del boletín (IA)</span></button>
                 <button class="side-btn" onclick="openAiChatModal()"><span class="sb-ico sky">💬</span><span id="aiChatBtnText">Asistente IA</span></button>
                 <button class="side-btn side-btn-quiet" onclick="openApiKeySettingsModal()"><span class="sb-ico slate">🔐</span><span id="aiConfigBtnText">Configurar IA</span></button>
             </div>
@@ -2175,6 +2262,91 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
     <div class="modal-content"><button class="modal-close-btn" onclick="hideModal('weeklySummaryModal')">&times;</button>
         <div id="weeklySummaryBody" class="ai-analysis-content"></div>
     </div>
+</div>
+
+<!-- Juegos de vocabulario: sopa de letras, crucigrama y bingo para imprimir -->
+<div class="modal" id="vocModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content voc-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarJuegosVocabulario()">&times;</button>
+    <h3 id="vocTituloModal">🧩 Juegos de vocabulario</h3>
+    <p class="voc-intro" id="vocIntro"></p>
+    <div class="voc-tabs" role="tablist">
+      <button type="button" class="voc-tab activo" role="tab" data-juego="sopa" onclick="elegirJuego('sopa')">🔤 <span id="vocTabSopa">Sopa de letras</span></button>
+      <button type="button" class="voc-tab" role="tab" data-juego="cruci" onclick="elegirJuego('cruci')">✏️ <span id="vocTabCruci">Crucigrama</span></button>
+      <button type="button" class="voc-tab" role="tab" data-juego="bingo" onclick="elegirJuego('bingo')">🎯 <span id="vocTabBingo">Bingo</span></button>
+    </div>
+    <div class="voc-cols">
+      <div class="voc-panel">
+        <div class="form-group"><label for="vocTitulo" id="vocTituloLbl">Título de la hoja</label><input type="text" id="vocTitulo" maxlength="60" oninput="vocProgramar()"></div>
+        <div class="form-group">
+          <label for="vocPalabras"><span id="vocPalabrasLbl">Palabras (una por renglón)</span> <span class="voc-cuenta" id="vocCuenta"></span></label>
+          <textarea id="vocPalabras" rows="9" spellcheck="false" placeholder="apple = manzana&#10;banana = plátano&#10;orange&#10;grapes" oninput="vocProgramar()"></textarea>
+          <small class="voc-ayuda" id="vocAyuda"></small>
+        </div>
+        <div class="voc-ia">
+          <button type="button" class="btn-ai voc-ia-btn" id="vocPistasBtn" onclick="vocPistasIA()">✨ Completar pistas con IA</button>
+          <label class="voc-mini"><span id="vocTipoPistaLbl">Pistas con IA:</span>
+            <select id="vocTipoPista"><option value="definicion">Definición en inglés</option><option value="traduccion">Traducción al español</option></select>
+          </label>
+        </div>
+        <div class="voc-opciones" data-para="sopa">
+          <div class="form-group"><label for="vocSopaNivel" id="vocSopaNivelLbl">Dificultad</label>
+            <select id="vocSopaNivel" onchange="vocGenerar()"><option value="facil">Fácil</option><option value="medio" selected>Media</option><option value="dificil">Difícil</option></select></div>
+          <div class="form-group"><label for="vocSopaLista" id="vocSopaListaLbl">Debajo de la sopa mostrar</label>
+            <select id="vocSopaLista" onchange="elegirJuego('sopa')"><option value="palabras">Las palabras</option><option value="pistas">Las pistas</option></select></div>
+        </div>
+        <div class="voc-opciones" data-para="bingo" hidden>
+          <div class="form-group"><label for="vocBingoLado" id="vocBingoLadoLbl">Tamaño del cartón</label>
+            <select id="vocBingoLado" onchange="vocGenerar()"><option value="3">3 × 3</option><option value="4" selected>4 × 4</option><option value="5">5 × 5</option></select></div>
+          <div class="form-group"><label for="vocBingoCantidad" id="vocBingoCantidadLbl">Cartones</label>
+            <input type="number" id="vocBingoCantidad" min="1" max="60" value="30" inputmode="numeric" oninput="this.dataset.tocado='1';vocProgramar()"></div>
+          <div class="form-group"><label for="vocBingoContenido" id="vocBingoContenidoLbl">En las casillas</label>
+            <select id="vocBingoContenido" onchange="vocGenerar()"><option value="palabras">Las palabras</option><option value="pistas">Las pistas</option></select></div>
+          <label class="voc-check"><input type="checkbox" id="vocBingoNombres" onchange="vocGenerar()"> <span id="vocBingoNombresLbl">Un cartón con el nombre de cada estudiante</span></label>
+        </div>
+        <div class="form-group"><label for="vocInstrucciones" id="vocInstrLbl">Instrucción para los estudiantes</label>
+          <input type="text" id="vocInstrucciones" maxlength="110" oninput="this.dataset.tocado='1'"></div>
+      </div>
+      <div class="voc-vista-col">
+        <div class="voc-barra">
+          <button type="button" class="btn-secondary" id="vocOtraBtn" onclick="vocOtraVersion()">🔀 Otra versión</button>
+          <label class="voc-check" data-para-no="bingo"><input type="checkbox" id="vocSolucion" onchange="vocVerSolucion(this.checked)"> <span id="vocSolucionLbl">Ver solución</span></label>
+        </div>
+        <div class="voc-vista" id="vocVista" aria-live="polite"></div>
+        <div class="voc-avisos" id="vocAvisos"></div>
+      </div>
+    </div>
+    <div class="voc-acciones">
+      <button type="button" class="btn-secondary" id="vocCerrarBtn" onclick="cerrarJuegosVocabulario()">Cerrar</button>
+      <button type="button" class="btn-primary" id="vocPdfBtn" onclick="vocDescargarPdf()" disabled>📄 Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Comentarios del boletin escritos con IA y revisados por el docente -->
+<div class="modal" id="biaModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content bia-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarComentariosBoletin()">&times;</button>
+    <h3 id="biaTituloModal">✍️ Comentarios para el boletín</h3>
+    <p class="bia-intro" id="biaIntro"></p>
+    <div class="bia-opciones">
+      <label><span id="biaPeriodoLbl">Sobre</span><select id="biaPeriodo" onchange="biaPintarLista()"></select></label>
+      <label><span id="biaTonoLbl">Tono</span><select id="biaTono"><option value="calido">Cálido</option><option value="formal">Formal</option><option value="motivador">Motivador</option></select></label>
+      <label><span id="biaLargoLbl">Extensión</span><select id="biaLargo"><option value="corto">Corto</option><option value="medio">Medio</option></select></label>
+      <label><span id="biaIdiomaLbl">Idioma</span><select id="biaIdioma"><option value="es">Español</option><option value="en">Inglés</option></select></label>
+      <label><span id="biaNombreLbl">Nombre en el texto</span><select id="biaNombre"><option value="completo">Nombre completo</option><option value="primero">Solo la primera palabra</option><option value="ninguno">Sin nombre</option></select></label>
+      <label><span id="biaParaLbl">Para</span><select id="biaPara" onchange="biaPintarLista()"><option value="sin">Quienes no tienen comentario</option><option value="todos">Todos los estudiantes</option></select></label>
+    </div>
+    <div class="form-group bia-extra"><label for="biaExtra" id="biaExtraLbl">Indicación para todos (opcional)</label><input type="text" id="biaExtra" maxlength="240"></div>
+    <div class="bia-progreso" id="biaProgreso" hidden><div class="bia-barra"><span></span></div><p></p></div>
+    <div class="bia-lista" id="biaLista"></div>
+    <p class="bia-privacidad" id="biaPrivacidad"></p>
+    <div class="voc-acciones">
+      <button type="button" class="btn-secondary" id="biaCerrarBtn" onclick="cerrarComentariosBoletin()">Cerrar</button>
+      <button type="button" class="btn-ai" id="biaGenerarBtn" onclick="biaGenerar()">✨ Generar borradores</button>
+      <button type="button" class="btn-primary" id="biaGuardarBtn" onclick="biaGuardar()" disabled>💾 Guardar</button>
+    </div>
+  </div>
 </div>
 
 <!-- Librerías externas -->
@@ -5585,6 +5757,8 @@ function updateNewFeaturesText(){
     const es=currentLanguage==='es';
     const ib=document.getElementById('importStudentsBtnText'); if(ib)ib.textContent=es?'Importar lista':'Import list';
     const ws=document.getElementById('weeklySummaryBtnText'); if(ws)ws.textContent=es?'Resumen semanal (IA)':'Weekly summary (AI)';
+    if(typeof textosJuegosVocabulario==='function') textosJuegosVocabulario();
+    if(typeof textosComentariosBoletin==='function') textosComentariosBoletin();
     const sc=document.getElementById('suggestCommentBtn'); if(sc && !sc.disabled) sc.innerHTML='✨ '+(es?'Sugerir con IA':'Suggest with AI');
     if(typeof updateCloudStatusPill==='function') updateCloudStatusPill();
     const fp=document.getElementById('forgotPasswordLink'); if(fp)fp.textContent=es?'¿Olvidaste tu contraseña?':'Forgot your password?';
@@ -8590,6 +8764,965 @@ function pushToCloud(){
     }
     db.collection('users').doc(u.uid).set({ email:currentUser.email||u.email||'', data:serialized, updatedAt:Date.now() },{merge:true}).catch(err=>{ console.error(err); showNotification(currentLanguage==='es'?'No se pudo sincronizar con la nube (tus datos siguen guardados en este equipo)':'Could not sync to cloud (your data is still saved on this device)','error'); });
   }catch(e){ console.error(e); }
+}
+</script>
+<script>
+// ===================== JUEGOS DE VOCABULARIO ==============================
+// Sopa de letras, crucigrama y bingo a partir de las palabras de la semana, listos
+// para imprimir. Todo se arma en el navegador. La IA solo interviene si el docente
+// pide completar pistas, y entonces recibe unicamente las palabras.
+const VOC_MAX_PALABRAS = 60;
+const VOC_MAX_CRUCI = 21;          // lado maximo del crucigrama, para que quepa en la hoja
+let _voc = { juego:'sopa', resultado:null, solucion:false, timer:null };
+
+function barajar(arr){
+    const a=arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+}
+function vocLetras(p){
+    return String(p||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,'');
+}
+// Una palabra por renglon. La pista va despues de "=", ":" o " - ".
+// Un renglon sin pista y con comas se toma como varias palabras.
+function vocLeerLista(texto){
+    const vistos=new Set(), lista=[], descartadas=[];
+    String(texto||'').split(/\r?\n/).forEach(linea=>{
+        linea=linea.trim(); if(!linea) return;
+        const m=linea.match(/^(.+?)\s*(?:=|:|\s[-–—]\s|\t)\s*(.+)$/);
+        const pista = m ? m[2].trim() : '';
+        const partes = m ? [m[1]] : linea.split(',');
+        partes.forEach(p=>{
+            p=p.trim(); if(!p) return;
+            const letras=vocLetras(p);
+            if(letras.length<2 || letras.length>15){ descartadas.push(p); return; }
+            if(vistos.has(letras)) return;
+            vistos.add(letras);
+            lista.push({ palabra:p.slice(0,40), letras:letras, pista:pista.slice(0,160) });
+        });
+    });
+    return { lista:lista.slice(0,VOC_MAX_PALABRAS), descartadas:descartadas, sobran:Math.max(0,lista.length-VOC_MAX_PALABRAS) };
+}
+
+// --- Sopa de letras ---------------------------------------------------------
+const VOC_DIRECCIONES = {
+    facil:   [[0,1],[1,0]],
+    medio:   [[0,1],[1,0],[1,1],[-1,1]],
+    dificil: [[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]]
+};
+function vocSopa(lista, nivel){
+    const dirs=VOC_DIRECCIONES[nivel]||VOC_DIRECCIONES.medio;
+    const orden=lista.slice().sort((a,b)=>b.letras.length-a.letras.length);
+    const larga=orden.length?orden[0].letras.length:5;
+    const letras=orden.reduce((a,w)=>a+w.letras.length,0);
+    const base=Math.min(20, Math.max(10, larga+1, Math.ceil(Math.sqrt(letras*2.2))));
+    let mejor=null;
+    // Si no caben todas, se prueba otra vez con una cuadricula un poco mas grande.
+    for(let tam=Math.max(base,larga); tam<=Math.max(20,larga); tam++){
+        for(let intento=0; intento<30; intento++){
+            const grid=Array.from({length:tam},()=>Array(tam).fill(''));
+            const colocadas=[], fuera=[];
+            orden.forEach(w=>{
+                const L=w.letras;
+                for(let t=0;t<400;t++){
+                    const [dr,dc]=dirs[Math.floor(Math.random()*dirs.length)];
+                    const r=Math.floor(Math.random()*tam), c=Math.floor(Math.random()*tam);
+                    const rf=r+dr*(L.length-1), cf=c+dc*(L.length-1);
+                    if(rf<0||rf>=tam||cf<0||cf>=tam) continue;
+                    let ok=true;
+                    for(let i=0;i<L.length;i++){ const x=grid[r+dr*i][c+dc*i]; if(x && x!==L[i]){ ok=false; break; } }
+                    if(!ok) continue;
+                    for(let i=0;i<L.length;i++) grid[r+dr*i][c+dc*i]=L[i];
+                    colocadas.push({ w:w, r:r, c:c, dr:dr, dc:dc });
+                    return;
+                }
+                fuera.push(w);
+            });
+            if(!mejor || colocadas.length>mejor.colocadas.length) mejor={ tam:tam, grid:grid, colocadas:colocadas, fuera:fuera };
+            if(!fuera.length) break;
+        }
+        if(mejor && !mejor.fuera.length) break;
+    }
+    const ABC='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    mejor.grid.forEach(fila=>fila.forEach((x,i)=>{ if(!x) fila[i]=ABC[Math.floor(Math.random()*26)]; }));
+    // Las palabras de la lista, en el orden en que el docente las escribio.
+    mejor.colocadas.sort((a,b)=>lista.indexOf(a.w)-lista.indexOf(b.w));
+    mejor.tipo='sopa';
+    return mejor;
+}
+
+// --- Crucigrama -------------------------------------------------------------
+function vocArmarCrucigrama(orden){
+    const celdas=new Map();
+    const get=(r,c)=>celdas.get(r+','+c);
+    const colocadas=[];
+    let minR=0,maxR=0,minC=0,maxC=0;
+    const cabe=(L,r,c,dir)=>{
+        const dr=dir==='v'?1:0, dc=dir==='h'?1:0;
+        if(get(r-dr,c-dc) || get(r+dr*L.length,c+dc*L.length)) return -1;
+        let cruces=0;
+        for(let i=0;i<L.length;i++){
+            const rr=r+dr*i, cc=c+dc*i, x=get(rr,cc);
+            if(x){ if(x.l!==L[i] || x[dir]) return -1; cruces++; }
+            else if(get(rr+dc,cc+dr) || get(rr-dc,cc-dr)) return -1;   // nada pegado al costado
+        }
+        return cruces;
+    };
+    const poner=(w,r,c,dir)=>{
+        const dr=dir==='v'?1:0, dc=dir==='h'?1:0;
+        for(let i=0;i<w.letras.length;i++){
+            const k=(r+dr*i)+','+(c+dc*i);
+            const x=celdas.get(k)||{ l:w.letras[i] };
+            x[dir]=true; celdas.set(k,x);
+        }
+        minR=Math.min(minR,r); maxR=Math.max(maxR,r+dr*(w.letras.length-1));
+        minC=Math.min(minC,c); maxC=Math.max(maxC,c+dc*(w.letras.length-1));
+        colocadas.push({ w:w, r:r, c:c, dir:dir });
+    };
+    const intentar=(w)=>{
+        const L=w.letras; let mejor=null;
+        celdas.forEach((x,k)=>{
+            const [cr,cc]=k.split(',').map(Number);
+            for(let i=0;i<L.length;i++){
+                if(L[i]!==x.l) continue;
+                ['h','v'].forEach(dir=>{
+                    if(x[dir]) return;
+                    const r=cr-(dir==='v'?i:0), c=cc-(dir==='h'?i:0);
+                    const n=cabe(L,r,c,dir); if(n<1) return;
+                    const r2=r+(dir==='v'?L.length-1:0), c2=c+(dir==='h'?L.length-1:0);
+                    const alto=Math.max(maxR,r2)-Math.min(minR,r)+1, ancho=Math.max(maxC,c2)-Math.min(minC,c)+1;
+                    if(alto>VOC_MAX_CRUCI || ancho>VOC_MAX_CRUCI) return;
+                    // Mas cruces y menos crecimiento es mejor; un poco de azar da variedad.
+                    const puntos=n*12 - (alto*ancho)/6 - Math.abs(alto-ancho) + Math.random()*3;
+                    if(!mejor || puntos>mejor.puntos) mejor={ r:r, c:c, dir:dir, puntos:puntos };
+                });
+            }
+        });
+        if(mejor){ poner(w,mejor.r,mejor.c,mejor.dir); return true; }
+        return false;
+    };
+    let pendientes=[];
+    if(orden.length) poner(orden[0],0,0,Math.random()<0.5?'h':'v');
+    orden.slice(1).forEach(w=>{ if(!intentar(w)) pendientes.push(w); });
+    // Segunda vuelta: algunas caben despues de que entraron otras.
+    pendientes=pendientes.filter(w=>!intentar(w));
+    return { colocadas:colocadas, fuera:pendientes, alto:maxR-minR+1, ancho:maxC-minC+1, minR:minR, minC:minC };
+}
+function vocCrucigrama(lista){
+    let mejor=null;
+    for(let intento=0; intento<50; intento++){
+        // Primero las mas largas; desde el segundo intento, con algo de azar en el orden.
+        const orden = lista.map(w=>({ w:w, k:w.letras.length+(intento?Math.random()*4:0) })).sort((a,b)=>b.k-a.k).map(x=>x.w);
+        const r=vocArmarCrucigrama(orden);
+        const nota=r.colocadas.length*1000 - r.alto*r.ancho - Math.abs(r.alto-r.ancho)*4;
+        if(!mejor || nota>mejor.nota){ mejor=r; mejor.nota=nota; }
+    }
+    const filas=mejor.alto, cols=mejor.ancho;
+    const grid=Array.from({length:filas},()=>Array(cols).fill(null));
+    const pal=mejor.colocadas.map(p=>({ w:p.w, r:p.r-mejor.minR, c:p.c-mejor.minC, dir:p.dir }));
+    pal.forEach(p=>{ for(let i=0;i<p.w.letras.length;i++) grid[p.r+(p.dir==='v'?i:0)][p.c+(p.dir==='h'?i:0)]=p.w.letras[i]; });
+    // Numeracion clasica: de izquierda a derecha y de arriba abajo.
+    const numeros=Array.from({length:filas},()=>Array(cols).fill(0));
+    const inicios={}; let n=0;
+    pal.forEach(p=>{ inicios[p.r+','+p.c]=true; });
+    for(let r=0;r<filas;r++) for(let c=0;c<cols;c++) if(inicios[r+','+c]) numeros[r][c]=++n;
+    pal.forEach(p=>{ p.n=numeros[p.r][p.c]; });
+    const porNumero=(a,b)=>a.n-b.n;
+    return { tipo:'cruci', filas:filas, cols:cols, grid:grid, numeros:numeros,
+             horizontales:pal.filter(p=>p.dir==='h').sort(porNumero),
+             verticales:pal.filter(p=>p.dir==='v').sort(porNumero),
+             fuera:mejor.fuera };
+}
+
+// --- Bingo ------------------------------------------------------------------
+function vocBingo(lista, lado, cantidad, conNombres){
+    const libre = lado===5;
+    const hacen = lado*lado-(libre?1:0);
+    if(lista.length<hacen) return { tipo:'bingo', error:true, hacen:hacen, lado:lado };
+    const cartones=[], firmas=new Set();
+    const alumnos=(currentStudents||[]);
+    for(let k=0;k<cantidad;k++){
+        let elegidas;
+        for(let t=0;t<25;t++){
+            elegidas=barajar(lista).slice(0,hacen);
+            const firma=elegidas.map(w=>w.letras).join('|');
+            if(!firmas.has(firma)){ firmas.add(firma); break; }
+        }
+        const casillas=elegidas.slice();
+        if(libre) casillas.splice(12,0,null);
+        const nombre=(conNombres && alumnos[k]) ? String(alumnos[k].name||'') : '';
+        cartones.push({ casillas:casillas, nombre:(typeof biaTitulo==='function') ? biaTitulo(nombre) : nombre });
+    }
+    return { tipo:'bingo', lado:lado, cartones:cartones, llamado:barajar(lista) };
+}
+
+// --- Ventana ----------------------------------------------------------------
+function vocClase(){ return (typeof classrooms!=='undefined' && classrooms[activeClassroomIndex]) || null; }
+function abrirJuegosVocabulario(){
+    const es=currentLanguage==='es';
+    const c=vocClase(), guardado=(c&&c.vocabulario)||{};
+    const ta=document.getElementById('vocPalabras'), ti=document.getElementById('vocTitulo');
+    // Cada salon recuerda su propia lista de palabras.
+    if(_voc.clase!==activeClassroomIndex){
+        _voc.clase=activeClassroomIndex;
+        if(ta) ta.value=guardado.texto||'';
+        if(ti) ti.value=guardado.titulo||'Vocabulary';
+    }
+    const cant=document.getElementById('vocBingoCantidad');
+    if(cant && !cant.dataset.tocado) cant.value=Math.min(60,Math.max(1,(currentStudents||[]).length||30));
+    textosJuegosVocabulario();
+    elegirJuego(_voc.juego);
+    showModal('vocModal');
+}
+function cerrarJuegosVocabulario(){ vocRecordar(); hideModal('vocModal'); }
+function vocRecordar(){
+    const c=vocClase(); if(!c) return;
+    const texto=(document.getElementById('vocPalabras')||{}).value||'';
+    const titulo=(document.getElementById('vocTitulo')||{}).value||'';
+    const antes=c.vocabulario||{};
+    if(antes.texto===texto && antes.titulo===titulo) return;
+    c.vocabulario={ texto:texto.slice(0,6000), titulo:titulo.slice(0,80) };
+    saveData();
+}
+function elegirJuego(j){
+    _voc.juego=['sopa','cruci','bingo'].includes(j)?j:'sopa';
+    document.querySelectorAll('#vocModal .voc-tab').forEach(b=>{
+        const activo=b.dataset.juego===_voc.juego;
+        b.classList.toggle('activo',activo); b.setAttribute('aria-selected',activo?'true':'false');
+    });
+    document.querySelectorAll('#vocModal [data-para]').forEach(el=>{ el.hidden = el.dataset.para!==_voc.juego; });
+    document.querySelectorAll('#vocModal [data-para-no]').forEach(el=>{ el.hidden = el.dataset.paraNo===_voc.juego; });
+    const ins=document.getElementById('vocInstrucciones');
+    if(ins && !ins.dataset.tocado) ins.value=vocInstruccionPorDefecto();
+    vocGenerar();
+}
+function vocInstruccionPorDefecto(){
+    if(_voc.juego==='sopa'){
+        const pistas=(document.getElementById('vocSopaLista')||{}).value==='pistas';
+        return pistas ? 'Read each clue and find the English word in the puzzle.' : 'Find the words in the puzzle and check them off.';
+    }
+    if(_voc.juego==='cruci') return 'Read the clues and complete the crossword.';
+    return 'Listen to your teacher and mark the words on your card.';
+}
+function vocProgramar(){ clearTimeout(_voc.timer); _voc.timer=setTimeout(vocGenerar,380); }
+function vocGenerar(){
+    const es=currentLanguage==='es';
+    const {lista,descartadas,sobran}=vocLeerLista((document.getElementById('vocPalabras')||{}).value);
+    const avisos=[];
+    const cuenta=document.getElementById('vocCuenta');
+    if(cuenta) cuenta.textContent = es ? `${lista.length} palabra${lista.length===1?'':'s'}` : `${lista.length} word${lista.length===1?'':'s'}`;
+    if(descartadas.length) avisos.push(es?`Se ignoraron (menos de 2 o más de 15 letras): ${descartadas.slice(0,6).join(', ')}`:`Ignored (under 2 or over 15 letters): ${descartadas.slice(0,6).join(', ')}`);
+    if(sobran) avisos.push(es?`Solo se usan las primeras ${VOC_MAX_PALABRAS} palabras.`:`Only the first ${VOC_MAX_PALABRAS} words are used.`);
+    _voc.resultado=null;
+    if(lista.length<3){
+        vocPintar(null, avisos, es?'Escribe al menos 3 palabras para armar el juego.':'Type at least 3 words to build the game.');
+        return;
+    }
+    if(_voc.juego==='sopa'){
+        _voc.resultado=vocSopa(lista,(document.getElementById('vocSopaNivel')||{}).value||'medio');
+        _voc.resultado.lista=lista;
+        if((document.getElementById('vocSopaLista')||{}).value==='pistas'){
+            const sin=lista.filter(w=>!w.pista).length;
+            if(sin) avisos.push(es?`${sin} palabra(s) sin pista: en la lista aparecerán tal cual.`:`${sin} word(s) without a clue will be listed as they are.`);
+        }
+    } else if(_voc.juego==='cruci'){
+        _voc.resultado=vocCrucigrama(lista);
+        const sin=lista.filter(w=>!w.pista).length;
+        if(sin) avisos.push(es?`⚠️ ${sin} palabra(s) no tienen pista. Escríbela después de "=" o usa ✨ Completar pistas con IA.`:`⚠️ ${sin} word(s) have no clue. Type it after "=" or use ✨ Fill in clues with AI.`);
+    } else {
+        const lado=parseInt((document.getElementById('vocBingoLado')||{}).value,10)||4;
+        const cant=Math.min(60,Math.max(1,parseInt((document.getElementById('vocBingoCantidad')||{}).value,10)||30));
+        const nombres=!!(document.getElementById('vocBingoNombres')||{}).checked;
+        _voc.resultado=vocBingo(lista,lado,cant,nombres);
+        if(_voc.resultado.error){
+            const r=_voc.resultado; _voc.resultado=null;
+            vocPintar(null, avisos, es?`Para cartones de ${r.lado}×${r.lado} hacen falta al menos ${r.hacen} palabras. Tienes ${lista.length}: agrega más o elige un cartón más pequeño.`:`${r.lado}×${r.lado} cards need at least ${r.hacen} words. You have ${lista.length}: add more or choose a smaller card.`);
+            return;
+        }
+        const hacen=lado*lado-(lado===5?1:0);
+        if(lista.length<hacen+4) avisos.push(es?'Con pocas palabras de más, los cartones se parecen mucho y varios pueden ganar a la vez.':'With few extra words the cards look alike and several may win at once.');
+        if((document.getElementById('vocBingoContenido')||{}).value==='pistas'){
+            const sin=lista.filter(w=>!w.pista).length;
+            if(sin) avisos.push(es?`${sin} palabra(s) sin pista: en el cartón aparecerán tal cual.`:`${sin} word(s) without a clue will show as they are.`);
+        }
+    }
+    if(_voc.resultado && _voc.resultado.fuera && _voc.resultado.fuera.length){
+        avisos.push(es?`No cupieron: ${_voc.resultado.fuera.map(w=>w.palabra).join(', ')}. Pulsa 🔀 Otra versión o quita alguna.`:`Did not fit: ${_voc.resultado.fuera.map(w=>w.palabra).join(', ')}. Press 🔀 Shuffle or remove some.`);
+    }
+    vocPintar(_voc.resultado, avisos, '');
+}
+function vocTextoCasilla(w, modo){ return (modo==='pistas' && w.pista) ? w.pista : w.palabra; }
+function vocPintar(res, avisos, vacio){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('vocVista'), av=document.getElementById('vocAvisos');
+    const pdfBtn=document.getElementById('vocPdfBtn');
+    _voc.avisos=avisos;
+    if(pdfBtn) pdfBtn.disabled=!res;
+    if(av) av.innerHTML=avisos.map(a=>`<p>${escapeHtml(a)}</p>`).join('');
+    if(!caja) return;
+    if(!res){ caja.innerHTML=`<div class="voc-vacio">🧩<br>${escapeHtml(vacio)}</div>`; return; }
+    const sol=_voc.solucion;
+    let h='';
+    if(res.tipo==='sopa'){
+        const marcadas=new Set();
+        res.colocadas.forEach(p=>{ for(let i=0;i<p.w.letras.length;i++) marcadas.add((p.r+p.dr*i)+','+(p.c+p.dc*i)); });
+        h+=`<div class="voc-sopa" style="--n:${res.tam}">`
+          + res.grid.map((fila,r)=>fila.map((l,c)=>`<span class="${sol&&marcadas.has(r+','+c)?'si':''}">${l}</span>`).join('')).join('')
+          + `</div>`;
+        const modo=(document.getElementById('vocSopaLista')||{}).value;
+        h+=`<ul class="voc-palabras">${res.colocadas.map(p=>`<li>${escapeHtml(vocTextoCasilla(p.w,modo))}</li>`).join('')}</ul>`;
+    } else if(res.tipo==='cruci'){
+        h+=`<div class="voc-cruci" style="--f:${res.filas};--c:${res.cols}">`;
+        for(let r=0;r<res.filas;r++) for(let c=0;c<res.cols;c++){
+            const l=res.grid[r][c];
+            if(!l){ h+='<span class="vacia"></span>'; continue; }
+            const n=res.numeros[r][c];
+            h+=`<span class="letra">${n?`<i>${n}</i>`:''}${sol?l:''}</span>`;
+        }
+        h+='</div>';
+        const pistas=(arr)=>arr.map(p=>`<li><b>${p.n}.</b> ${p.w.pista?escapeHtml(p.w.pista):`<em class="voc-sin">${es?'(sin pista)':'(no clue)'}</em>`} <small>(${p.w.letras.length})</small></li>`).join('');
+        h+=`<div class="voc-pistas"><div><h4>${es?'Horizontales':'Across'}</h4><ol>${pistas(res.horizontales)}</ol></div><div><h4>${es?'Verticales':'Down'}</h4><ol>${pistas(res.verticales)}</ol></div></div>`;
+    } else {
+        const modo=(document.getElementById('vocBingoContenido')||{}).value;
+        const k=res.cartones[0];
+        h+=`<p class="voc-nota">${es?`Vista del cartón 1 de ${res.cartones.length}. Todos son distintos.`:`Preview of card 1 of ${res.cartones.length}. All of them are different.`}</p>`;
+        h+=`<div class="voc-bingo" style="--n:${res.lado}">`
+          + k.casillas.map(w=>w?`<span>${escapeHtml(vocTextoCasilla(w,modo))}</span>`:`<span class="libre">FREE</span>`).join('')
+          + `</div>`;
+        if(k.nombre) h+=`<p class="voc-nota">${escapeHtml(k.nombre)}</p>`;
+    }
+    caja.innerHTML=h;
+}
+function vocOtraVersion(){ vocGenerar(); }
+// Al mirar la solucion no se rehace el juego: se repinta el que esta en pantalla.
+function vocVerSolucion(v){ _voc.solucion=!!v; if(_voc.resultado) vocPintar(_voc.resultado,_voc.avisos||[],''); }
+
+// --- Pistas con IA ------------------------------------------------------------
+async function vocPistasIA(){
+    const es=currentLanguage==='es';
+    const ta=document.getElementById('vocPalabras'); if(!ta) return;
+    const {lista}=vocLeerLista(ta.value);
+    if(!lista.length){ showNotification(es?'Escribe primero las palabras':'Type the words first','error'); return; }
+    const faltan=lista.filter(w=>!w.pista);
+    if(!faltan.length){ showNotification(es?'Todas las palabras ya tienen pista':'Every word already has a clue','info'); return; }
+    if(!ensureAiKey()) return;
+    const tipo=(document.getElementById('vocTipoPista')||{}).value||'definicion';
+    const btn=document.getElementById('vocPistasBtn');
+    if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'+(es?'Creando pistas…':'Writing clues…'); }
+    try{
+        const prompt = 'You write clues for vocabulary games in an English class for Colombian students (level A1-A2). '
+            + (tipo==='traduccion'
+                ? 'For each word give its most common Spanish translation (1 to 3 words).'
+                : 'For each word give a very short and simple clue in English (maximum 10 words) that does NOT contain the word itself.')
+            + ' Keep the same order. Return only JSON like {"pistas":[{"palabra":"apple","pista":"..."}]}. Words: '
+            + JSON.stringify(faltan.map(w=>w.palabra));
+        const r=await callGeminiJson(prompt);
+        const mapa={};
+        (Array.isArray(r&&r.pistas)?r.pistas:[]).forEach(x=>{
+            if(!x||typeof x.palabra!=='string'||typeof x.pista!=='string') return;
+            mapa[vocLetras(x.palabra)]=x.pista;
+        });
+        let puestas=0;
+        lista.forEach(w=>{
+            if(w.pista || !mapa[w.letras]) return;
+            let p=String(mapa[w.letras]).replace(/[\r\n=]+/g,' ').trim().slice(0,160);
+            // Una pista que trae la respuesta no sirve.
+            const esc=w.palabra.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+            p=p.replace(new RegExp(esc,'ig'),'___');
+            if(p){ w.pista=p; puestas++; }
+        });
+        ta.value=lista.map(w=>w.pista?`${w.palabra} = ${w.pista}`:w.palabra).join('\n');
+        vocGenerar();
+        showNotification(es?`✨ ${puestas} pista(s) nuevas. Revísalas antes de imprimir.`:`✨ ${puestas} new clue(s). Check them before printing.`,'success');
+    }catch(err){ console.error(err); showNotification((es?'Error de IA: ':'AI error: ')+(err.message||''),'error'); }
+    finally{ if(btn){ btn.disabled=false; btn.innerHTML='✨ '+(es?'Completar pistas con IA':'Fill in clues with AI'); } }
+}
+
+// --- PDF --------------------------------------------------------------------
+// Las fuentes base de jsPDF solo traen Latin-1: lo que se sale se cambia por su
+// equivalente simple para que no aparezcan simbolos raros en la hoja.
+function vocPdfTxt(t){
+    return String(t==null?'':t)
+        .replace(/[‘’‚′]/g,"'").replace(/[“”„″]/g,'"').replace(/[–—−]/g,'-').replace(/…/g,'...')
+        .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,'');
+}
+function vocEncabezado(pdf, titulo, instrucciones, conNombre){
+    const info=getInstitutionalInfo();
+    pdf.setFillColor(79,70,229); pdf.rect(0,0,210,24,'F');
+    const logo=userProfile.institutionLogo && addInstitutionLogoToPDF(pdf,userProfile.institutionLogo,{x:184,y:3,width:20,height:18});
+    pdf.setTextColor(255,255,255);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(17);
+    pdf.text(vocPdfTxt(titulo).slice(0,60), 14, 12);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+    const sub=[info.institution,info.classroom].filter(x=>x&&x!=='N/A').join(' · ');
+    if(sub) pdf.text(vocPdfTxt(sub).slice(0,95), 14, 19);
+    let y=33;
+    pdf.setTextColor(31,35,64);
+    if(conNombre){
+        pdf.setFontSize(10);
+        pdf.text('Name:', 14, y); pdf.setDrawColor(160,166,190); pdf.line(27,y+0.8,128,y+0.8);
+        pdf.text('Date:', 136, y); pdf.line(147,y+0.8,196,y+0.8);
+        y+=9;
+    }
+    if(instrucciones){
+        pdf.setFont('helvetica','italic'); pdf.setFontSize(10.5);
+        const ls=pdf.splitTextToSize(vocPdfTxt(instrucciones),182);
+        pdf.text(ls.slice(0,2), 14, y); y+=ls.slice(0,2).length*5+3;
+        pdf.setFont('helvetica','normal');
+    }
+    return y;
+}
+function vocPie(pdf, texto){
+    pdf.setFontSize(8); pdf.setTextColor(150,155,175);
+    pdf.text(vocPdfTxt(texto), 105, 290, {align:'center'});
+}
+function vocNombreArchivo(pref){
+    const t=(document.getElementById('vocTitulo')||{}).value||pref;
+    return `${pref}_${vocLetras(t).slice(0,24)||'Vocabulary'}_${new Date().toISOString().split('T')[0]}.pdf`;
+}
+function vocPdfSopa(pdf, res, titulo, instr){
+    const modo=(document.getElementById('vocSopaLista')||{}).value;
+    const dibujar=(solucion)=>{
+        let y=vocEncabezado(pdf, solucion?titulo+' - Answer key':titulo, solucion?'':instr, !solucion);
+        const celda=Math.min(182/res.tam, 150/res.tam, 10.5);
+        const ancho=celda*res.tam, x0=105-ancho/2, y0=y+2;
+        pdf.setDrawColor(79,70,229); pdf.setLineWidth(0.6);
+        pdf.roundedRect(x0-2,y0-2,ancho+4,ancho+4,3,3,'S');
+        if(solucion){
+            const colores=[[199,210,254],[167,243,208],[253,230,138],[251,207,232],[186,230,253],[221,214,254]];
+            pdf.setLineCap('round');
+            res.colocadas.forEach((p,i)=>{
+                const L=p.w.letras.length-1, col=colores[i%colores.length];
+                pdf.setDrawColor(col[0],col[1],col[2]); pdf.setLineWidth(celda*0.78);
+                pdf.line(x0+(p.c+0.5)*celda, y0+(p.r+0.5)*celda, x0+(p.c+p.dc*L+0.5)*celda, y0+(p.r+p.dr*L+0.5)*celda);
+            });
+            pdf.setLineCap('butt');
+        }
+        pdf.setTextColor(31,35,64); pdf.setFont('helvetica','bold'); pdf.setFontSize(celda*1.75);
+        res.grid.forEach((fila,r)=>fila.forEach((l,c)=>{
+            pdf.text(l, x0+(c+0.5)*celda, y0+(r+0.5)*celda, {align:'center', baseline:'middle'});
+        }));
+        y=y0+ancho+10;
+        // Lista de palabras en columnas, con una casilla para ir tachando.
+        const items=res.colocadas.map(p=>vocPdfTxt(vocTextoCasilla(p.w,modo)));
+        const largo=items.some(t=>t.length>22);
+        const ncol=largo?2:3, anchoCol=182/ncol;
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(10.5); pdf.setLineWidth(0.3); pdf.setDrawColor(120,126,150);
+        const porCol=Math.ceil(items.length/ncol);
+        items.forEach((t,i)=>{
+            const col=Math.floor(i/porCol), fila=i%porCol;
+            const x=14+col*anchoCol;
+            let yy=y+fila*6.4;
+            if(yy>280) return;
+            pdf.rect(x, yy-3.2, 3.4, 3.4);
+            const ls=pdf.splitTextToSize(t, anchoCol-8);
+            pdf.text(ls[0]+(ls.length>1?'...':''), x+5.5, yy);
+        });
+    };
+    dibujar(false);
+    vocPie(pdf,'Learners Track');
+    pdf.addPage(); dibujar(true);
+}
+function vocPdfCruci(pdf, res, titulo, instr){
+    const dibujarGrid=(y, solucion)=>{
+        const celda=Math.min(182/res.cols, (solucion?200:128)/res.filas, 11);
+        const x0=105-(celda*res.cols)/2;
+        pdf.setLineWidth(0.35); pdf.setDrawColor(31,35,64);
+        for(let r=0;r<res.filas;r++) for(let c=0;c<res.cols;c++){
+            const l=res.grid[r][c]; if(!l) continue;
+            const x=x0+c*celda, yy=y+r*celda;
+            pdf.setFillColor(255,255,255); pdf.rect(x,yy,celda,celda,'FD');
+            const n=res.numeros[r][c];
+            if(n){ pdf.setFont('helvetica','bold'); pdf.setFontSize(Math.max(5.5,celda*0.78)); pdf.setTextColor(79,70,229); pdf.text(String(n), x+0.6, yy+celda*0.3); }
+            if(solucion){ pdf.setFont('helvetica','bold'); pdf.setFontSize(celda*1.55); pdf.setTextColor(31,35,64); pdf.text(l, x+celda/2, yy+celda*0.54, {align:'center', baseline:'middle'}); }
+        }
+        return y+res.filas*celda;
+    };
+    let y=vocEncabezado(pdf, titulo, instr, true);
+    y=dibujarGrid(y+2,false)+9;
+    // Pistas en dos columnas; si no caben, siguen en otra hoja.
+    const columnas=[[ 'Across', res.horizontales ], [ 'Down', res.verticales ]];
+    const anchoCol=87;
+    let ys=[y,y], pagina=pdf.getCurrentPageInfo().pageNumber;
+    columnas.forEach(([nombre,arr],k)=>{
+        let x=14+k*95, yy=ys[k];
+        pdf.setPage(pagina);
+        const cab=()=>{ pdf.setFont('helvetica','bold'); pdf.setFontSize(11.5); pdf.setTextColor(79,70,229); pdf.text(nombre, x, yy); yy+=6; };
+        cab();
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(31,35,64);
+        let hoja=pagina;
+        arr.forEach(p=>{
+            const ls=pdf.splitTextToSize(vocPdfTxt(`${p.n}. ${p.w.pista||'-'} (${p.w.letras.length})`), anchoCol);
+            if(yy+ls.length*4.6>284){
+                hoja++;
+                if(pdf.getNumberOfPages()<hoja) pdf.addPage();
+                pdf.setPage(hoja); yy=20; cab();
+                pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor(31,35,64);
+            }
+            pdf.text(ls, x, yy); yy+=ls.length*4.6+1.4;
+        });
+    });
+    pdf.setPage(pdf.getNumberOfPages());
+    pdf.addPage();
+    y=vocEncabezado(pdf, titulo+' - Answer key', '', false);
+    dibujarGrid(y+2,true);
+}
+function vocPdfBingo(pdf, res, titulo, instr){
+    const modo=(document.getElementById('vocBingoContenido')||{}).value;
+    const lado=res.lado, COL=[[79,70,229],[124,58,237],[6,182,212],[16,185,129],[245,158,11]];
+    res.cartones.forEach((k,i)=>{
+        const arriba=i%2===0;
+        if(i>0 && arriba) pdf.addPage();
+        const top=arriba?8:156;
+        if(arriba){
+            pdf.setLineDashPattern([2,2],0); pdf.setDrawColor(190,195,215); pdf.setLineWidth(0.3);
+            pdf.line(8,148.5,202,148.5); pdf.setLineDashPattern([],0);
+        }
+        const celda=Math.min(160/lado, 104/lado);
+        const ancho=celda*lado, x0=105-ancho/2;
+        // Cabecera del carton
+        const letras='BINGO'.split('');
+        const anchoLetra=ancho/5;
+        letras.forEach((l,j)=>{
+            const col=COL[j];
+            pdf.setFillColor(col[0],col[1],col[2]);
+            pdf.roundedRect(x0+j*anchoLetra+0.8, top, anchoLetra-1.6, 11, 2.5, 2.5, 'F');
+            pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold'); pdf.setFontSize(17);
+            pdf.text(l, x0+j*anchoLetra+anchoLetra/2, top+5.7, {align:'center', baseline:'middle'});
+        });
+        pdf.setTextColor(31,35,64); pdf.setFont('helvetica','normal'); pdf.setFontSize(9.5);
+        pdf.text(vocPdfTxt(titulo).slice(0,50), x0, top+17);
+        if(k.nombre){ pdf.setFont('helvetica','bold'); pdf.text(vocPdfTxt(k.nombre).slice(0,45), x0+ancho, top+17, {align:'right'}); }
+        else { pdf.text('Name:', x0+ancho-62, top+17); pdf.setDrawColor(160,166,190); pdf.line(x0+ancho-50, top+17.8, x0+ancho, top+17.8); }
+        const y0=top+21;
+        pdf.setDrawColor(79,70,229); pdf.setLineWidth(0.5);
+        k.casillas.forEach((w,j)=>{
+            const r=Math.floor(j/lado), c=j%lado, x=x0+c*celda, y=y0+r*celda;
+            if(!w){
+                pdf.setFillColor(238,240,254); pdf.rect(x,y,celda,celda,'FD');
+                pdf.setTextColor(79,70,229); pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+                pdf.text('FREE', x+celda/2, y+celda/2, {align:'center', baseline:'middle'});
+                return;
+            }
+            pdf.rect(x,y,celda,celda,'S');
+            const t=vocPdfTxt(vocTextoCasilla(w,modo));
+            // La letra se achica hasta que el texto cabe en la casilla.
+            let fs=lado===3?17:(lado===4?14:12.5), ls;
+            pdf.setFont('helvetica','bold'); pdf.setTextColor(31,35,64);
+            for(;;){
+                pdf.setFontSize(fs);
+                ls=pdf.splitTextToSize(t, celda-3);
+                const alto=ls.length*fs*0.3528*1.15;
+                const palabraMasAncha=Math.max(...t.split(/\s+/).map(s=>pdf.getTextWidth(s)));
+                if((alto<=celda-3 && palabraMasAncha<=celda-3) || fs<=6.5) break;
+                fs-=0.5;
+            }
+            const altoL=fs*0.3528*1.15;
+            const yIni=y+celda/2-((ls.length-1)*altoL)/2;
+            ls.forEach((s,q)=>pdf.text(s, x+celda/2, yIni+q*altoL, {align:'center', baseline:'middle'}));
+        });
+        if(instr && !k.nombre){
+            pdf.setFont('helvetica','italic'); pdf.setFontSize(8.5); pdf.setTextColor(107,114,144);
+            pdf.text(vocPdfTxt(instr).slice(0,110), 105, y0+ancho+5, {align:'center'});
+        }
+    });
+    // Hoja del docente: la lista para ir cantando, ya barajada.
+    pdf.addPage();
+    let y=vocEncabezado(pdf, titulo+' - Caller list', 'Read the words in this order and tick them off as you go.', false);
+    pdf.autoTable({
+        startY:y, theme:'grid',
+        head:[['#','Word','Clue','OK']],
+        body:res.llamado.map((w,i)=>[String(i+1), vocPdfTxt(w.palabra), vocPdfTxt(w.pista||''), '']),
+        headStyles:{ fillColor:[79,70,229] }, styles:{ fontSize:10, cellPadding:2.4 },
+        columnStyles:{ 0:{cellWidth:12,halign:'center'}, 3:{cellWidth:14} }
+    });
+}
+function vocDescargarPdf(){
+    const es=currentLanguage==='es';
+    const res=_voc.resultado;
+    if(!res){ showNotification(es?'Primero arma el juego':'Build the game first','error'); return; }
+    if(!window.jspdf){ showNotification(es?'No cargó la librería de PDF. Revisa tu conexión.':'The PDF library did not load. Check your connection.','error'); return; }
+    if(res.tipo==='cruci'){
+        const sin=[...res.horizontales,...res.verticales].filter(p=>!p.w.pista);
+        if(sin.length && !confirm(es?`${sin.length} palabra(s) del crucigrama no tienen pista y saldrán con un guion.\n\n¿Descargar de todos modos?`:`${sin.length} crossword word(s) have no clue and will show a dash.\n\nDownload anyway?`)) return;
+    }
+    try{
+        const {jsPDF}=window.jspdf;
+        const pdf=new jsPDF();
+        const titulo=((document.getElementById('vocTitulo')||{}).value||'Vocabulary').trim()||'Vocabulary';
+        const instr=((document.getElementById('vocInstrucciones')||{}).value||'').trim();
+        if(res.tipo==='sopa'){ vocPdfSopa(pdf,res,titulo,instr); pdf.save(vocNombreArchivo('WordSearch')); }
+        else if(res.tipo==='cruci'){ vocPdfCruci(pdf,res,titulo,instr); pdf.save(vocNombreArchivo('Crossword')); }
+        else { vocPdfBingo(pdf,res,titulo,instr); pdf.save(vocNombreArchivo('Bingo')); }
+        vocRecordar();
+        showNotification(res.tipo==='bingo'
+            ? (es?`📄 PDF listo: ${res.cartones.length} cartones y, al final, tu lista para cantar.`:`📄 PDF ready: ${res.cartones.length} cards and, at the end, your caller list.`)
+            : (es?'📄 PDF listo. La última hoja trae las respuestas.':'📄 PDF ready. The last page has the answers.'),'success');
+    }catch(e){ console.error(e); showNotification(es?'No se pudo crear el PDF.':'Could not create the PDF.','error'); }
+}
+function textosJuegosVocabulario(){
+    const es=currentLanguage==='es';
+    const t=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    t('vocBtnText', es?'Juegos de vocabulario':'Vocabulary games');
+    t('vocTituloModal', es?'🧩 Juegos de vocabulario':'🧩 Vocabulary games');
+    t('vocIntro', es?'Escribe las palabras de la semana y la plataforma arma el juego listo para imprimir, con la hoja de respuestas al final.':'Type the words of the week and the platform builds a printable game, with the answer key at the end.');
+    t('vocTabSopa', es?'Sopa de letras':'Word search');
+    t('vocTabCruci', es?'Crucigrama':'Crossword');
+    t('vocTabBingo', es?'Bingo':'Bingo');
+    t('vocTituloLbl', es?'Título de la hoja':'Worksheet title');
+    t('vocPalabrasLbl', es?'Palabras (una por renglón)':'Words (one per line)');
+    t('vocAyuda', es?'Para agregar una pista o traducción: apple = manzana':'To add a clue or translation: apple = manzana');
+    t('vocTipoPistaLbl', es?'Pistas con IA:':'AI clues:');
+    t('vocSopaNivelLbl', es?'Dificultad':'Difficulty');
+    t('vocSopaListaLbl', es?'Debajo de la sopa mostrar':'Below the puzzle show');
+    t('vocBingoLadoLbl', es?'Tamaño del cartón':'Card size');
+    t('vocBingoCantidadLbl', es?'Cartones':'Cards');
+    t('vocBingoContenidoLbl', es?'En las casillas':'In the squares');
+    t('vocBingoNombresLbl', es?'Un cartón con el nombre de cada estudiante':'One card with each student’s name');
+    t('vocInstrLbl', es?'Instrucción para los estudiantes':'Instruction for students');
+    t('vocSolucionLbl', es?'Ver solución':'Show answers');
+    t('vocOtraBtn', es?'🔀 Otra versión':'🔀 Shuffle');
+    t('vocCerrarBtn', es?'Cerrar':'Close');
+    t('vocPdfBtn', es?'📄 Descargar PDF':'📄 Download PDF');
+    const pb=document.getElementById('vocPistasBtn'); if(pb && !pb.disabled) pb.innerHTML='✨ '+(es?'Completar pistas con IA':'Fill in clues with AI');
+    const opt=(id,vals)=>{ const s=document.getElementById(id); if(!s) return; [...s.options].forEach((o,i)=>{ if(vals[i]) o.textContent=vals[i]; }); };
+    opt('vocTipoPista', es?['Definición en inglés','Traducción al español']:['English definition','Spanish translation']);
+    opt('vocSopaNivel', es?['Fácil (→ ↓)','Media (+ diagonal)','Difícil (+ al revés)']:['Easy (→ ↓)','Medium (+ diagonal)','Hard (+ backwards)']);
+    opt('vocSopaLista', es?['Las palabras','Las pistas']:['The words','The clues']);
+    opt('vocBingoContenido', es?['Las palabras','Las pistas']:['The words','The clues']);
+}
+</script>
+<script>
+// ===================== COMENTARIOS DEL BOLETIN CON IA ======================
+// La IA escribe un borrador por estudiante con sus notas, asistencia e insignias.
+// El docente lo revisa, lo cambia si quiere y guarda solo los que marca.
+//
+// PRIVACIDAD. A Google no le llega ningun nombre: cada estudiante viaja como un
+// codigo (E01, E02...) y la IA escribe {NOMBRE} donde va el nombre, que se pone
+// aqui, en el equipo del docente. Tambien se quitan los nombres que pudiera haber
+// dentro del comentario anterior y de las indicaciones del docente.
+const BIA_LOTE = 8;
+let _bia = { clase:-1, borradores:{}, marcados:{}, errores:{}, guardados:{}, generando:false };
+
+function biaNumero(v){ const n=parseFloat(String(v==null?'':v).replace(',','.')); return isFinite(n)?n:null; }
+function biaDesempeno(n){
+    if(n===null) return null;
+    // Escala nacional (Decreto 1290) sobre 5, con el minimo que configuro el docente.
+    if(n<notaMinimaAnual) return 'Bajo';
+    if(n<4) return 'Básico';
+    if(n<4.6) return 'Alto';
+    return 'Superior';
+}
+function biaTitulo(nombre){
+    const t=String(nombre||'').trim().replace(/\s+/g,' ');
+    // Las listas del colegio suelen venir en MAYUSCULAS: en el comentario se ve mejor "Juan Pérez".
+    if(t && t===t.toUpperCase()) return t.toLowerCase().replace(/(^|\s)(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+    return t;
+}
+function biaNombreParaComentario(s, modo){
+    const n=biaTitulo(s.name);
+    if(modo==='ninguno') return '';
+    if(modo==='primero') return n.split(' ')[0]||n;
+    return n;
+}
+function biaEscRegex(t){ return String(t).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+// Quita de un texto los nombres de los estudiantes del salon. Los del propio
+// estudiante pasan a {NOMBRE}; los de los demas, a "un compañero".
+function biaSinNombres(texto, alumnos, reemplazo, propio){
+    let out=String(texto||'');
+    const piezasDe=(n)=>{ n=String(n||'').trim(); if(n.length<2) return []; return [n].concat(n.split(/\s+/).filter(p=>p.length>=3)); };
+    const quitar=(piezas, por)=>{
+        [...new Set(piezas)].sort((a,b)=>b.length-a.length).forEach(p=>{
+            out=out.replace(new RegExp('(?<!\\p{L})'+biaEscRegex(p)+'(?!\\p{L})','giu'), '\u0000');
+        });
+        // Nombre y apellidos seguidos quedan como una sola mencion.
+        out=out.replace(/\u0000(?:\s+\u0000)*/g, por);
+    };
+    if(propio) quitar(piezasDe(propio.name), '{NOMBRE}');
+    quitar(alumnos.filter(a=>a!==propio).flatMap(a=>piezasDe(a.name)), reemplazo);
+    return out;
+}
+function biaColumnas(p){ return (p===activePeriod ? noteColumns : (noteColumnsByPeriod[p]||[])).slice(); }
+function biaResumen(s, periodo){
+    const registros=Object.values(s.attendance||{}).filter(e=>e==='p'||e==='a');
+    const ausencias=registros.filter(e=>e==='a').length;
+    const cuenta={};
+    (s.gridBadges||[]).forEach(c=>(c||[]).forEach(b=>{ if(b&&b.name){ cuenta[b.name]=(cuenta[b.name]||0)+1; } }));
+    const insignias=Object.entries(cuenta).sort((a,b)=>b[1]-a[1]);
+    let nota=null, detalle=null;
+    if(periodo==='anual'){
+        const r=resumenAnual(s);
+        nota = r.definitiva!==null ? r.definitiva : r.parcial;
+        detalle = { periodos:r.det.filter(d=>d.efectiva!==null).map(d=>({ periodo:d.p, nota:d.efectiva, recuperado:!!d.recuperada })),
+                    estadoDelAno:textoEstadoAnual(r,true).replace(/^\S+\s/,'') };
+    } else {
+        const cols=biaColumnas(periodo), notas=notasDePeriodo(s,periodo);
+        nota=biaNumero(promedioDePeriodo(s,periodo));
+        detalle = { notas: cols.map((c,i)=>({ actividad:String(c||'').slice(0,40), nota:String(notas[i]==null?'':notas[i]).trim() })).filter(x=>x.nota) };
+    }
+    return {
+        nota:nota, desempeno:biaDesempeno(nota), detalle:detalle,
+        asistencia:{ registradas:registros.length, ausencias:ausencias, porcentaje:registros.length?Math.round((registros.length-ausencias)*100/registros.length):null },
+        insignias:{ total:insignias.reduce((a,x)=>a+x[1],0), principales:insignias.slice(0,6).map(x=>x[0]+(x[1]>1?` x${x[1]}`:'')) }
+    };
+}
+function biaOpciones(){
+    const v=(id,def)=>{ const el=document.getElementById(id); return el&&el.value?el.value:def; };
+    const p=v('biaPeriodo',String(activePeriod));
+    return {
+        periodo: p==='anual' ? 'anual' : periodoValido(p),
+        tono: v('biaTono','calido'), largo: v('biaLargo','corto'), idioma: v('biaIdioma','es'),
+        nombre: v('biaNombre','completo'), para: v('biaPara','sin'),
+        extra: String((document.getElementById('biaExtra')||{}).value||'').trim().slice(0,240)
+    };
+}
+function biaAlumnosObjetivo(op){
+    const lista=(currentStudents||[]);
+    return op.para==='todos' ? lista.slice() : lista.filter(s=>!(s.comment&&s.comment.trim()) || _bia.borradores[s.id]!==undefined || _bia.guardados[s.id]);
+}
+function biaGuardarPreferencias(){
+    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara'].forEach(id=>{ const el=document.getElementById(id); if(el) localStorage.setItem('lt_'+id, el.value); }); }catch(e){}
+}
+function abrirComentariosBoletin(){
+    const es=currentLanguage==='es';
+    if(!(currentStudents||[]).length){ showNotification(es?'No hay estudiantes en el aula':'No students in classroom','error'); return; }
+    if(_bia.clase!==activeClassroomIndex){ _bia={ clase:activeClassroomIndex, borradores:{}, marcados:{}, errores:{}, guardados:{}, generando:false }; }
+    const sel=document.getElementById('biaPeriodo');
+    if(sel){
+        const actual=sel.value;
+        sel.innerHTML=PERIODOS.map(p=>`<option value="${p}">${es?'Periodo':'Period'} ${p}</option>`).join('')
+            + `<option value="anual">${es?'Año completo (nota final)':'Whole year (final grade)'}</option>`;
+        sel.value = actual || String(activePeriod);
+    }
+    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara'].forEach(id=>{ const el=document.getElementById(id), g=localStorage.getItem('lt_'+id); if(el&&g&&[...el.options].some(o=>o.value===g)) el.value=g; }); }catch(e){}
+    textosComentariosBoletin();
+    biaPintarLista();
+    showModal('biaModal');
+}
+function cerrarComentariosBoletin(){ hideModal('biaModal'); }
+function biaAbierto(){ const m=document.getElementById('biaModal'); return !!(m && m.style.display==='flex'); }
+
+function biaPintarLista(){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('biaLista'); if(!caja) return;
+    const op=biaOpciones();
+    const alumnos=biaAlumnosObjetivo(op);
+    if(!alumnos.length){
+        caja.innerHTML=`<div class="bia-vacio">✅ ${es?'Todos los estudiantes ya tienen comentario. Elige “Todos los estudiantes” si quieres escribirlos de nuevo.':'Every student already has a comment. Choose “All students” to write them again.'}</div>`;
+        biaActualizarBotones(); return;
+    }
+    caja.innerHTML=alumnos.map(s=>{
+        const r=biaResumen(s,op.periodo);
+        const chips=[];
+        chips.push(r.nota!==null ? `📘 ${r.nota.toFixed(1)} · ${escapeHtml(r.desempeno)}` : `📘 ${es?'Sin notas':'No scores'}`);
+        if(r.asistencia.porcentaje!==null) chips.push(`📋 ${r.asistencia.porcentaje}%`);
+        chips.push(`🏅 ${r.insignias.total}`);
+        const borrador=_bia.borradores[s.id];
+        const err=_bia.errores[s.id];
+        const estado = _bia.guardados[s.id] ? `<span class="bia-ok">✓ ${es?'Guardado':'Saved'}</span>`
+                     : err ? `<span class="bia-err">⚠️ ${escapeHtml(err)}</span>` : '';
+        const actual=(s.comment&&s.comment.trim()) ? `<details class="bia-actual"><summary>${es?'Comentario actual':'Current comment'}</summary><p>${escapeHtml(s.comment)}</p></details>` : '';
+        return `<div class="bia-fila${r.desempeno==='Bajo'?' bia-bajo':''}" data-id="${Number(s.id)}">
+            <div class="bia-cab">
+                <label class="bia-check"><input type="checkbox" ${_bia.marcados[s.id]?'checked':''} ${borrador?'':'disabled'} onchange="biaMarcar(${Number(s.id)},this.checked)"><b>${escapeHtml(s.name||'')}</b></label>
+                <span class="bia-chips">${chips.map(c=>`<span>${c}</span>`).join('')}</span>
+            </div>
+            <textarea rows="3" maxlength="900" placeholder="${es?'Aquí aparecerá el borrador…':'The draft will appear here…'}" oninput="biaEditar(${Number(s.id)},this.value)">${escapeHtml(borrador||'')}</textarea>
+            ${actual}
+            <div class="bia-pie"><button type="button" class="bia-otra" onclick="biaOtraVersion(${Number(s.id)})" ${_bia.generando?'disabled':''}>↻ ${es?(borrador?'Otra versión':'Escribir este'):(borrador?'Another version':'Write this one')}</button>${estado}</div>
+        </div>`;
+    }).join('');
+    biaActualizarBotones();
+}
+function biaMarcar(id,v){ _bia.marcados[id]=!!v; biaActualizarBotones(); }
+function biaEditar(id,texto){
+    _bia.borradores[id]=texto;
+    delete _bia.guardados[id];
+    const fila=document.querySelector(`#biaLista .bia-fila[data-id="${Number(id)}"]`);
+    const cb=fila&&fila.querySelector('input[type=checkbox]');
+    if(cb){ cb.disabled=!texto.trim(); cb.checked=!!texto.trim(); _bia.marcados[id]=cb.checked; }
+    biaActualizarBotones();
+}
+function biaActualizarBotones(){
+    const es=currentLanguage==='es';
+    const n=(currentStudents||[]).filter(s=>_bia.marcados[s.id] && String(_bia.borradores[s.id]||'').trim()).length;
+    const g=document.getElementById('biaGuardarBtn');
+    if(g){ g.disabled=!n||_bia.generando; g.textContent = es?`💾 Guardar ${n} comentario${n===1?'':'s'}`:`💾 Save ${n} comment${n===1?'':'s'}`; }
+    const gen=document.getElementById('biaGenerarBtn');
+    if(gen){
+        gen.disabled=false;
+        gen.innerHTML = _bia.generando ? (es?'⏹ Detener':'⏹ Stop') : ('✨ '+(es?'Generar borradores':'Write drafts'));
+    }
+}
+function biaProgreso(hechos,total,texto){
+    const box=document.getElementById('biaProgreso'); if(!box) return;
+    if(total===null){ box.hidden=true; return; }
+    box.hidden=false;
+    const barra=box.querySelector('span'), p=box.querySelector('p');
+    if(barra) barra.style.transform=`scaleX(${total?hechos/total:0})`;
+    if(p) p.textContent=texto;
+}
+// Arma la peticion para un grupo de estudiantes. Devuelve el mapa codigo -> estudiante.
+function biaPrompt(grupo, op, variar){
+    const alumnos=currentStudents||[];
+    const mapa={};
+    const datos=grupo.map((s,i)=>{
+        const codigo='E'+String(i+1).padStart(2,'0');
+        mapa[codigo]=s;
+        const r=biaResumen(s,op.periodo);
+        const d={ id:codigo, nota:r.nota, desempeno:r.desempeno, asistencia:r.asistencia, insignias:r.insignias };
+        if(op.periodo==='anual'){ d.periodos=r.detalle.periodos; d.estadoDelAno=r.detalle.estadoDelAno; }
+        else d.notas=r.detalle.notas;
+        if(s.comment&&s.comment.trim()) d.observacionAnteriorDelDocente=biaSinNombres(s.comment,alumnos,'un compañero',s).slice(0,400);
+        if(variar && String(_bia.borradores[s.id]||'').trim()) d.versionAnteriorQueNoGusto=biaSinNombres(_bia.borradores[s.id],alumnos,'un compañero',s).slice(0,600);
+        return d;
+    });
+    const idioma = op.idioma==='en' ? 'inglés' : 'español';
+    const largo = op.largo==='medio' ? 'de 3 a 4 frases' : 'de 2 frases';
+    const tono = { calido:'cálido y cercano', formal:'formal y respetuoso', motivador:'motivador y entusiasta' }[op.tono] || 'cálido y cercano';
+    const que = op.periodo==='anual' ? 'el año escolar completo (nota final)' : `el periodo ${op.periodo}`;
+    const reglaNombre = op.nombre==='ninguno'
+        ? '- No uses el nombre del estudiante ni ningún marcador de nombre.'
+        : '- Escribe exactamente {NOMBRE} donde vaya el nombre, una sola vez. Nunca inventes un nombre.';
+    const texto = [
+        'Eres docente de inglés en un colegio de Colombia y escribes los comentarios del boletín de calificaciones que leen las familias.',
+        `Para cada estudiante escribe UN comentario en ${idioma}, ${largo}, con tono ${tono}, sobre ${que}.`,
+        'Reglas:',
+        '- Básate solo en los datos que recibes y menciona algo concreto de cada estudiante (una fortaleza, una nota, la asistencia o las insignias). No inventes nada.',
+        '- Si el desempeño es Bajo o tiene muchas ausencias, dilo con respeto y termina con una recomendación práctica para mejorar, que la familia pueda apoyar en casa.',
+        '- Si el desempeño es Alto o Superior, reconoce el logro y anímale a mantenerlo.',
+        reglaNombre,
+        '- No sabes si es niño o niña: usa expresiones neutras (por ejemplo "muestra compromiso" en vez de "es comprometido").',
+        '- Sin listas, sin comillas, sin emojis y sin saludos. Varía la forma de empezar para que no todos suenen igual.',
+        '- La escala de notas es de 1.0 a 5.0.',
+        variar ? '- Si hay "versionAnteriorQueNoGusto", escribe algo claramente distinto a esa versión.' : '',
+        op.extra ? 'Indicaciones del docente para todos: ' + biaSinNombres(op.extra,alumnos,'un estudiante') : '',
+        'Devuelve solo JSON con esta forma: {"comentarios":[{"id":"E01","texto":"..."}]}',
+        'Datos: ' + JSON.stringify(datos)
+    ].filter(Boolean).join('\n');
+    return { texto:texto, mapa:mapa };
+}
+function biaLimpiar(texto, s, op){
+    let t=String(texto||'').replace(/\s+/g,' ').trim().replace(/^["'“”«]+|["'“”»]+$/g,'');
+    const nombre=biaNombreParaComentario(s,op.nombre);
+    t=t.replace(/[{\[]\s*nombre\s*[}\]]/gi, nombre);
+    if(!nombre) t=t.replace(/\s{2,}/g,' ').replace(/^\s*[,.]\s*/,'').replace(/\s+([,.;:])/g,'$1');
+    t=t.trim();
+    return t ? t.charAt(0).toUpperCase()+t.slice(1) : '';
+}
+async function biaPedir(grupo, op, variar){
+    const {texto,mapa}=biaPrompt(grupo,op,variar);
+    const r=await callGeminiJson(texto);
+    const lista=Array.isArray(r&&r.comentarios)?r.comentarios:[];
+    const hechos=new Set();
+    lista.forEach(x=>{
+        if(!x||typeof x.id!=='string'||typeof x.texto!=='string') return;
+        const s=mapa[x.id.trim()]; if(!s || hechos.has(s.id)) return;
+        const limpio=biaLimpiar(x.texto,s,op).slice(0,900);
+        if(!limpio) return;
+        hechos.add(s.id);
+        _bia.borradores[s.id]=limpio; _bia.marcados[s.id]=true;
+        delete _bia.errores[s.id]; delete _bia.guardados[s.id];
+    });
+    grupo.forEach(s=>{ if(!hechos.has(s.id)) _bia.errores[s.id]=currentLanguage==='es'?'La IA no lo devolvió. Pulsa ↻ para intentarlo de nuevo.':'The AI did not return it. Press ↻ to try again.'; });
+}
+async function biaGenerar(){
+    const es=currentLanguage==='es';
+    if(_bia.generando){ _bia.detener=true; return; }
+    if(!ensureAiKey()) return;
+    biaGuardarPreferencias();
+    const op=biaOpciones();
+    const pendientes=biaAlumnosObjetivo(op).filter(s=>!String(_bia.borradores[s.id]||'').trim());
+    const todos=biaAlumnosObjetivo(op);
+    let grupo=pendientes;
+    if(!pendientes.length){
+        if(!todos.length) return;
+        if(!confirm(es?'Todos ya tienen borrador. ¿Escribirlos todos de nuevo? Se reemplazan los borradores que no has guardado.':'Everyone already has a draft. Write them all again? Unsaved drafts will be replaced.')) return;
+        grupo=todos;
+    }
+    _bia.generando=true; _bia.detener=false;
+    biaPintarLista();
+    let hechos=0;
+    try{
+        for(let i=0;i<grupo.length;i+=BIA_LOTE){
+            if(_bia.detener || !biaAbierto()) break;
+            const lote=grupo.slice(i,i+BIA_LOTE);
+            biaProgreso(hechos,grupo.length, es?`Escribiendo ${Math.min(hechos+lote.length,grupo.length)} de ${grupo.length}…`:`Writing ${Math.min(hechos+lote.length,grupo.length)} of ${grupo.length}…`);
+            try{ await biaPedir(lote,op,false); }
+            catch(err){
+                console.error(err);
+                const msg=(err&&err.message)||'';
+                lote.forEach(s=>{ _bia.errores[s.id]=(es?'Error de IA':'AI error')+(msg?': '+msg.slice(0,90):''); });
+                if(/api key|API_KEY|permission|quota|429/i.test(msg)){ showNotification((es?'Error de IA: ':'AI error: ')+msg,'error'); break; }
+            }
+            hechos+=lote.length;
+            biaProgreso(hechos,grupo.length,'');
+            biaPintarLista();
+        }
+    } finally {
+        _bia.generando=false;
+        biaProgreso(0,null,'');
+        biaPintarLista();
+    }
+    const listos=grupo.filter(s=>String(_bia.borradores[s.id]||'').trim()).length;
+    if(listos) showNotification(es?`✨ ${listos} borrador(es) listos. Léelos antes de guardar.`:`✨ ${listos} draft(s) ready. Read them before saving.`,'success');
+}
+async function biaOtraVersion(id){
+    const es=currentLanguage==='es';
+    if(_bia.generando) return;
+    const s=(currentStudents||[]).find(x=>x.id===id); if(!s) return;
+    if(!ensureAiKey()) return;
+    const fila=document.querySelector(`#biaLista .bia-fila[data-id="${Number(id)}"]`);
+    const btn=fila&&fila.querySelector('.bia-otra');
+    if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'+(es?'Escribiendo…':'Writing…'); }
+    try{ await biaPedir([s],biaOpciones(),true); }
+    catch(err){ console.error(err); _bia.errores[s.id]=(es?'Error de IA: ':'AI error: ')+((err&&err.message)||'').slice(0,90); }
+    biaPintarLista();
+}
+function biaGuardar(){
+    const es=currentLanguage==='es';
+    const elegidos=(currentStudents||[]).filter(s=>_bia.marcados[s.id] && String(_bia.borradores[s.id]||'').trim());
+    if(!elegidos.length) return;
+    const reemplaza=elegidos.filter(s=>s.comment&&s.comment.trim() && s.comment.trim()!==_bia.borradores[s.id].trim()).length;
+    if(reemplaza && !confirm(es?`${reemplaza} estudiante(s) ya tenían comentario y se va a reemplazar.\n\n¿Guardar?`:`${reemplaza} student(s) already had a comment that will be replaced.\n\nSave?`)) return;
+    const copia=elegidos.map(s=>({ id:s.id, antes:s.comment||'' }));
+    elegidos.forEach(s=>{ s.comment=_bia.borradores[s.id].trim(); _bia.guardados[s.id]=true; _bia.marcados[s.id]=false; });
+    saveData(); updateStats(); if(typeof renderCurrentView==='function') renderCurrentView();
+    biaPintarLista();
+    showNotification(
+        es?`💾 ${elegidos.length} comentario(s) guardados en el boletín`:`💾 ${elegidos.length} comment(s) saved to the report card`,
+        'success',
+        { texto: es?'Deshacer':'Undo', onClick(){
+            copia.forEach(r=>{ const s=currentStudents.find(x=>x.id===r.id); if(s){ s.comment=r.antes; delete _bia.guardados[r.id]; _bia.marcados[r.id]=true; } });
+            saveData(); updateStats(); if(typeof renderCurrentView==='function') renderCurrentView();
+            if(biaAbierto()) biaPintarLista();
+            showNotification(es?'Comentarios restaurados':'Comments restored','info');
+        }}
+    );
+}
+function textosComentariosBoletin(){
+    const es=currentLanguage==='es';
+    const t=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+    t('biaBtnText', es?'Comentarios del boletín (IA)':'Report card comments (AI)');
+    t('biaTituloModal', es?'✍️ Comentarios para el boletín':'✍️ Report card comments');
+    t('biaIntro', es?'La IA escribe un borrador para cada estudiante con sus notas, su asistencia y sus insignias. Tú lo lees, lo cambias si quieres y guardas los que marques.':'The AI writes a draft for each student from their scores, attendance and badges. You read it, edit it if you like, and save the ones you tick.');
+    t('biaPeriodoLbl', es?'Sobre':'About');
+    t('biaTonoLbl', es?'Tono':'Tone');
+    t('biaLargoLbl', es?'Extensión':'Length');
+    t('biaIdiomaLbl', es?'Idioma':'Language');
+    t('biaNombreLbl', es?'Nombre en el texto':'Name in the text');
+    t('biaParaLbl', es?'Para':'For');
+    t('biaExtraLbl', es?'Indicación para todos (opcional)':'Note for all (optional)');
+    t('biaPrivacidad', es?'🔒 A Google llegan las notas, la asistencia y las insignias con un código (E01, E02…). Los nombres se ponen aquí, en tu equipo.':'🔒 Google receives scores, attendance and badges under a code (E01, E02…). Names are filled in here, on your device.');
+    t('biaCerrarBtn', es?'Cerrar':'Close');
+    const ex=document.getElementById('biaExtra'); if(ex) ex.placeholder=es?'Ej.: mencionar la presentación oral del periodo':'E.g.: mention this term’s oral presentation';
+    const opt=(id,vals)=>{ const s=document.getElementById(id); if(!s) return; [...s.options].forEach((o,i)=>{ if(vals[i]) o.textContent=vals[i]; }); };
+    opt('biaTono', es?['Cálido','Formal','Motivador']:['Warm','Formal','Encouraging']);
+    opt('biaLargo', es?['Corto (2 frases)','Medio (3 a 4 frases)']:['Short (2 sentences)','Medium (3 to 4 sentences)']);
+    opt('biaIdioma', es?['Español','Inglés']:['Spanish','English']);
+    opt('biaNombre', es?['Nombre completo','Solo la primera palabra','Sin nombre']:['Full name','First word only','No name']);
+    opt('biaPara', es?['Quienes no tienen comentario','Todos los estudiantes']:['Students without a comment','All students']);
+    biaActualizarBotones();
 }
 </script>
 </body>
