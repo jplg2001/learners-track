@@ -1425,6 +1425,44 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   .voc-pistas { grid-template-columns:1fr; }
 }
 
+/* === BIENVENIDA AL PASAR LISTA === */
+/* La capa va fija sobre la pagina: dentro de la tabla, el "overflow" cortaria
+   las chispas. Solo se mueven transform y opacity, asi que no cuesta nada
+   aunque se pase lista de 40 estudiantes seguidos. */
+.fiesta-capa { position:fixed; z-index:2500; width:0; height:0; pointer-events:none; }
+.fiesta-f { color:#ec4899; } .fiesta-m { color:#2563eb; } .fiesta-x { color:var(--accent-strong); }
+.fiesta-p { position:absolute; left:0; top:0; font-size:1.05rem; line-height:1; opacity:0; will-change:transform,opacity; animation:fiestaVuela .95s var(--ease-out) forwards; }
+@keyframes fiestaVuela {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
+  12%  { opacity:1; }
+  70%  { opacity:.95; }
+  100% { opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(var(--giro)); }
+}
+.fiesta-aro { position:absolute; left:-14px; top:-14px; width:28px; height:28px; border-radius:50%; border:2.5px solid currentColor; opacity:.9; animation:fiestaAro .7s var(--ease-out) forwards; }
+@keyframes fiestaAro { 0%{ transform:scale(.35); opacity:.9; } 100%{ transform:scale(2.8); opacity:0; } }
+.fiesta-saludo { position:absolute; left:0; top:0; white-space:nowrap; font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:.92rem; text-shadow:0 1px 0 var(--bg-alt), 0 2px 10px rgba(31,35,64,.25); opacity:0; animation:fiestaSaludo 1.25s var(--ease-out) forwards; }
+@keyframes fiestaSaludo {
+  0%   { opacity:0; transform:translate(-50%,-20%) scale(.6); }
+  22%  { opacity:1; transform:translate(-50%,-150%) scale(1.06); }
+  72%  { opacity:1; transform:translate(-50%,-175%) scale(1); }
+  100% { opacity:0; transform:translate(-50%,-250%) scale(1); }
+}
+/* El destello de la fila toma el color de la celebracion. */
+tr.flash-f td { animation:flashF .9s ease-out; }
+tr.flash-m td { animation:flashM .9s ease-out; }
+tr.flash-x td { animation:flashX .9s ease-out; }
+@keyframes flashF { 0%{background:rgba(236,72,153,.26);} 100%{background:transparent;} }
+@keyframes flashM { 0%{background:rgba(37,99,235,.24);} 100%{background:transparent;} }
+@keyframes flashX { 0%{background:rgba(34,197,94,.30);} 100%{background:transparent;} }
+/* Elegir para quien es cada celebracion, desde la ficha del estudiante. */
+.genero-fila { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; font-size:.86rem; color:var(--fg-muted); }
+.genero-btn { border:1.5px solid var(--border); background:var(--bg-alt); color:var(--fg); border-radius:999px; padding:5px 12px; font:inherit; font-size:.84rem; font-weight:600; cursor:pointer; transition:border-color .2s var(--ease-out), background-color .2s var(--ease-out); }
+.genero-btn:hover { border-color:var(--accent); }
+.genero-btn[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong); }
+@media (prefers-reduced-motion:reduce){
+  .fiesta-capa { display:none; }
+  tr.flash-f td,tr.flash-m td,tr.flash-x td { animation:none; }
+}
 /* === RULETA DEL BINGO === */
 .voc-barra .btn-ai { padding:8px 14px; border:none; border-radius:var(--radius-sm); cursor:pointer; font:inherit; font-weight:700; }
 #ruletaModal { z-index:2100; }
@@ -3137,6 +3175,7 @@ window.toggleJuyuTip=function(){
         + ` <button type="button" class="juyu-free-btn" onclick="juyuSonidoToggle()">${_juyuMudo
             ? (es?'🔇 Sin ladrido':'🔇 Muted')
             : (es?'🔊 Con ladrido':'🔊 Barking')}</button>`
+        + (_juyuMudo ? '' : ` <button type="button" class="juyu-free-btn" onclick="juyuVozToggle()">${es?'🐕 Cambiar voz':'🐕 Change voice'}</button>`)
         + (_juyuFijado
             ? ` <button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
             : '');
@@ -3483,52 +3522,106 @@ function juyuAudioCtx(){
     document.addEventListener('pointerdown',abrir,{passive:true});
     document.addEventListener('keydown',abrir);
 })();
-function juyuUnLadrido(ac, t0, agudo){
-    const vol=ac.createGain();
-    vol.gain.value=0.22;
-    vol.connect(ac.destination);
-    // La voz: cae rapido de agudo a grave, como un "guau".
-    const base=(agudo?330:250)*(0.92+Math.random()*0.16);
-    const o=ac.createOscillator();
-    o.type='sawtooth';
-    o.frequency.setValueAtTime(base*1.7,t0);
-    o.frequency.exponentialRampToValueAtTime(base,t0+0.05);
-    o.frequency.exponentialRampToValueAtTime(base*0.55,t0+0.17);
-    const g=ac.createGain();
-    g.gain.setValueAtTime(0.0001,t0);
-    g.gain.exponentialRampToValueAtTime(0.9,t0+0.012);
-    g.gain.exponentialRampToValueAtTime(0.28,t0+0.08);
-    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.2);
-    // Un filtro le quita el zumbido metalico del oscilador.
-    const f=ac.createBiquadFilter();
-    f.type='lowpass'; f.frequency.setValueAtTime(2200,t0);
-    f.frequency.exponentialRampToValueAtTime(700,t0+0.2);
-    o.connect(g); g.connect(f); f.connect(vol);
-    o.start(t0); o.stop(t0+0.24);
-    // El aire: un golpe corto de ruido, que es lo que hace que suene a perro.
+// Tamano de la voz: cachorro, mediano o grandote. Solo cambia el tono de base.
+const JUYU_VOCES = { cachorro:430, mediano:290, grande:195 };
+let _juyuVoz='mediano';
+try{ const v=localStorage.getItem('learnersTrackJuyuVoz'); if(JUYU_VOCES[v]) _juyuVoz=v; }catch(e){}
+
+// Una curva suave de saturacion: le da el ronroneo aspero de la garganta.
+function juyuRasposo(ac){
+    const ws=ac.createWaveShaper(), n=1024, curva=new Float32Array(n);
+    for(let i=0;i<n;i++){ const x=i*2/n-1; curva[i]=Math.tanh(x*2.6); }
+    ws.curve=curva; ws.oversample='2x';
+    return ws;
+}
+// Un ladrido de verdad son tres cosas a la vez:
+//   1. el golpe de aire al abrir la boca de repente;
+//   2. la voz, un tono que sube de golpe y enseguida cae;
+//   3. el soplido del final, al cerrar el hocico.
+// Y sobre todo, la garganta y el hocico resaltan tres franjas de frecuencia
+// -las formantes- que se van cerrando: eso es lo que suena a perro y no a pito.
+function juyuUnLadrido(ac, t0, corto){
+    const f0=JUYU_VOCES[_juyuVoz]*(corto?0.9:1)*(0.94+Math.random()*0.12);
+    const dur=(corto?0.17:0.23)*(0.92+Math.random()*0.16);
+    const salida=ac.createGain();
+    salida.gain.value=0.34;
+    salida.connect(ac.destination);
+
+    // --- La voz ---
+    const env=ac.createGain();
+    env.gain.setValueAtTime(0.0001,t0);
+    env.gain.exponentialRampToValueAtTime(1,t0+0.008);        // ataque seco
+    env.gain.setValueAtTime(1,t0+0.05);
+    env.gain.exponentialRampToValueAtTime(0.3,t0+dur*0.6);
+    env.gain.exponentialRampToValueAtTime(0.0008,t0+dur);
+    const rasp=juyuRasposo(ac);
+    env.connect(rasp);
+    [['sawtooth',1],['square',0.3]].forEach(par=>{
+        const o=ac.createOscillator(); o.type=par[0];
+        o.frequency.setValueAtTime(f0*0.78,t0);
+        o.frequency.exponentialRampToValueAtTime(f0*1.24,t0+0.03);   // sube de golpe
+        o.frequency.exponentialRampToValueAtTime(f0*0.6,t0+dur);     // y cae
+        const g=ac.createGain(); g.gain.value=par[1];
+        o.connect(g); g.connect(env);
+        o.start(t0); o.stop(t0+dur+0.05);
+    });
+    // --- Las formantes, cerrandose como el hocico ---
+    [[720,470,7,1],[1650,1050,9,0.6],[2750,2300,10,0.3]].forEach(fm=>{
+        const f=ac.createBiquadFilter();
+        f.type='bandpass'; f.Q.value=fm[2];
+        f.frequency.setValueAtTime(fm[0]*(0.94+Math.random()*0.12),t0);
+        f.frequency.exponentialRampToValueAtTime(fm[1],t0+dur);
+        const g=ac.createGain(); g.gain.value=fm[3]*3.2;   // el pasabanda baja mucho el nivel
+        rasp.connect(f); f.connect(g); g.connect(salida);
+    });
+    // Algo de voz sin filtrar, para que no suene hueco.
+    const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3200;
+    const directo=ac.createGain(); directo.gain.value=0.28;
+    rasp.connect(lp); lp.connect(directo); directo.connect(salida);
+
+    // --- El aire: golpe al abrir y soplido al cerrar ---
     if(_juyuRuido){
-        const n=ac.createBufferSource(); n.buffer=_juyuRuido;
-        const nf=ac.createBiquadFilter();
-        nf.type='bandpass'; nf.Q.value=1.1;
-        nf.frequency.setValueAtTime(1500,t0);
-        nf.frequency.exponentialRampToValueAtTime(600,t0+0.12);
-        const ng=ac.createGain();
-        ng.gain.setValueAtTime(0.0001,t0);
-        ng.gain.exponentialRampToValueAtTime(0.5,t0+0.012);
-        ng.gain.exponentialRampToValueAtTime(0.0001,t0+0.14);
-        n.connect(nf); nf.connect(ng); ng.connect(vol);
-        n.start(t0); n.stop(t0+0.16);
+        const golpe=ac.createBufferSource(); golpe.buffer=_juyuRuido;
+        golpe.playbackRate.value=0.9+Math.random()*0.3;
+        const gf=ac.createBiquadFilter(); gf.type='bandpass'; gf.Q.value=0.8; gf.frequency.value=1900;
+        const gg=ac.createGain();
+        gg.gain.setValueAtTime(0.0001,t0);
+        gg.gain.exponentialRampToValueAtTime(0.45,t0+0.006);
+        gg.gain.exponentialRampToValueAtTime(0.0008,t0+0.055);
+        golpe.connect(gf); gf.connect(gg); gg.connect(salida);
+        golpe.start(t0); golpe.stop(t0+0.09);
+
+        const soplo=ac.createBufferSource(); soplo.buffer=_juyuRuido;
+        const sf=ac.createBiquadFilter(); sf.type='bandpass'; sf.Q.value=1.4; sf.frequency.value=950;
+        const sg=ac.createGain();
+        sg.gain.setValueAtTime(0.0001,t0+dur*0.55);
+        sg.gain.exponentialRampToValueAtTime(0.14,t0+dur*0.72);
+        sg.gain.exponentialRampToValueAtTime(0.0008,t0+dur+0.07);
+        soplo.connect(sf); sf.connect(sg); sg.connect(salida);
+        soplo.start(t0+dur*0.55); soplo.stop(t0+dur+0.12);
     }
 }
-// Tres ladridos al ritmo de la animacion de la boca.
+// Varios ladridos seguidos, al compas de la boca del dibujo. El ultimo sale
+// mas corto y mas bajo, como cuando un perro remata.
 function juyuGuau(veces){
-    if(_juyuMudo) return;
-    if(document.hidden) return;
+    if(_juyuMudo || document.hidden) return;
     const ac=juyuAudioCtx(); if(!ac) return;
     if(ac.state==='suspended'){ ac.resume().catch(()=>{}); if(ac.state==='suspended') return; }
-    const t=ac.currentTime+0.06;
-    for(let i=0;i<(veces||3);i++) juyuUnLadrido(ac, t+i*0.46, i%2===1);
+    const n=veces||3;
+    for(let i=0;i<n;i++) juyuUnLadrido(ac, ac.currentTime+0.05+i*0.46, n>1 && i===n-1);
 }
+// Voz de cachorro, mediana o grandota: se prueba al cambiarla.
+window.juyuVozToggle=function(){
+    const orden=Object.keys(JUYU_VOCES);
+    _juyuVoz=orden[(orden.indexOf(_juyuVoz)+1)%orden.length];
+    try{ localStorage.setItem('learnersTrackJuyuVoz',_juyuVoz); }catch(e){}
+    _juyuMudo=false;
+    try{ localStorage.setItem('learnersTrackJuyuMudo','0'); }catch(e){}
+    juyuGuau(2);
+    const es=currentLanguage==='es';
+    const nombre={cachorro:es?'cachorro':'puppy', mediano:es?'mediano':'medium', grande:es?'grandote':'big'}[_juyuVoz];
+    showNotification((es?'🐕 Voz de perro ':'🐕 Dog voice: ')+nombre,'info');
+};
 window.juyuSonidoToggle=function(){
     _juyuMudo=!_juyuMudo;
     try{ localStorage.setItem('learnersTrackJuyuMudo', _juyuMudo?'1':'0'); }catch(e){}
@@ -4665,7 +4758,7 @@ window.marcarAsistencia=function(sid,estado,btn){
     // Se retocan solo los botones de ese alumno: volver a dibujar la parrilla
     // entera en cada nombre de la lista se notaria, y cortaria la animacion.
     sincronizarAsistencia(s);
-    if(s.attendance[attendanceDate]) animarAsistencia(btn,estado);
+    if(s.attendance[attendanceDate]) animarAsistencia(btn,estado,s);
     actualizarResumenAsistencia();
 };
 // El mismo alumno sale en la vista de grupos y en la individual: se ponen al dia
@@ -4680,21 +4773,91 @@ function sincronizarAsistencia(s){
         if(celda){ celda.classList.toggle('celda-presente',est==='p'); celda.classList.toggle('celda-ausente',est==='a'); }
     });
 }
-function animarAsistencia(btn,estado){
+// === BIENVENIDA AL PASAR LISTA ===
+// Cuando el estudiante llega y se marca el chulito, sale una pequena celebracion
+// con los colores y los dibujos de nina o de nino. El genero se adivina por el
+// nombre de pila; si no se reconoce, la fiesta es neutra. El docente siempre
+// puede corregirlo desde la ficha (boton 📋) y queda guardado.
+const NOMBRES_NINA = new Set(('MARIA ANA ANNA SOFIA SOPHIA ISABELLA ISABEL VALENTINA VALERIA MARIANA CAMILA SARA SARAH SALOME LUCIANA DANIELA GABRIELA ALEJANDRA ANDREA PAULA LAURA JULIANA NATALIA CAROLINA CATALINA TATIANA JIMENA XIMENA LUISA LUZ MERCEDES CARMEN ROSA ROSALBA MARTHA MARTA PATRICIA CLAUDIA DIANA SANDRA MONICA YULIANA JESSICA YESSICA JOHANA YOHANA JOHANNA LILIANA VIVIANA ADRIANA ANGELA ANGIE ANGELICA BEATRIZ BLANCA CECILIA CLARA CONSUELO CRISTINA DORA ELENA ELIANA ELIZABETH ELSA EMILIA EMMA ESPERANZA ESTEFANIA ESTHER EVELIN FABIANA FERNANDA FLOR FRANCIA GLORIA GRACIELA HEIDY ILIANA INES IRENE IVONNE KAREN KATHERINE KATERINE KELLY LEIDY LEIDI LINA LUCERO LUCIA MAGDA MAGDALENA MANUELA MARCELA MARGARITA MARIANGEL MARIBEL MARLEN MARLENE MAYERLY MELISA MELISSA MICHELL MICHELLE MILENA MIREYA NANCY NATALY NAYELI NIDIA NOHORA NORA OLGA PAOLA PILAR RUBY SAMANTHA SILVANA SILVIA SOLEDAD STEFANIA SUSANA TERESA VANESA VANESSA VERONICA VICTORIA WENDY YENIFER YENNIFER YURANI ZULEIMA ZULY AMALIA AMPARO ANTONIA ARIANA ASHLEY BRENDA BRIGITTE DAYANA DANNA DULCE ERIKA ESTELA GERALDINE GISELA HANNA IRMA ITZEL JAZMIN JULIETA KIARA LILIA LORENA LUNA MAITE NICOL NICOLE NOEMI PERLA ROCIO SOL TAMARA VIOLETA YAMILE YURI ALISON ALISSON SHARICK SHIRLEY THALIA VALERY').split(' '));
+const NOMBRES_NINO = new Set(('JUAN JOSE LUIS CARLOS ANDRES DAVID SANTIAGO SEBASTIAN MATEO MIGUEL DIEGO ALEJANDRO DANIEL NICOLAS SAMUEL EMANUEL EMMANUEL MANUEL JERONIMO TOMAS THOMAS MARTIN MAURICIO JULIAN CAMILO FELIPE PABLO PEDRO JORGE JAIME JAVIER JHON JOHN JHONATAN JONATHAN BRAYAN BRIAN KEVIN CRISTIAN CHRISTIAN EDWIN EDUARDO ERNESTO ESTEBAN FABIAN FERNANDO FRANCISCO GABRIEL GERMAN GUSTAVO HECTOR HERNAN HUGO IVAN JAIRO JESUS JOAQUIN LEONARDO MARCOS MARIO MAXIMILIANO NELSON OSCAR OMAR RAFAEL RAMIRO RAUL RICARDO ROBERTO RODRIGO ROLANDO RUBEN SERGIO SIMON VICENTE VICTOR WILSON WILLIAM YEISON ALBERTO ALFONSO ALFREDO ANIBAL ANTONIO ARIEL ARMANDO ARTURO AUGUSTO BENJAMIN BERNARDO CESAR DAMIAN DARIO DEIVID DILAN DYLAN EFRAIN ELIAS EMILIO ENRIQUE FABIO FIDEL GERARDO GILBERTO GONZALO GREGORIO HAROLD HENRY HORACIO HUMBERTO IGNACIO ISAAC ISMAEL ISRAEL JADER JEFFERSON JEISON JOEL JOHAN JOSUE LEANDRO LORENZO LUCAS MAICOL MARCO MATIAS MAURO MOISES NESTOR NORBERTO OLIVER ORLANDO RENE REINALDO RODOLFO RONALD SAUL TEODORO VALENTIN WALTER WILMER YAIR ANDERSON JEAN JUANJOSE MIGUELANGEL').split(' '));
+function letrasNombre(t){ return String(t==null?'':t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(); }
+// Se mira palabra por palabra en el orden escrito: asi "MARIA JOSE" sale nina y
+// "JOSE MARIA" sale nino, y funciona igual si la lista trae primero los apellidos.
+function adivinarGenero(nombre){
+    const partes=letrasNombre(nombre).split(/[^A-Z]+/).filter(Boolean);
+    for(const w of partes){
+        if(NOMBRES_NINA.has(w)) return 'f';
+        if(NOMBRES_NINO.has(w)) return 'm';
+    }
+    return 'x';
+}
+function generoDeAlumno(s){
+    if(s && (s.genero==='f' || s.genero==='m' || s.genero==='x')) return s.genero;
+    return adivinarGenero(s && s.name);
+}
+window.setGeneroAlumno=function(sid,g){
+    const s=currentStudents.find(x=>x.id===sid); if(!s) return;
+    s.genero=(g==='f'||g==='m')?g:'x';
+    saveData();
+    document.querySelectorAll('#studentReportBody .genero-btn').forEach(b=>b.setAttribute('aria-pressed', b.dataset.g===s.genero?'true':'false'));
+    // Se muestra al momento como va a quedar la celebracion.
+    const ancla=document.querySelector('#studentReportBody .genero-fila');
+    if(ancla) celebrarLlegada(ancla,s);
+};
+const FIESTA_TEMAS = {
+    f:{ emojis:['🌸','💖','✨','🦋','🎀','⭐'], saludo:['¡Bienvenida!','Welcome!'] },
+    m:{ emojis:['⚽','🚀','⭐','⚡','🏅','🎈'], saludo:['¡Bienvenido!','Welcome!'] },
+    x:{ emojis:['🎉','✨','⭐','🎊','🌟','🎈'], saludo:['¡Qué bueno verte!','Great to see you!'] }
+};
+function celebrarLlegada(ancla,s){
+    if(!ancla || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'x';
+    const g=generoDeAlumno(s), tema=FIESTA_TEMAS[g]||FIESTA_TEMAS.x;
+    const es=currentLanguage==='es';
+    const r=ancla.getBoundingClientRect();
+    const capa=document.createElement('div');
+    capa.className='fiesta-capa fiesta-'+g;
+    capa.style.left=(r.left+r.width/2)+'px';
+    capa.style.top=(r.top+r.height/2)+'px';
+    for(let i=0;i<9;i++){
+        const chispa=document.createElement('span');
+        chispa.className='fiesta-p';
+        chispa.textContent=tema.emojis[Math.floor(Math.random()*tema.emojis.length)];
+        // Abanico hacia arriba: si salieran hacia abajo taparian la lista.
+        const ang=-Math.PI/2+(Math.random()-0.5)*2.1;
+        const dist=46+Math.random()*70;
+        chispa.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(1)+'px');
+        chispa.style.setProperty('--dy',(Math.sin(ang)*dist).toFixed(1)+'px');
+        chispa.style.setProperty('--giro',((Math.random()-0.5)*90).toFixed(0)+'deg');
+        chispa.style.animationDelay=(i*22)+'ms';
+        chispa.style.animationDuration=(820+Math.random()*420)+'ms';
+        capa.appendChild(chispa);
+    }
+    const aro=document.createElement('span'); aro.className='fiesta-aro'; capa.appendChild(aro);
+    const saludo=document.createElement('span'); saludo.className='fiesta-saludo';
+    saludo.textContent=tema.saludo[es?0:1];
+    capa.appendChild(saludo);
+    document.body.appendChild(capa);
+    setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); },1600);
+    return g;
+}
+function animarAsistencia(btn,estado,s){
     if(!btn) return;
+    // Solo se celebra la llegada; la ausencia se marca en seco.
+    const g = estado==='p' ? celebrarLlegada(btn,s) : null;
     btn.classList.remove('att-anim'); void btn.offsetWidth; btn.classList.add('att-anim');
     setTimeout(()=>btn.classList.remove('att-anim'),700);
     // Globo que sube y se desvanece: confirma el registro sin tapar la lista.
     const globo=document.createElement('span');
     globo.className='att-pop '+(estado==='p'?'att-pop-si':'att-pop-no');
     globo.textContent = estado==='p' ? '✓' : '✗';
+    if(g) globo.style.display='none';   // con la celebracion, el globo sobra
     btn.appendChild(globo);
     setTimeout(()=>{ if(globo.parentNode) globo.parentNode.removeChild(globo); },900);
     const fila=btn.closest('tr');
     if(fila){
-        fila.classList.remove('flash-si','flash-no'); void fila.offsetWidth;
-        fila.classList.add(estado==='p'?'flash-si':'flash-no');
-        setTimeout(()=>fila.classList.remove('flash-si','flash-no'),800);
+        fila.classList.remove('flash-si','flash-no','flash-f','flash-m','flash-x'); void fila.offsetWidth;
+        fila.classList.add(estado==='a' ? 'flash-no' : (g ? 'flash-'+g : 'flash-si'));
+        setTimeout(()=>fila.classList.remove('flash-si','flash-no','flash-f','flash-m','flash-x'),900);
     }
 }
 function actualizarResumenAsistencia(){
@@ -5960,6 +6123,11 @@ function openStudentReport(sid){
        </div>
        <h4 style="color:var(--accent-strong);">${es?'Notas':'Scores'}</h4><ul style="margin:4px 0 12px;">${scoresHtml}</ul>
        <h4 style="color:var(--accent-strong);">${es?'Insignias':'Badges'}</h4>${badgesHtml}
+       <div class="genero-fila">
+         <span>${es?'Al pasar lista celebrar como:':'At attendance, celebrate as:'}</span>
+         ${[['f',es?'👧 Niña':'👧 Girl'],['m',es?'👦 Niño':'👦 Boy'],['x',es?'✨ Neutral':'✨ Neutral']].map(o=>
+           `<button type="button" class="genero-btn" data-g="${o[0]}" aria-pressed="${generoDeAlumno(s)===o[0]?'true':'false'}" onclick="setGeneroAlumno(${s.id},'${o[0]}')">${o[1]}</button>`).join('')}
+       </div>
        <h4 style="color:var(--accent-strong);margin-top:10px;">${es?'Comentario':'Comment'}</h4>
        <p style="background:var(--bg-card);border-radius:8px;padding:10px;min-height:20px;white-space:pre-wrap;">${s.comment?escapeHtml(s.comment):`<span style="opacity:.6;">${es?'(sin comentario)':'(no comment)'}</span>`}</p>
        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;">
