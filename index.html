@@ -1426,42 +1426,72 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 }
 
 /* === BIENVENIDA AL PASAR LISTA === */
-/* La capa va fija sobre la pagina: dentro de la tabla, el "overflow" cortaria
-   las chispas. Solo se mueven transform y opacity, asi que no cuesta nada
-   aunque se pase lista de 40 estudiantes seguidos. */
-.fiesta-capa { position:fixed; z-index:2500; width:0; height:0; pointer-events:none; }
-.fiesta-f { color:#ec4899; } .fiesta-m { color:#2563eb; } .fiesta-x { color:var(--accent-strong); }
-.fiesta-p { position:absolute; left:0; top:0; font-size:1.05rem; line-height:1; opacity:0; will-change:transform,opacity; animation:fiestaVuela .95s var(--ease-out) forwards; }
-@keyframes fiestaVuela {
-  0%   { opacity:0; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
-  12%  { opacity:1; }
-  70%  { opacity:.95; }
-  100% { opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(var(--giro)); }
+/* Una celebracion grande, en medio de la pantalla, cuando el estudiante llega.
+   La capa no recibe clics (pointer-events:none), asi que el docente puede seguir
+   pasando lista mientras corre. Solo se animan transform y opacity. */
+.cel-capa { position:fixed; inset:0; z-index:2550; display:grid; place-items:center; pointer-events:none; opacity:1; transition:opacity .34s var(--ease-out), transform .34s var(--ease-out); }
+.cel-capa.saliendo { opacity:0; transform:scale(.96); }
+.cel-f { --cel-1:#ec4899; --cel-2:#a855f7; --cel-3:#fbbf24; --cel-4:#f472b6; }
+.cel-m { --cel-1:#2563eb; --cel-2:#06b6d4; --cel-3:#fbbf24; --cel-4:#22c55e; }
+.cel-fondo { position:absolute; inset:0; background:radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--cel-1) 26%, transparent) 0%, color-mix(in srgb, var(--cel-2) 12%, transparent) 38%, transparent 66%); animation:celFondo .5s var(--ease-out) both; }
+@keyframes celFondo { from { opacity:0; } to { opacity:1; } }
+.cel-escena { position:relative; display:grid; justify-items:center; gap:10px; }
+/* Rayos de sol detras del personaje */
+.cel-rayos { position:absolute; top:44%; left:50%; width:min(78vh,620px); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; opacity:.2;
+  background:repeating-conic-gradient(from 0deg, var(--cel-1) 0deg 7deg, transparent 7deg 22deg);
+  -webkit-mask-image:radial-gradient(circle, transparent 26%, #000 34%, #000 60%, transparent 74%);
+  mask-image:radial-gradient(circle, transparent 26%, #000 34%, #000 60%, transparent 74%);
+  animation:celRayos 9s linear infinite, celRayosEntra .6s var(--ease-out) both; }
+@keyframes celRayos { to { rotate:360deg; } }
+@keyframes celRayosEntra { from { opacity:0; scale:.6; } to { opacity:.2; scale:1; } }
+/* El personaje: entra de golpe y despues da dos saltos */
+.cel-kid { position:relative; animation:celEntra .5s var(--ease-out-back) both, celSalta .62s .52s 2 var(--ease-in-out); }
+.cel-kid svg { height:min(46vh,340px); width:auto; display:block; filter:drop-shadow(0 18px 30px rgba(31,35,64,.28)); }
+@keyframes celEntra { 0%{ opacity:0; transform:scale(.55) translateY(40px); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1) translateY(0); } }
+@keyframes celSalta { 0%,100%{ transform:translateY(0); } 42%{ transform:translateY(-34px); } }
+.cel-cuerpo { animation:celEstira .62s .52s 2 var(--ease-in-out); transform-origin:100px 254px; }
+@keyframes celEstira { 0%,100%{ transform:scaleY(.94) scaleX(1.03); } 42%{ transform:scaleY(1.03) scaleX(.98); } }
+.cel-sombra { fill:rgba(31,35,64,.16); animation:celSombra .62s .52s 2 var(--ease-in-out); transform-origin:100px 254px; }
+@keyframes celSombra { 0%,100%{ transform:scale(1); opacity:.55; } 42%{ transform:scale(.62); opacity:.28; } }
+.cel-brazo-l { transform-origin:71px 130px; animation:celBrazoL .34s ease-in-out infinite alternate; }
+.cel-brazo-r { transform-origin:129px 130px; animation:celBrazoR .34s ease-in-out infinite alternate; }
+@keyframes celBrazoL { from { rotate:-9deg; } to { rotate:9deg; } }
+@keyframes celBrazoR { from { rotate:9deg; } to { rotate:-9deg; } }
+.cel-pierna-l { transform-origin:89px 190px; animation:celPiernaL .62s .52s 2 var(--ease-in-out); }
+.cel-pierna-r { transform-origin:110px 190px; animation:celPiernaR .62s .52s 2 var(--ease-in-out); }
+@keyframes celPiernaL { 0%,100%{ rotate:0deg; } 42%{ rotate:-13deg; } }
+@keyframes celPiernaR { 0%,100%{ rotate:0deg; } 42%{ rotate:13deg; } }
+.cel-cabeza { transform-origin:100px 100px; animation:celCabeza .62s .52s 2 var(--ease-in-out); }
+@keyframes celCabeza { 0%,100%{ rotate:0deg; } 30%{ rotate:-5deg; } 70%{ rotate:5deg; } }
+/* El saludo y el nombre */
+.cel-texto { text-align:center; animation:celTexto .55s .16s var(--ease-out) both; }
+@keyframes celTexto { from { opacity:0; transform:translateY(26px) scale(.9); } to { opacity:1; transform:translateY(0) scale(1); } }
+.cel-saludo { display:block; font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(1.6rem,5.2vw,3rem); line-height:1.05; color:var(--cel-1); text-shadow:0 3px 0 var(--bg-alt), 0 8px 24px rgba(31,35,64,.28); }
+.cel-quien { display:block; margin-top:2px; max-width:min(90vw,760px); font-family:'Montserrat',sans-serif; font-weight:700; font-size:clamp(1rem,2.6vw,1.5rem); color:var(--fg); text-shadow:0 2px 10px var(--bg-alt); overflow-wrap:anywhere; }
+/* Confeti: cada pedazo lleva su propio destino en --dx/--dy */
+.cel-confeti { position:absolute; top:34%; left:50%; width:0; height:0; }
+.cel-confeti i { position:absolute; display:block; width:11px; height:15px; border-radius:2px; opacity:0; will-change:transform,opacity; animation:celConfeti 1.7s var(--ease-out) both; }
+@keyframes celConfeti {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.3) rotate(0deg); }
+  10%  { opacity:1; }
+  75%  { opacity:1; }
+  100% { opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--giro)); }
 }
-.fiesta-aro { position:absolute; left:-14px; top:-14px; width:28px; height:28px; border-radius:50%; border:2.5px solid currentColor; opacity:.9; animation:fiestaAro .7s var(--ease-out) forwards; }
-@keyframes fiestaAro { 0%{ transform:scale(.35); opacity:.9; } 100%{ transform:scale(2.8); opacity:0; } }
-.fiesta-saludo { position:absolute; left:0; top:0; white-space:nowrap; font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:.92rem; text-shadow:0 1px 0 var(--bg-alt), 0 2px 10px rgba(31,35,64,.25); opacity:0; animation:fiestaSaludo 1.25s var(--ease-out) forwards; }
-@keyframes fiestaSaludo {
-  0%   { opacity:0; transform:translate(-50%,-20%) scale(.6); }
-  22%  { opacity:1; transform:translate(-50%,-150%) scale(1.06); }
-  72%  { opacity:1; transform:translate(-50%,-175%) scale(1); }
-  100% { opacity:0; transform:translate(-50%,-250%) scale(1); }
-}
-/* El destello de la fila toma el color de la celebracion. */
+/* El destello de la fila, del color de la celebracion */
 tr.flash-f td { animation:flashF .9s ease-out; }
 tr.flash-m td { animation:flashM .9s ease-out; }
-tr.flash-x td { animation:flashX .9s ease-out; }
 @keyframes flashF { 0%{background:rgba(236,72,153,.26);} 100%{background:transparent;} }
 @keyframes flashM { 0%{background:rgba(37,99,235,.24);} 100%{background:transparent;} }
-@keyframes flashX { 0%{background:rgba(34,197,94,.30);} 100%{background:transparent;} }
-/* Elegir para quien es cada celebracion, desde la ficha del estudiante. */
+/* Elegir para quien es la celebracion, desde la ficha del estudiante. */
 .genero-fila { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; font-size:.86rem; color:var(--fg-muted); }
 .genero-btn { border:1.5px solid var(--border); background:var(--bg-alt); color:var(--fg); border-radius:999px; padding:5px 12px; font:inherit; font-size:.84rem; font-weight:600; cursor:pointer; transition:border-color .2s var(--ease-out), background-color .2s var(--ease-out); }
 .genero-btn:hover { border-color:var(--accent); }
 .genero-btn[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong); }
+@media (max-width:600px){ .cel-kid svg { height:min(38vh,260px); } }
 @media (prefers-reduced-motion:reduce){
-  .fiesta-capa { display:none; }
-  tr.flash-f td,tr.flash-m td,tr.flash-x td { animation:none; }
+  .cel-rayos,.cel-confeti { display:none; }
+  .cel-kid,.cel-cuerpo,.cel-sombra,.cel-brazo-l,.cel-brazo-r,.cel-pierna-l,.cel-pierna-r,.cel-cabeza,.cel-texto,.cel-fondo { animation:none; }
+  tr.flash-f td,tr.flash-m td { animation:none; }
 }
 /* === RULETA DEL BINGO === */
 .voc-barra .btn-ai { padding:8px 14px; border:none; border-radius:var(--radius-sm); cursor:pointer; font:inherit; font-weight:700; }
@@ -3172,10 +3202,6 @@ window.toggleJuyuTip=function(){
             ? 'Puedes arrastrarme a donde quieras.'
             : 'You can drag me anywhere you like.'}</span>`
         + `<br><button type="button" class="juyu-free-btn" onclick="juyuTruco()">${es?'🎾 ¡Haz un truco!':'🎾 Do a trick!'}</button>`
-        + ` <button type="button" class="juyu-free-btn" onclick="juyuSonidoToggle()">${_juyuMudo
-            ? (es?'🔇 Sin ladrido':'🔇 Muted')
-            : (es?'🔊 Con ladrido':'🔊 Barking')}</button>`
-        + (_juyuMudo ? '' : ` <button type="button" class="juyu-free-btn" onclick="juyuVozToggle()">${es?'🐕 Cambiar voz':'🐕 Change voice'}</button>`)
         + (_juyuFijado
             ? ` <button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
             : '');
@@ -3487,152 +3513,6 @@ function juyuHayModalAbierto(){
     return [...document.querySelectorAll('.modal')].some(x=>x.style.display==='flex')
         || document.getElementById('statisticsPage')?.classList.contains('show');
 }
-// === EL LADRIDO DE YUJU ===
-// El sonido se fabrica aqui mismo con el oscilador del navegador: no hay archivo
-// de audio que descargar, asi que no pesa nada y funciona sin internet.
-// Un ladrido son dos cosas juntas: un tono grave que cae de golpe (la voz) y un
-// golpe de ruido filtrado (el aire). Cada uno sale un poco distinto para que no
-// suene a maquina.
-let _juyuAudio=null, _juyuRuido=null;
-let _juyuMudo=false;
-try{ _juyuMudo = localStorage.getItem('learnersTrackJuyuMudo')==='1'; }catch(e){}
-
-function juyuAudioCtx(){
-    if(_juyuAudio) return _juyuAudio;
-    try{
-        const AC=window.AudioContext||window.webkitAudioContext;
-        if(!AC) return null;
-        _juyuAudio=new AC();
-        const seg=_juyuAudio.sampleRate*0.25;
-        _juyuRuido=_juyuAudio.createBuffer(1,seg,_juyuAudio.sampleRate);
-        const datos=_juyuRuido.getChannelData(0);
-        for(let i=0;i<seg;i++) datos[i]=Math.random()*2-1;
-    }catch(e){ _juyuAudio=null; }
-    return _juyuAudio;
-}
-// Los navegadores no dejan sonar nada hasta que la persona toca la pagina:
-// al primer clic o tecla se despierta el audio, y ya queda listo.
-(function despertarAudio(){
-    const abrir=()=>{
-        const ac=juyuAudioCtx();
-        if(ac && ac.state==='suspended') ac.resume().catch(()=>{});
-        document.removeEventListener('pointerdown',abrir);
-        document.removeEventListener('keydown',abrir);
-    };
-    document.addEventListener('pointerdown',abrir,{passive:true});
-    document.addEventListener('keydown',abrir);
-})();
-// Tamano de la voz: cachorro, mediano o grandote. Solo cambia el tono de base.
-const JUYU_VOCES = { cachorro:430, mediano:290, grande:195 };
-let _juyuVoz='mediano';
-try{ const v=localStorage.getItem('learnersTrackJuyuVoz'); if(JUYU_VOCES[v]) _juyuVoz=v; }catch(e){}
-
-// Una curva suave de saturacion: le da el ronroneo aspero de la garganta.
-function juyuRasposo(ac){
-    const ws=ac.createWaveShaper(), n=1024, curva=new Float32Array(n);
-    for(let i=0;i<n;i++){ const x=i*2/n-1; curva[i]=Math.tanh(x*2.6); }
-    ws.curve=curva; ws.oversample='2x';
-    return ws;
-}
-// Un ladrido de verdad son tres cosas a la vez:
-//   1. el golpe de aire al abrir la boca de repente;
-//   2. la voz, un tono que sube de golpe y enseguida cae;
-//   3. el soplido del final, al cerrar el hocico.
-// Y sobre todo, la garganta y el hocico resaltan tres franjas de frecuencia
-// -las formantes- que se van cerrando: eso es lo que suena a perro y no a pito.
-function juyuUnLadrido(ac, t0, corto){
-    const f0=JUYU_VOCES[_juyuVoz]*(corto?0.9:1)*(0.94+Math.random()*0.12);
-    const dur=(corto?0.17:0.23)*(0.92+Math.random()*0.16);
-    const salida=ac.createGain();
-    salida.gain.value=0.34;
-    salida.connect(ac.destination);
-
-    // --- La voz ---
-    const env=ac.createGain();
-    env.gain.setValueAtTime(0.0001,t0);
-    env.gain.exponentialRampToValueAtTime(1,t0+0.008);        // ataque seco
-    env.gain.setValueAtTime(1,t0+0.05);
-    env.gain.exponentialRampToValueAtTime(0.3,t0+dur*0.6);
-    env.gain.exponentialRampToValueAtTime(0.0008,t0+dur);
-    const rasp=juyuRasposo(ac);
-    env.connect(rasp);
-    [['sawtooth',1],['square',0.3]].forEach(par=>{
-        const o=ac.createOscillator(); o.type=par[0];
-        o.frequency.setValueAtTime(f0*0.78,t0);
-        o.frequency.exponentialRampToValueAtTime(f0*1.24,t0+0.03);   // sube de golpe
-        o.frequency.exponentialRampToValueAtTime(f0*0.6,t0+dur);     // y cae
-        const g=ac.createGain(); g.gain.value=par[1];
-        o.connect(g); g.connect(env);
-        o.start(t0); o.stop(t0+dur+0.05);
-    });
-    // --- Las formantes, cerrandose como el hocico ---
-    [[720,470,7,1],[1650,1050,9,0.6],[2750,2300,10,0.3]].forEach(fm=>{
-        const f=ac.createBiquadFilter();
-        f.type='bandpass'; f.Q.value=fm[2];
-        f.frequency.setValueAtTime(fm[0]*(0.94+Math.random()*0.12),t0);
-        f.frequency.exponentialRampToValueAtTime(fm[1],t0+dur);
-        const g=ac.createGain(); g.gain.value=fm[3]*3.2;   // el pasabanda baja mucho el nivel
-        rasp.connect(f); f.connect(g); g.connect(salida);
-    });
-    // Algo de voz sin filtrar, para que no suene hueco.
-    const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3200;
-    const directo=ac.createGain(); directo.gain.value=0.28;
-    rasp.connect(lp); lp.connect(directo); directo.connect(salida);
-
-    // --- El aire: golpe al abrir y soplido al cerrar ---
-    if(_juyuRuido){
-        const golpe=ac.createBufferSource(); golpe.buffer=_juyuRuido;
-        golpe.playbackRate.value=0.9+Math.random()*0.3;
-        const gf=ac.createBiquadFilter(); gf.type='bandpass'; gf.Q.value=0.8; gf.frequency.value=1900;
-        const gg=ac.createGain();
-        gg.gain.setValueAtTime(0.0001,t0);
-        gg.gain.exponentialRampToValueAtTime(0.45,t0+0.006);
-        gg.gain.exponentialRampToValueAtTime(0.0008,t0+0.055);
-        golpe.connect(gf); gf.connect(gg); gg.connect(salida);
-        golpe.start(t0); golpe.stop(t0+0.09);
-
-        const soplo=ac.createBufferSource(); soplo.buffer=_juyuRuido;
-        const sf=ac.createBiquadFilter(); sf.type='bandpass'; sf.Q.value=1.4; sf.frequency.value=950;
-        const sg=ac.createGain();
-        sg.gain.setValueAtTime(0.0001,t0+dur*0.55);
-        sg.gain.exponentialRampToValueAtTime(0.14,t0+dur*0.72);
-        sg.gain.exponentialRampToValueAtTime(0.0008,t0+dur+0.07);
-        soplo.connect(sf); sf.connect(sg); sg.connect(salida);
-        soplo.start(t0+dur*0.55); soplo.stop(t0+dur+0.12);
-    }
-}
-// Varios ladridos seguidos, al compas de la boca del dibujo. El ultimo sale
-// mas corto y mas bajo, como cuando un perro remata.
-function juyuGuau(veces){
-    if(_juyuMudo || document.hidden) return;
-    const ac=juyuAudioCtx(); if(!ac) return;
-    if(ac.state==='suspended'){ ac.resume().catch(()=>{}); if(ac.state==='suspended') return; }
-    const n=veces||3;
-    for(let i=0;i<n;i++) juyuUnLadrido(ac, ac.currentTime+0.05+i*0.46, n>1 && i===n-1);
-}
-// Voz de cachorro, mediana o grandota: se prueba al cambiarla.
-window.juyuVozToggle=function(){
-    const orden=Object.keys(JUYU_VOCES);
-    _juyuVoz=orden[(orden.indexOf(_juyuVoz)+1)%orden.length];
-    try{ localStorage.setItem('learnersTrackJuyuVoz',_juyuVoz); }catch(e){}
-    _juyuMudo=false;
-    try{ localStorage.setItem('learnersTrackJuyuMudo','0'); }catch(e){}
-    juyuGuau(2);
-    const es=currentLanguage==='es';
-    const nombre={cachorro:es?'cachorro':'puppy', mediano:es?'mediano':'medium', grande:es?'grandote':'big'}[_juyuVoz];
-    showNotification((es?'🐕 Voz de perro ':'🐕 Dog voice: ')+nombre,'info');
-};
-window.juyuSonidoToggle=function(){
-    _juyuMudo=!_juyuMudo;
-    try{ localStorage.setItem('learnersTrackJuyuMudo', _juyuMudo?'1':'0'); }catch(e){}
-    const es=currentLanguage==='es';
-    if(!_juyuMudo) juyuGuau(1);
-    showNotification(_juyuMudo
-        ? (es?'🔇 YUJU ladra en silencio':'🔇 YUJU barks silently')
-        : (es?'🔊 Ya se oye el ladrido de YUJU':'🔊 YUJU can be heard again'),'info');
-    const b=document.getElementById('juyuBubble');
-    if(b&&b.classList.contains('show')){ b.classList.remove('show'); document.getElementById('juyuMascot')?.classList.remove('tip-open'); }
-};
 function juyuAccion(nombre,duracion){
     const m=document.getElementById('juyuMascot'); if(!m) return;
     clearTimeout(_juyuAccionTimer);
@@ -3641,7 +3521,6 @@ function juyuAccion(nombre,duracion){
     document.querySelectorAll('#juyuFx i').forEach((el,i)=>{ el.textContent=adornos?adornos[i]:''; });
     void m.offsetWidth;                                                  // reinicia las animaciones
     m.classList.add('act-'+nombre,'busy');
-    if(nombre==='bark') juyuGuau(3);
     _juyuAccionTimer=setTimeout(()=>{
         m.classList.remove('act-'+nombre,'busy');
         m.classList.remove('facing-left');                               // vuelve a mirar al frente
@@ -4807,41 +4686,112 @@ window.setGeneroAlumno=function(sid,g){
     const ancla=document.querySelector('#studentReportBody .genero-fila');
     if(ancla) celebrarLlegada(ancla,s);
 };
-const FIESTA_TEMAS = {
-    f:{ emojis:['🌸','💖','✨','🦋','🎀','⭐'], saludo:['¡Bienvenida!','Welcome!'] },
-    m:{ emojis:['⚽','🚀','⭐','⚡','🏅','🎈'], saludo:['¡Bienvenido!','Welcome!'] },
-    x:{ emojis:['🎉','✨','⭐','🎊','🌟','🎈'], saludo:['¡Qué bueno verte!','Great to see you!'] }
-};
+// Los dos personajes que celebran. Se dibujan con SVG (no son imagenes), asi que
+// se ven nitidos en cualquier pantalla y no pesan nada.
+const CEL_NINA = `<svg viewBox="0 0 200 270" aria-hidden="true">
+  <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
+  <g class="cel-cuerpo">
+    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="#ef4467"/></g>
+    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="#ef4467"/></g>
+    <path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="#ec4899"/>
+    <path d="M66 172h68l3 12H63Z" fill="#f9a8d4"/>
+    <circle cx="100" cy="132" r="6" fill="#fbbf24"/>
+    <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
+    <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
+    <rect x="92" y="96" width="16" height="24" rx="8" fill="#e8b68d"/>
+    <g class="cel-cabeza">
+      <circle cx="58" cy="60" r="16" fill="#6b4226"/><circle cx="142" cy="60" r="16" fill="#6b4226"/>
+      <circle cx="100" cy="70" r="37" fill="#6b4226"/>
+      <circle cx="100" cy="74" r="31" fill="#f6cfae"/>
+      <path d="M69 62q7-28 31-28t31 28q-11-11-31-11t-31 11Z" fill="#6b4226"/>
+      <path d="M82 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="78" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/><circle cx="122" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/>
+      <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
+      <path d="M94 95q6 6 12 0Z" fill="#f9788f"/>
+      <g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>
+    </g>
+  </g>
+</svg>`;
+const CEL_NINO = `<svg viewBox="0 0 200 270" aria-hidden="true">
+  <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
+  <g class="cel-cuerpo">
+    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="#334155"/></g>
+    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="#334155"/></g>
+    <path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="#1e3a8a"/>
+    <path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="#2563eb"/>
+    <path d="m100 130 4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3-9.3-4.9-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#fbbf24"/>
+    <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
+    <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
+    <rect x="92" y="96" width="16" height="24" rx="8" fill="#e8b68d"/>
+    <g class="cel-cabeza">
+      <circle cx="100" cy="74" r="32" fill="#f6cfae"/>
+      <path d="M68 70q2-36 32-36t32 36q-6-18-32-18T68 70Z" fill="#3f2a1d"/>
+      <path d="M126 40q10-6 13 4-7-1-13-4Z" fill="#3f2a1d"/>
+      <path d="M82 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="78" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/><circle cx="122" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/>
+      <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
+      <path d="M94 95q6 6 12 0Z" fill="#f9788f"/>
+    </g>
+  </g>
+</svg>`;
+const CEL_COLORES = { f:['#ec4899','#a855f7','#fbbf24','#f472b6','#60a5fa','#fff'],
+                      m:['#2563eb','#06b6d4','#fbbf24','#22c55e','#f472b6','#fff'] };
+let _celCapa=null, _celTimers=[];
+// Celebracion grande: entra el personaje, salta dos veces, estalla el confeti y
+// se va sola en poco mas de dos segundos. Si se pasa lista rapido, cada llegada
+// reemplaza a la anterior en vez de amontonarse.
 function celebrarLlegada(ancla,s){
-    if(!ancla || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'x';
-    const g=generoDeAlumno(s), tema=FIESTA_TEMAS[g]||FIESTA_TEMAS.x;
+    const g=generoDeAlumno(s);
     const es=currentLanguage==='es';
-    const r=ancla.getBoundingClientRect();
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return g;
+    cerrarCelebracion();
+    const nombre=(typeof biaTitulo==='function') ? biaTitulo(s&&s.name) : String((s&&s.name)||'');
     const capa=document.createElement('div');
-    capa.className='fiesta-capa fiesta-'+g;
-    capa.style.left=(r.left+r.width/2)+'px';
-    capa.style.top=(r.top+r.height/2)+'px';
-    for(let i=0;i<9;i++){
-        const chispa=document.createElement('span');
-        chispa.className='fiesta-p';
-        chispa.textContent=tema.emojis[Math.floor(Math.random()*tema.emojis.length)];
-        // Abanico hacia arriba: si salieran hacia abajo taparian la lista.
-        const ang=-Math.PI/2+(Math.random()-0.5)*2.1;
-        const dist=46+Math.random()*70;
-        chispa.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(1)+'px');
-        chispa.style.setProperty('--dy',(Math.sin(ang)*dist).toFixed(1)+'px');
-        chispa.style.setProperty('--giro',((Math.random()-0.5)*90).toFixed(0)+'deg');
-        chispa.style.animationDelay=(i*22)+'ms';
-        chispa.style.animationDuration=(820+Math.random()*420)+'ms';
-        capa.appendChild(chispa);
+    capa.className='cel-capa cel-'+g;
+    capa.setAttribute('aria-hidden','true');
+    const fondo=document.createElement('div'); fondo.className='cel-fondo'; capa.appendChild(fondo);
+    const escena=document.createElement('div'); escena.className='cel-escena';
+    const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
+    const kid=document.createElement('div'); kid.className='cel-kid'; kid.innerHTML = g==='f' ? CEL_NINA : CEL_NINO;
+    escena.appendChild(kid);
+    const texto=document.createElement('div'); texto.className='cel-texto';
+    const saludo=document.createElement('span'); saludo.className='cel-saludo';
+    saludo.textContent = es ? (g==='f'?'¡Bienvenida!':'¡Bienvenido!') : 'Welcome!';
+    texto.appendChild(saludo);
+    if(nombre){ const quien=document.createElement('span'); quien.className='cel-quien'; quien.textContent=nombre; texto.appendChild(quien); }
+    escena.appendChild(texto);
+    capa.appendChild(escena);
+    // Confeti que sale del centro hacia los lados y cae.
+    const confeti=document.createElement('div'); confeti.className='cel-confeti';
+    const colores=CEL_COLORES[g];
+    for(let i=0;i<34;i++){
+        const trozo=document.createElement('i');
+        const ang=(Math.PI*2*i)/34 + Math.random()*0.3;
+        const dist=120+Math.random()*260;
+        trozo.style.background=colores[i%colores.length];
+        trozo.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(0)+'px');
+        trozo.style.setProperty('--dy',(Math.sin(ang)*dist*0.72+120).toFixed(0)+'px');   // caen un poco
+        trozo.style.setProperty('--giro',Math.round((Math.random()-0.5)*900)+'deg');
+        trozo.style.width=(7+Math.random()*7).toFixed(0)+'px';
+        trozo.style.height=(10+Math.random()*9).toFixed(0)+'px';
+        if(i%4===0) trozo.style.borderRadius='50%';
+        trozo.style.animationDelay=(80+i*16)+'ms';
+        trozo.style.animationDuration=(1300+Math.random()*700)+'ms';
+        confeti.appendChild(trozo);
     }
-    const aro=document.createElement('span'); aro.className='fiesta-aro'; capa.appendChild(aro);
-    const saludo=document.createElement('span'); saludo.className='fiesta-saludo';
-    saludo.textContent=tema.saludo[es?0:1];
-    capa.appendChild(saludo);
+    capa.appendChild(confeti);
     document.body.appendChild(capa);
-    setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); },1600);
+    _celCapa=capa;
+    _celTimers.push(setTimeout(()=>{ capa.classList.add('saliendo'); },1950));
+    _celTimers.push(setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); if(_celCapa===capa) _celCapa=null; },2350));
     return g;
+}
+function cerrarCelebracion(){
+    _celTimers.forEach(clearTimeout); _celTimers=[];
+    if(_celCapa && _celCapa.parentNode) _celCapa.parentNode.removeChild(_celCapa);
+    _celCapa=null;
 }
 function animarAsistencia(btn,estado,s){
     if(!btn) return;
