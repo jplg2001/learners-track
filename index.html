@@ -3134,6 +3134,9 @@ window.toggleJuyuTip=function(){
             ? 'Puedes arrastrarme a donde quieras.'
             : 'You can drag me anywhere you like.'}</span>`
         + `<br><button type="button" class="juyu-free-btn" onclick="juyuTruco()">${es?'🎾 ¡Haz un truco!':'🎾 Do a trick!'}</button>`
+        + ` <button type="button" class="juyu-free-btn" onclick="juyuSonidoToggle()">${_juyuMudo
+            ? (es?'🔇 Sin ladrido':'🔇 Muted')
+            : (es?'🔊 Con ladrido':'🔊 Barking')}</button>`
         + (_juyuFijado
             ? ` <button type="button" class="juyu-free-btn" onclick="soltarJuyu()">${es?'🐾 Que pasee':'🐾 Let him roam'}</button>`
             : '');
@@ -3445,6 +3448,98 @@ function juyuHayModalAbierto(){
     return [...document.querySelectorAll('.modal')].some(x=>x.style.display==='flex')
         || document.getElementById('statisticsPage')?.classList.contains('show');
 }
+// === EL LADRIDO DE YUJU ===
+// El sonido se fabrica aqui mismo con el oscilador del navegador: no hay archivo
+// de audio que descargar, asi que no pesa nada y funciona sin internet.
+// Un ladrido son dos cosas juntas: un tono grave que cae de golpe (la voz) y un
+// golpe de ruido filtrado (el aire). Cada uno sale un poco distinto para que no
+// suene a maquina.
+let _juyuAudio=null, _juyuRuido=null;
+let _juyuMudo=false;
+try{ _juyuMudo = localStorage.getItem('learnersTrackJuyuMudo')==='1'; }catch(e){}
+
+function juyuAudioCtx(){
+    if(_juyuAudio) return _juyuAudio;
+    try{
+        const AC=window.AudioContext||window.webkitAudioContext;
+        if(!AC) return null;
+        _juyuAudio=new AC();
+        const seg=_juyuAudio.sampleRate*0.25;
+        _juyuRuido=_juyuAudio.createBuffer(1,seg,_juyuAudio.sampleRate);
+        const datos=_juyuRuido.getChannelData(0);
+        for(let i=0;i<seg;i++) datos[i]=Math.random()*2-1;
+    }catch(e){ _juyuAudio=null; }
+    return _juyuAudio;
+}
+// Los navegadores no dejan sonar nada hasta que la persona toca la pagina:
+// al primer clic o tecla se despierta el audio, y ya queda listo.
+(function despertarAudio(){
+    const abrir=()=>{
+        const ac=juyuAudioCtx();
+        if(ac && ac.state==='suspended') ac.resume().catch(()=>{});
+        document.removeEventListener('pointerdown',abrir);
+        document.removeEventListener('keydown',abrir);
+    };
+    document.addEventListener('pointerdown',abrir,{passive:true});
+    document.addEventListener('keydown',abrir);
+})();
+function juyuUnLadrido(ac, t0, agudo){
+    const vol=ac.createGain();
+    vol.gain.value=0.22;
+    vol.connect(ac.destination);
+    // La voz: cae rapido de agudo a grave, como un "guau".
+    const base=(agudo?330:250)*(0.92+Math.random()*0.16);
+    const o=ac.createOscillator();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(base*1.7,t0);
+    o.frequency.exponentialRampToValueAtTime(base,t0+0.05);
+    o.frequency.exponentialRampToValueAtTime(base*0.55,t0+0.17);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(0.9,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.28,t0+0.08);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.2);
+    // Un filtro le quita el zumbido metalico del oscilador.
+    const f=ac.createBiquadFilter();
+    f.type='lowpass'; f.frequency.setValueAtTime(2200,t0);
+    f.frequency.exponentialRampToValueAtTime(700,t0+0.2);
+    o.connect(g); g.connect(f); f.connect(vol);
+    o.start(t0); o.stop(t0+0.24);
+    // El aire: un golpe corto de ruido, que es lo que hace que suene a perro.
+    if(_juyuRuido){
+        const n=ac.createBufferSource(); n.buffer=_juyuRuido;
+        const nf=ac.createBiquadFilter();
+        nf.type='bandpass'; nf.Q.value=1.1;
+        nf.frequency.setValueAtTime(1500,t0);
+        nf.frequency.exponentialRampToValueAtTime(600,t0+0.12);
+        const ng=ac.createGain();
+        ng.gain.setValueAtTime(0.0001,t0);
+        ng.gain.exponentialRampToValueAtTime(0.5,t0+0.012);
+        ng.gain.exponentialRampToValueAtTime(0.0001,t0+0.14);
+        n.connect(nf); nf.connect(ng); ng.connect(vol);
+        n.start(t0); n.stop(t0+0.16);
+    }
+}
+// Tres ladridos al ritmo de la animacion de la boca.
+function juyuGuau(veces){
+    if(_juyuMudo) return;
+    if(document.hidden) return;
+    const ac=juyuAudioCtx(); if(!ac) return;
+    if(ac.state==='suspended'){ ac.resume().catch(()=>{}); if(ac.state==='suspended') return; }
+    const t=ac.currentTime+0.06;
+    for(let i=0;i<(veces||3);i++) juyuUnLadrido(ac, t+i*0.46, i%2===1);
+}
+window.juyuSonidoToggle=function(){
+    _juyuMudo=!_juyuMudo;
+    try{ localStorage.setItem('learnersTrackJuyuMudo', _juyuMudo?'1':'0'); }catch(e){}
+    const es=currentLanguage==='es';
+    if(!_juyuMudo) juyuGuau(1);
+    showNotification(_juyuMudo
+        ? (es?'🔇 YUJU ladra en silencio':'🔇 YUJU barks silently')
+        : (es?'🔊 Ya se oye el ladrido de YUJU':'🔊 YUJU can be heard again'),'info');
+    const b=document.getElementById('juyuBubble');
+    if(b&&b.classList.contains('show')){ b.classList.remove('show'); document.getElementById('juyuMascot')?.classList.remove('tip-open'); }
+};
 function juyuAccion(nombre,duracion){
     const m=document.getElementById('juyuMascot'); if(!m) return;
     clearTimeout(_juyuAccionTimer);
@@ -3453,6 +3548,7 @@ function juyuAccion(nombre,duracion){
     document.querySelectorAll('#juyuFx i').forEach((el,i)=>{ el.textContent=adornos?adornos[i]:''; });
     void m.offsetWidth;                                                  // reinicia las animaciones
     m.classList.add('act-'+nombre,'busy');
+    if(nombre==='bark') juyuGuau(3);
     _juyuAccionTimer=setTimeout(()=>{
         m.classList.remove('act-'+nombre,'busy');
         m.classList.remove('facing-left');                               // vuelve a mirar al frente
