@@ -611,6 +611,10 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 /* Editor */
 .preguntas-modal { max-width:560px; }
 .preguntas-modal h3 { margin:0 0 8px; }
+/* === MOTOR PROPIO === */
+.preguntas-banco { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; font-size:.85rem; color:var(--fg-muted); }
+.preguntas-banco select { flex:1 1 150px; min-width:0; padding:7px 9px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.86rem; }
+.preguntas-banco .btn-secondary { padding:7px 12px; font-size:.84rem; }
 .preguntas-ayuda { font-size:.86rem; color:var(--fg-muted); line-height:1.45; margin:0 0 12px; }
 #preguntasInput { width:100%; box-sizing:border-box; font-family:inherit; font-size:.95rem; line-height:1.55; color:var(--fg); background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:12px 14px; resize:vertical; }
 #preguntasInput:focus { outline:2px solid var(--accent); outline-offset:1px; }
@@ -2086,6 +2090,11 @@ tr.flash-m td { animation:flashM .9s ease-out; }
     <h3 id="preguntasTitulo">❓ Preguntas del día</h3>
     <p class="preguntas-ayuda" id="preguntasAyuda">Escribe una pregunta por renglón.</p>
     <textarea id="preguntasInput" rows="9" oninput="contarPreguntasEditor()" aria-labelledby="preguntasTitulo"></textarea>
+    <div class="preguntas-banco">
+      <label for="preguntasTema" id="preguntasTemaLbl">Tema:</label>
+      <select id="preguntasTema"></select>
+      <button class="btn-secondary" type="button" id="preguntasTraer" onclick="traerPreguntasPropias()">📚 Traer preguntas</button>
+    </div>
     <div class="preguntas-pie">
       <span class="preguntas-cuenta" id="preguntasCuenta"></span>
       <button class="btn-secondary" type="button" id="preguntasReusar" onclick="reusarPreguntas()">↻ Volver a usar todas</button>
@@ -2548,6 +2557,7 @@ tr.flash-m td { animation:flashM .9s ease-out; }
       <label><span id="biaIdiomaLbl">Idioma</span><select id="biaIdioma"><option value="es">Español</option><option value="en">Inglés</option></select></label>
       <label><span id="biaNombreLbl">Nombre en el texto</span><select id="biaNombre"><option value="completo">Nombre completo</option><option value="primero">Solo la primera palabra</option><option value="ninguno">Sin nombre</option></select></label>
       <label><span id="biaParaLbl">Para</span><select id="biaPara" onchange="biaPintarLista()"><option value="sin">Quienes no tienen comentario</option><option value="todos">Todos los estudiantes</option></select></label>
+      <label><span id="biaMotorLbl">Quién escribe</span><select id="biaMotor" onchange="biaCambiarMotor()"><option value="propio">⚡ La plataforma</option><option value="gemini">✨ Gemini (IA)</option></select></label>
     </div>
     <div class="form-group bia-extra"><label for="biaExtra" id="biaExtraLbl">Indicación para todos (opcional)</label><input type="text" id="biaExtra" maxlength="240"></div>
     <div class="bia-progreso" id="biaProgreso" hidden><div class="bia-barra"><span></span></div><p></p></div>
@@ -6769,9 +6779,15 @@ async function suggestCommentAI(){
 // --- Resumen semanal automático del salón ---
 async function weeklySummaryAI(){
   const es=currentLanguage==='es';
-  if(!hasApiKey()){ showNotification(es?'Configura tu API key de Gemini (botón 🔐 Configurar IA) para el resumen semanal':'Configure your Gemini API key (🔐 Configure AI) for the weekly summary','error'); return; }
   if((currentStudents||[]).length===0){ showNotification(es?'No hay estudiantes en el aula':'No students in classroom','error'); return; }
   const body=document.getElementById('weeklySummaryBody');
+  // Sin clave, el resumen lo arma la plataforma con sus propias cuentas.
+  if(!hasApiKey()){
+    showModal('weeklySummaryModal');
+    if(body) body.innerHTML='<h3 style="color:var(--accent-strong);">📅 '+(es?'Resumen semanal del salón':'Weekly classroom summary')
+        +'</h3><div class="ai-result-section">'+resumenSemanalPropio()+'</div>';
+    return;
+  }
   showModal('weeklySummaryModal');
   if(body) body.innerHTML='<div class="ai-loading"><div class="ai-loading-spinner"></div><p>'+(es?'Generando resumen...':'Generating summary...')+'</p></div>';
   try{
@@ -8517,6 +8533,14 @@ window.abrirPreguntas=function(){
         ta.value=preguntasDelSalon().join('\n');
         ta.placeholder='What did you do last weekend?\nDescribe your favourite food.\nHow do you say "biblioteca" in English?';
     }
+    t('preguntasTemaLbl', es?'Tema:':'Topic:');
+    t('preguntasTraer', es?'📚 Traer preguntas':'📚 Bring questions');
+    const sel=document.getElementById('preguntasTema');
+    if(sel){
+        const antes=sel.value;
+        sel.innerHTML=Object.keys(MOTOR_PREGUNTAS).map(k=>`<option value="${k}">${escapeHtml(MOTOR_PREGUNTAS[k][es?'es':'en'])}</option>`).join('');
+        if(antes) sel.value=antes;
+    }
     const cb=document.getElementById('preguntasBocaAbajo'); if(cb) cb.checked=preguntaBocaAbajo();
     contarPreguntasEditor();
     showModal('preguntasModal');
@@ -9482,9 +9506,26 @@ async function vocPistasIA(){
     const ta=document.getElementById('vocPalabras'); if(!ta) return;
     const {lista}=vocLeerLista(ta.value);
     if(!lista.length){ showNotification(es?'Escribe primero las palabras':'Type the words first','error'); return; }
-    const faltan=lista.filter(w=>!w.pista);
+    let faltan=lista.filter(w=>!w.pista);
     if(!faltan.length){ showNotification(es?'Todas las palabras ya tienen pista':'Every word already has a clue','info'); return; }
-    if(!ensureAiKey()) return;
+    // Primero el diccionario de la plataforma: instantaneo y sin clave.
+    let propias=0;
+    faltan.forEach(w=>{ const t=pistaPropia(w.palabra); if(t){ w.pista=t; propias++; } });
+    if(propias){
+        ta.value=lista.map(w=>w.pista?`${w.palabra} = ${w.pista}`:w.palabra).join('\n');
+        vocGenerar();
+    }
+    faltan=lista.filter(w=>!w.pista);
+    if(!faltan.length){
+        showNotification(es?`⚡ ${propias} traducción(es) puestas por la plataforma.`:`⚡ ${propias} translation(s) added by the platform.`,'success');
+        return;
+    }
+    if(!hasApiKey()){
+        showNotification(es
+            ? `⚡ ${propias} pista(s) puestas. ${faltan.length} palabra(s) no están en el diccionario: escríbelas a mano después de "=".`
+            : `⚡ ${propias} clue(s) added. ${faltan.length} word(s) are not in the dictionary: type them after "=".`, propias?'success':'info');
+        return;
+    }
     const tipo=(document.getElementById('vocTipoPista')||{}).value||'definicion';
     const btn=document.getElementById('vocPistasBtn');
     if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'+(es?'Creando pistas…':'Writing clues…'); }
@@ -10000,7 +10041,331 @@ function textosJuegosVocabulario(){
 }
 </script>
 <script>
-// ===================== COMENTARIOS DEL BOLETIN CON IA ======================
+// ===================== MOTOR PROPIO (SIN CLAVE NI INTERNET) ================
+// Todo lo de aqui trabaja con los datos que ya estan en la plataforma: no llama
+// a ningun servicio, no necesita clave y funciona sin internet. Es lo que hace
+// que cualquiera que abra el enlace tenga las funciones utiles desde el minuto
+// uno, con o sin IA de Google.
+
+// Elige un elemento de la lista evitando repetir los ultimos que salieron.
+const _motorMemoria = {};
+function motorElegir(clave, lista){
+    if(!lista || !lista.length) return '';
+    const usados=_motorMemoria[clave]||[];
+    let pozo=lista.filter((_,i)=>usados.indexOf(i)<0);
+    if(!pozo.length){ _motorMemoria[clave]=[]; pozo=lista.slice(); }
+    const texto=pozo[Math.floor(Math.random()*pozo.length)];
+    const idx=lista.indexOf(texto);
+    _motorMemoria[clave]=(_motorMemoria[clave]||[]).concat(idx).slice(-Math.max(1,lista.length-1));
+    return texto;
+}
+function motorRellenar(texto, datos){
+    return String(texto||'').replace(/\{(\w+)\}/g, (m,k)=> (datos[k]!==undefined && datos[k]!==null) ? String(datos[k]) : '');
+}
+
+// --- Comentarios del boletin -------------------------------------------------
+// Frases de verdad, escritas para boletines colombianos, que se combinan segun
+// los datos de cada estudiante. El resultado no es una plantilla fija: cambian
+// la apertura, los datos que se mencionan y el cierre.
+const MOTOR_COMENTARIO = {
+  es: {
+    apertura: {
+      Superior: ['{NOMBRE} cerró el periodo con un desempeño superior y un promedio de {NOTA}.',
+                 'Con {NOTA} de promedio, {NOMBRE} alcanzó un desempeño superior en inglés.',
+                 '{NOMBRE} sobresalió durante todo el periodo: su promedio fue {NOTA}.',
+                 'El trabajo de {NOMBRE} fue excelente y se refleja en su promedio de {NOTA}.'],
+      Alto:     ['{NOMBRE} tuvo un buen periodo, con un promedio de {NOTA}.',
+                 'Con {NOTA} de promedio, {NOMBRE} mantuvo un desempeño alto.',
+                 '{NOMBRE} avanzó con seguridad este periodo y obtuvo {NOTA} de promedio.',
+                 'El desempeño de {NOMBRE} fue alto: cerró con {NOTA}.'],
+      'Básico': ['{NOMBRE} alcanzó los logros básicos del periodo, con {NOTA} de promedio.',
+                 'El promedio de {NOMBRE} fue {NOTA}: cumplió con lo mínimo esperado.',
+                 '{NOMBRE} llegó a un desempeño básico, con {NOTA} de promedio.',
+                 'Con {NOTA} de promedio, {NOMBRE} superó el periodo, aunque con lo justo.'],
+      Bajo:     ['{NOMBRE} terminó el periodo con {NOTA} de promedio, por debajo de lo esperado.',
+                 'Este periodo fue exigente para {NOMBRE}: su promedio fue {NOTA}.',
+                 'Con {NOTA} de promedio, {NOMBRE} todavía no alcanza los logros del periodo.',
+                 'Los resultados de {NOMBRE} este periodo ({NOTA}) muestran que necesita apoyo.'],
+      'sin':    ['{NOMBRE} aún no tiene notas registradas en este periodo.',
+                 'Todavía no hay calificaciones de {NOMBRE} en este periodo.']
+    },
+    aperturaAnual: {
+      Superior: ['{NOMBRE} termina el año escolar con un desempeño superior: su nota definitiva es {NOTA}.',
+                 'Con {NOTA} como nota definitiva, {NOMBRE} cierra un año sobresaliente.',
+                 '{NOMBRE} culmina el año con {NOTA}, un resultado excelente.'],
+      Alto:      ['{NOMBRE} cierra el año con {NOTA} como nota definitiva, en un buen nivel.',
+                 'Con {NOTA} de nota definitiva, {NOMBRE} termina el año con un desempeño alto.',
+                 '{NOMBRE} completa el año escolar con {NOTA}, un buen resultado.'],
+      'Básico':  ['{NOMBRE} aprueba el año con {NOTA} como nota definitiva.',
+                 'Con {NOTA} de nota definitiva, {NOMBRE} cumple con lo mínimo del año.',
+                 '{NOMBRE} termina el año escolar con {NOTA}, alcanzando los logros básicos.'],
+      Bajo:      ['{NOMBRE} termina el año con {NOTA}, por debajo del mínimo de {MIN}.',
+                 'Con {NOTA} como nota definitiva, {NOMBRE} no alcanzó los logros del año.',
+                 'El año fue difícil para {NOMBRE}: su nota definitiva es {NOTA}.'],
+      'sin':     ['{NOMBRE} aún no tiene notas suficientes para calcular la nota definitiva del año.']
+    },
+    asistencia: {
+      alta:  ['Su asistencia fue excelente: estuvo en el {PCT}% de las clases.',
+              'Casi no faltó a clase ({PCT}% de asistencia).',
+              'Acompañó el curso de principio a fin, con {PCT}% de asistencia.'],
+      media: ['Asistió al {PCT}% de las clases.',
+              'Su asistencia fue del {PCT}%, con {AUSENCIAS} {FALTAS}.',
+              'Estuvo presente en la mayoría de las clases ({PCT}%).'],
+      baja:  ['Preocupa su asistencia: faltó {AUSENCIAS} {VECES} ({PCT}%).',
+              'Con {PCT}% de asistencia y {AUSENCIAS} {FALTAS}, perdió clases importantes.',
+              'Su asistencia fue baja ({PCT}%), lo que le dificultó seguir el ritmo del curso.']
+    },
+    insignias: {
+      muchas: ['Recibió {N} insignias en clase, sobre todo por {TOP}.',
+               'Sus {N} insignias, especialmente por {TOP}, muestran su constancia.',
+               'Ganó {N} insignias, la mayoría por {TOP}.'],
+      pocas:  ['Ganó {N} {INSIG} por {TOP}.',
+               'Obtuvo {N} {INSIG} en clase, por {TOP}.'],
+      cero:   ['Aún no ha ganado insignias en clase.',
+               'Todavía no recibe insignias: participar más le ayudaría a conseguirlas.']
+    },
+    mejor:   ['Su mejor resultado fue en {ACT} ({VAL}).',
+              'Se destacó especialmente en {ACT}, con {VAL}.',
+              'Lo mejor le salió en {ACT}, con {VAL}.'],
+    anual:   ['Su nota definitiva del año es {FINAL}.',
+              'Cierra el año escolar con {FINAL} como nota definitiva.'],
+    recupero:['Recuperó el periodo {P}, lo que muestra su interés por mejorar.',
+              'Presentó y aprobó la recuperación del periodo {P}.'],
+    cierre: {
+      calido: {
+        Superior: ['¡Felicitaciones! Es un gusto tenerle en clase.',
+                   'Un trabajo para sentirse orgulloso; ojalá siga así.',
+                   'Gracias por el compromiso mostrado durante todo el periodo.'],
+        Alto:     ['Va por muy buen camino; con un poco más de práctica llegará aún más lejos.',
+                   'Sigue así, el esfuerzo se nota.',
+                   'Un buen periodo: le animo a seguir participando con esa disposición.'],
+        'Básico': ['Con un poco más de práctica en casa puede subir su desempeño.',
+                   'Le invito a preguntar en clase cuando algo no quede claro; eso le ayudará a avanzar.',
+                   'Está cerca de mejorar: repasar el vocabulario cada semana le hará la diferencia.'],
+        Bajo:     ['Le sugiero repasar diez minutos diarios en casa y participar más en clase; con apoyo puede mejorar.',
+                   'Con acompañamiento en casa y asistencia constante, el próximo periodo será distinto.',
+                   'Cuenta con mi apoyo en clase; le pido también repasar en casa el vocabulario visto.'],
+        sin:      ['Espero contar con su trabajo durante el próximo periodo.']
+      },
+      formal: {
+        Superior: ['Se felicita su desempeño y se espera que lo mantenga.',
+                   'Se reconoce su compromiso académico durante el periodo.'],
+        Alto:     ['Se espera que mantenga este nivel en el siguiente periodo.',
+                   'Se recomienda continuar con el mismo ritmo de trabajo.'],
+        'Básico': ['Se recomienda reforzar el vocabulario y la práctica oral en casa.',
+                   'Se sugiere mayor dedicación a los trabajos asignados.'],
+        Bajo:     ['Se requiere acompañamiento en casa y asistencia constante para superar las dificultades.',
+                   'Se recomienda plan de refuerzo y presentar las actividades pendientes.'],
+        sin:      ['Se espera su participación en las actividades del próximo periodo.']
+      },
+      motivador: {
+        Superior: ['¡Excelente trabajo! Su ejemplo anima al resto del grupo.',
+                   '¡Siga brillando así en inglés!'],
+        Alto:     ['¡Va muy bien! Un paso más y llegará al nivel superior.',
+                   'Con esa actitud, el próximo periodo puede ser aún mejor.'],
+        'Básico': ['¡Puede más de lo que cree! Practicar un poco cada día lo demostrará.',
+                   'Ánimo: con constancia el próximo periodo se le va a notar.'],
+        Bajo:     ['No se desanime: paso a paso y con práctica diaria se sale adelante.',
+                   'Todavía hay tiempo de mejorar; cuente conmigo para lograrlo.'],
+        sin:      ['¡Le espero con toda la energía el próximo periodo!']
+      }
+    }
+  },
+  en: {
+    apertura: {
+      Superior: ['{NOMBRE} finished the term with an outstanding performance and an average of {NOTA}.',
+                 'With an average of {NOTA}, {NOMBRE} reached a superior level in English.',
+                 '{NOMBRE} stood out all term long, with {NOTA} as a final average.'],
+      Alto:     ['{NOMBRE} had a good term, with an average of {NOTA}.',
+                 'With {NOTA} on average, {NOMBRE} kept a high performance.',
+                 '{NOMBRE} made steady progress this term and finished with {NOTA}.'],
+      'Básico': ['{NOMBRE} met the basic goals of the term, with an average of {NOTA}.',
+                 '{NOMBRE} finished with {NOTA}: the minimum expected was achieved.',
+                 'With {NOTA} on average, {NOMBRE} passed the term, though narrowly.'],
+      Bajo:     ['{NOMBRE} finished the term with {NOTA}, below what was expected.',
+                 'This was a demanding term for {NOMBRE}, who averaged {NOTA}.',
+                 'With an average of {NOTA}, {NOMBRE} has not met the goals yet.'],
+      'sin':    ['{NOMBRE} has no grades recorded for this term yet.']
+    },
+    aperturaAnual: {
+      Superior: ['{NOMBRE} ends the school year with an outstanding final grade of {NOTA}.'],
+      Alto:      ['{NOMBRE} finishes the year with {NOTA} as a final grade, at a good level.'],
+      'Básico':  ['{NOMBRE} passes the year with a final grade of {NOTA}.'],
+      Bajo:      ['{NOMBRE} ends the year with {NOTA}, below the {MIN} minimum.'],
+      'sin':     ['{NOMBRE} does not have enough grades yet for a final mark.']
+    },
+    asistencia: {
+      alta:  ['Attendance was excellent: {PCT}% of the classes.', 'Hardly missed a class ({PCT}% attendance).'],
+      media: ['Attended {PCT}% of the classes.', 'Attendance was {PCT}%, with {AUSENCIAS} {FALTAS}.'],
+      baja:  ['Attendance is a concern: {AUSENCIAS} {FALTAS} ({PCT}%).', 'With {PCT}% attendance, important classes were missed.']
+    },
+    insignias: {
+      muchas: ['Earned {N} badges in class, mostly for {TOP}.', 'The {N} badges earned, especially for {TOP}, show real commitment.'],
+      pocas:  ['Earned {N} {INSIG} for {TOP}.'],
+      cero:   ['No badges earned yet in class.']
+    },
+    mejor:   ['The best result was in {ACT} ({VAL}).', 'Did especially well in {ACT}, with {VAL}.'],
+    anual:   ['The final grade for the year is {FINAL}.'],
+    recupero:['Passed the make-up work for term {P}.'],
+    cierre: {
+      calido: { Superior:['Congratulations, a pleasure to have in class.'], Alto:['Keep it up, the effort shows.'],
+                'Básico':['A little more practice at home will make the difference.'],
+                Bajo:['Ten minutes of daily practice at home, plus steady attendance, will help a lot.'], sin:['Looking forward to the work next term.'] },
+      formal: { Superior:['The performance shown is commended.'], Alto:['Maintaining this level is expected.'],
+                'Básico':['Reinforcing vocabulary and oral practice at home is recommended.'],
+                Bajo:['Support at home and regular attendance are required.'], sin:['Participation is expected next term.'] },
+      motivador:{ Superior:['Excellent work, an example for the group!'], Alto:['Very good! One more step to the top level.'],
+                'Básico':['You can do more than you think: practise a little every day.'],
+                Bajo:['Do not give up: step by step, with daily practice, it gets better.'], sin:['See you next term with all the energy!'] }
+    }
+  }
+};
+// Escribe el comentario de un estudiante con los datos reales, sin IA.
+function comentarioPropio(s, op){
+    const es = op.idioma!=='en';
+    const T = MOTOR_COMENTARIO[es?'es':'en'];
+    const r = biaResumen(s, op.periodo);
+    const nivel = r.desempeno || 'sin';
+    const nombre = biaNombreParaComentario(s, op.nombre);
+    const datos = {
+        NOMBRE: nombre || (es?'El estudiante':'The student'),
+        NOTA: r.nota!==null ? r.nota.toFixed(1) : '',
+        PCT: r.asistencia.porcentaje, AUSENCIAS: r.asistencia.ausencias,
+        N: r.insignias.total, TOP: (r.insignias.principales[0]||'').replace(/\s*x\d+$/,''),
+        INSIG: r.insignias.total===1 ? (es?'insignia':'badge') : (es?'insignias':'badges'),
+        FALTAS: r.asistencia.ausencias===1 ? (es?'falta':'absence') : (es?'faltas':'absences'),
+        VECES: r.asistencia.ausencias===1 ? (es?'vez':'time') : (es?'veces':'times'),
+        FINAL: (op.periodo==='anual' && r.nota!==null) ? r.nota.toFixed(1) : '',
+        MIN: (typeof notaMinimaAnual==='number') ? notaMinimaAnual.toFixed(1) : '3.0'
+    };
+    const partes=[];
+    const banco = (op.periodo==='anual' && T.aperturaAnual) ? T.aperturaAnual : T.apertura;
+    partes.push(motorElegir((op.periodo==='anual'?'an':'ap')+nivel, banco[nivel] || banco.sin));
+    // Datos concretos: primero lo que mas dice de este estudiante.
+    const detalles=[];
+    if(r.asistencia.registradas>=3 && r.asistencia.porcentaje!==null){
+        const franja = r.asistencia.porcentaje>=95 ? 'alta' : (r.asistencia.porcentaje>=80 ? 'media' : 'baja');
+        detalles.push({ prioridad: franja==='baja'?3:1, texto: motorElegir('as'+franja, T.asistencia[franja]) });
+    }
+    if(r.insignias.total>=6) detalles.push({ prioridad:2, texto: motorElegir('inmuchas', T.insignias.muchas) });
+    else if(r.insignias.total>0) detalles.push({ prioridad:1, texto: motorElegir('inpocas', T.insignias.pocas) });
+    else if(nivel==='Bajo' || nivel==='Básico') detalles.push({ prioridad:1, texto: motorElegir('incero', T.insignias.cero) });
+    if(op.periodo==='anual'){
+        const rec=(r.detalle.periodos||[]).filter(x=>x.recuperado);
+        if(rec.length){ datos.P=rec.map(x=>x.periodo).join(', '); detalles.push({ prioridad:2, texto: motorElegir('recup', T.recupero) }); }
+    } else {
+        const notas=(r.detalle.notas||[]).map(x=>({ act:x.actividad, val:parseFloat(String(x.nota).replace(',','.')) })).filter(x=>isFinite(x.val));
+        if(notas.length>1 && nivel!=='Bajo'){
+            const mejor=notas.reduce((a,b)=>b.val>a.val?b:a);
+            if(mejor.act){ datos.ACT=mejor.act; datos.VAL=mejor.val.toFixed(1); detalles.push({ prioridad:2, texto: motorElegir('mejor', T.mejor) }); }
+        }
+    }
+    detalles.sort((a,b)=>b.prioridad-a.prioridad);
+    const cuantos = op.largo==='medio' ? 2 : 1;
+    detalles.slice(0,cuantos).forEach(x=>partes.push(x.texto));
+    const cierres=T.cierre[op.tono] || T.cierre.calido;
+    partes.push(motorElegir('ci'+op.tono+nivel, cierres[nivel] || cierres.sin));
+    let texto=motorRellenar(partes.join(' '), datos).replace(/\s{2,}/g,' ').trim();
+    // Si no hay nombre, la frase no puede empezar con un hueco.
+    if(!nombre) texto=texto.replace(/^\s*,?\s*/,'');
+    return texto.charAt(0).toUpperCase()+texto.slice(1);
+}
+
+// --- Diccionario para las pistas de vocabulario ------------------------------
+// Lo mas usado en primaria y bachillerato. Alcanza para la mayoria de listas;
+// lo que no esté aqui se puede completar con la IA, si hay clave.
+const MOTOR_DICCIONARIO = ('apple=manzana|banana=plátano|orange=naranja|grape=uva|grapes=uvas|strawberry=fresa|watermelon=sandía|pineapple=piña|lemon=limón|pear=pera|peach=durazno|mango=mango|bread=pan|cheese=queso|milk=leche|water=agua|juice=jugo|rice=arroz|chicken=pollo|meat=carne|fish=pescado|egg=huevo|eggs=huevos|soup=sopa|salad=ensalada|carrot=zanahoria|potato=papa|tomato=tomate|onion=cebolla|beans=fríjoles|corn=maíz|ice cream=helado|cake=torta|candy=dulce|chocolate=chocolate|breakfast=desayuno|lunch=almuerzo|dinner=cena|'
++'dog=perro|cat=gato|bird=pájaro|fish=pez|horse=caballo|cow=vaca|pig=cerdo|sheep=oveja|chicken=gallina|duck=pato|rabbit=conejo|mouse=ratón|lion=león|tiger=tigre|bear=oso|elephant=elefante|monkey=mono|giraffe=jirafa|zebra=cebra|snake=serpiente|frog=rana|turtle=tortuga|spider=araña|bee=abeja|butterfly=mariposa|ant=hormiga|shark=tiburón|whale=ballena|dolphin=delfín|penguin=pingüino|'
++'red=rojo|blue=azul|green=verde|yellow=amarillo|black=negro|white=blanco|orange=naranja|pink=rosado|purple=morado|brown=café|grey=gris|gray=gris|'
++'one=uno|two=dos|three=tres|four=cuatro|five=cinco|six=seis|seven=siete|eight=ocho|nine=nueve|ten=diez|eleven=once|twelve=doce|twenty=veinte|hundred=cien|'
++'head=cabeza|hair=pelo|eye=ojo|eyes=ojos|ear=oreja|nose=nariz|mouth=boca|tooth=diente|teeth=dientes|tongue=lengua|neck=cuello|shoulder=hombro|arm=brazo|hand=mano|finger=dedo|leg=pierna|foot=pie|feet=pies|knee=rodilla|back=espalda|heart=corazón|'
++'mother=mamá|mom=mamá|father=papá|dad=papá|sister=hermana|brother=hermano|grandmother=abuela|grandfather=abuelo|aunt=tía|uncle=tío|cousin=primo|son=hijo|daughter=hija|baby=bebé|family=familia|friend=amigo|'
++'school=colegio|teacher=profesor|student=estudiante|classroom=salón|desk=pupitre|chair=silla|table=mesa|board=tablero|book=libro|notebook=cuaderno|pencil=lápiz|pen=lapicero|eraser=borrador|ruler=regla|scissors=tijeras|glue=pegante|backpack=morral|homework=tarea|test=examen|lesson=clase|library=biblioteca|playground=patio|'
++'house=casa|home=hogar|room=cuarto|bedroom=habitación|kitchen=cocina|bathroom=baño|door=puerta|window=ventana|bed=cama|sofa=sofá|lamp=lámpara|mirror=espejo|floor=piso|wall=pared|garden=jardín|'
++'shirt=camisa|t-shirt=camiseta|pants=pantalón|trousers=pantalón|dress=vestido|skirt=falda|shoes=zapatos|socks=medias|hat=sombrero|cap=gorra|jacket=chaqueta|coat=abrigo|sweater=suéter|uniform=uniforme|glasses=gafas|'
++'monday=lunes|tuesday=martes|wednesday=miércoles|thursday=jueves|friday=viernes|saturday=sábado|sunday=domingo|january=enero|february=febrero|march=marzo|april=abril|may=mayo|june=junio|july=julio|august=agosto|september=septiembre|october=octubre|november=noviembre|december=diciembre|today=hoy|tomorrow=mañana|yesterday=ayer|week=semana|month=mes|year=año|day=día|night=noche|morning=mañana|afternoon=tarde|'
++'sun=sol|moon=luna|star=estrella|sky=cielo|rain=lluvia|snow=nieve|wind=viento|cloud=nube|cold=frío|hot=caliente|warm=cálido|weather=clima|beach=playa|mountain=montaña|river=río|sea=mar|tree=árbol|flower=flor|grass=pasto|forest=bosque|city=ciudad|town=pueblo|farm=finca|park=parque|'
++'car=carro|bus=bus|bike=bicicleta|bicycle=bicicleta|train=tren|plane=avión|airplane=avión|boat=bote|ship=barco|truck=camión|motorcycle=moto|taxi=taxi|street=calle|road=carretera|'
++'doctor=médico|nurse=enfermera|police officer=policía|firefighter=bombero|farmer=campesino|cook=cocinero|driver=conductor|singer=cantante|dancer=bailarín|painter=pintor|writer=escritor|engineer=ingeniero|dentist=odontólogo|vet=veterinario|'
++'happy=feliz|sad=triste|angry=bravo|tired=cansado|hungry=hambriento|thirsty=sediento|scared=asustado|excited=emocionado|bored=aburrido|sick=enfermo|'
++'big=grande|small=pequeño|tall=alto|short=bajo|long=largo|new=nuevo|old=viejo|young=joven|fast=rápido|slow=lento|easy=fácil|difficult=difícil|clean=limpio|dirty=sucio|beautiful=hermoso|ugly=feo|strong=fuerte|funny=chistoso|kind=amable|smart=inteligente|'
++'run=correr|walk=caminar|jump=saltar|swim=nadar|eat=comer|drink=beber|sleep=dormir|read=leer|write=escribir|listen=escuchar|speak=hablar|talk=hablar|sing=cantar|dance=bailar|play=jugar|study=estudiar|work=trabajar|draw=dibujar|paint=pintar|cook=cocinar|help=ayudar|love=amar|like=gustar|want=querer|need=necesitar|learn=aprender|teach=enseñar|open=abrir|close=cerrar|buy=comprar|sell=vender|drive=manejar|fly=volar|laugh=reír|cry=llorar|think=pensar|'
++'ball=balón|game=juego|toy=juguete|doll=muñeca|puzzle=rompecabezas|music=música|song=canción|movie=película|party=fiesta|birthday=cumpleaños|gift=regalo|holiday=vacaciones|soccer=fútbol|basketball=baloncesto|swimming=natación|'
++'phone=teléfono|computer=computador|television=televisor|camera=cámara|clock=reloj|key=llave|money=dinero|bag=bolsa|box=caja|paper=papel|letter=carta|picture=foto|color=color|number=número|word=palabra|name=nombre|question=pregunta|answer=respuesta').split('|')
+    .reduce((m,par)=>{ const i=par.indexOf('='); if(i>0) m[par.slice(0,i).trim().toLowerCase()]=par.slice(i+1).trim(); return m; },{});
+function pistaPropia(palabra){
+    const p=String(palabra||'').trim().toLowerCase().replace(/^(a|an|the|to)\s+/,'');
+    if(MOTOR_DICCIONARIO[p]) return MOTOR_DICCIONARIO[p];
+    // Plurales sencillos y terminaciones comunes.
+    if(/s$/.test(p) && MOTOR_DICCIONARIO[p.slice(0,-1)]) return MOTOR_DICCIONARIO[p.slice(0,-1)]+'s';
+    if(/es$/.test(p) && MOTOR_DICCIONARIO[p.slice(0,-2)]) return MOTOR_DICCIONARIO[p.slice(0,-2)]+'s';
+    if(/ies$/.test(p) && MOTOR_DICCIONARIO[p.slice(0,-3)+'y']) return MOTOR_DICCIONARIO[p.slice(0,-3)+'y']+'s';
+    return '';
+}
+
+// --- Preguntas del dia -------------------------------------------------------
+const MOTOR_PREGUNTAS = {
+  rutina:  { es:'Rutina diaria', en:'Daily routine', q:['What time do you wake up?','What do you have for breakfast?','How do you go to school?','What do you do after school?','What time do you go to bed?','Do you help at home? How?','What is your favourite day of the week? Why?','What do you do on Sundays?'] },
+  familia: { es:'Familia y amigos', en:'Family and friends', q:['How many people are there in your family?','Who is the funniest person in your family?','Describe your best friend.','What do you like doing with your friends?','Do you have any pets? Describe them.','Who do you look like in your family?','What does your mother do?','Tell me about your grandparents.'] },
+  comida:  { es:'Comida', en:'Food', q:['What is your favourite food?','Do you like vegetables? Which ones?','What do you usually eat for lunch?','Can you cook? What can you cook?','What is a typical dish from your region?','Sweet or salty? Why?','What food do you not like at all?','What did you eat yesterday?'] },
+  gustos:  { es:'Gustos y pasatiempos', en:'Likes and hobbies', q:['What is your favourite sport?','What music do you listen to?','What do you do in your free time?','What is your favourite movie? Why?','Can you play an instrument?','What video game do you like?','What is your favourite colour and why?','What are you good at?'] },
+  colegio: { es:'Colegio', en:'School', q:['What is your favourite subject? Why?','What do you like about your school?','Who is your favourite teacher and why?','What do you do at break time?','Is homework important? Why?','What would you change in your school?','What do you carry in your backpack?','What are you learning in English this week?'] },
+  vacaciones:{ es:'Vacaciones y viajes', en:'Holidays and travel', q:['Where did you go on your last holiday?','Do you prefer the beach or the mountains? Why?','What country would you like to visit?','How do you like to travel: by bus, car or plane?','What do you always take on a trip?','Describe the best day of your holidays.','Have you ever been to another city? Which one?','What are your plans for the next holidays?'] },
+  futuro:  { es:'Planes y futuro', en:'Plans and future', q:['What do you want to be when you grow up? Why?','What are you going to do this weekend?','Where do you see yourself in five years?','What would you like to learn?','If you had a lot of money, what would you do?','What is a goal you have this year?','Would you like to live in another country? Why?','What is something new you want to try?'] },
+  descripcion:{ es:'Describir', en:'Describing', q:['Describe your bedroom.','Describe the person next to you.','Describe your favourite animal without saying its name.','What is the weather like today?','Describe your neighbourhood.','What are you wearing today?','Describe your favourite place in your town.','How do you feel today and why?'] }
+};
+window.traerPreguntasPropias=function(){
+    const es=currentLanguage==='es';
+    const sel=document.getElementById('preguntasTema');
+    const ta=document.getElementById('preguntasInput'); if(!ta) return;
+    const tema=(sel&&MOTOR_PREGUNTAS[sel.value])?sel.value:'rutina';
+    const actuales=ta.value.split('\n').map(x=>x.trim()).filter(Boolean);
+    const nuevas=MOTOR_PREGUNTAS[tema].q.filter(q=>actuales.indexOf(q)<0);
+    if(!nuevas.length){ showNotification(es?'Ya tienes todas las preguntas de ese tema':'You already have every question from that topic','info'); return; }
+    ta.value=actuales.concat(nuevas).join('\n');
+    contarPreguntasEditor();
+    showNotification(es?`📚 ${nuevas.length} preguntas agregadas`:`📚 ${nuevas.length} questions added`,'success');
+};
+
+// --- Resumen semanal sin IA ---------------------------------------------------
+function resumenSemanalPropio(){
+    const es=currentLanguage==='es';
+    const lista=(currentStudents||[]);
+    const semana=gridWeeks;                      // la ultima semana cargada
+    const ini=(semana-1)*weekDays.length, fin=ini+weekDays.length;
+    const datos=lista.map(s=>{
+        let dela=0; for(let ci=ini;ci<fin;ci++) dela+=((s.gridBadges||[])[ci]||[]).length;
+        const reg=Object.values(s.attendance||{}).filter(e=>e==='p'||e==='a');
+        const aus=reg.filter(e=>e==='a').length;
+        return { s:s, insignias:dela, total:(s.gridBadges||[]).reduce((a,c)=>a+(c||[]).length,0), ausencias:aus,
+                 prom:parseFloat(calculateStudentAverage(s))||null };
+    });
+    const totalSem=datos.reduce((a,x)=>a+x.insignias,0);
+    const destacados=datos.filter(x=>x.insignias>0).sort((a,b)=>b.insignias-a.insignias).slice(0,5);
+    const callados=datos.filter(x=>x.insignias===0);
+    const enRiesgo=datos.filter(x=>x.prom!==null && x.prom<notaMinimaAnual).sort((a,b)=>a.prom-b.prom);
+    const faltones=datos.filter(x=>x.ausencias>=3).sort((a,b)=>b.ausencias-a.ausencias);
+    const li=(arr,f)=>arr.map(f).join('');
+    const plural=(n,uno,varios)=>n===1?uno:varios;
+    const nom=x=>escapeHtml(x.s.name||'');
+    let h=`<h4>${es?'Participación de la semana':'Participation this week'}</h4>`
+        + `<p>${es?`Se ${plural(totalSem,'entregó','entregaron')} <b>${totalSem}</b> ${plural(totalSem,'insignia','insignias')} entre <b>${lista.length}</b> estudiantes.`
+                 :`<b>${totalSem}</b> ${plural(totalSem,'badge was','badges were')} given to <b>${lista.length}</b> students.`}</p>`;
+    if(destacados.length) h+=`<h4>${es?'Los que más participaron':'Most active'}</h4><ul>`+li(destacados,x=>`<li>${nom(x)} — ${x.insignias} ${es?plural(x.insignias,'insignia','insignias'):plural(x.insignias,'badge','badges')}</li>`)+`</ul>`;
+    if(callados.length) h+=`<h4>${es?'Sin insignias esta semana':'No badges this week'}</h4><p>${callados.slice(0,12).map(nom).join(', ')}${callados.length>12?'…':''}</p>`;
+    if(enRiesgo.length) h+=`<h4>${es?'Ojo con estos promedios':'Averages to watch'}</h4><ul>`+li(enRiesgo.slice(0,8),x=>`<li>${nom(x)} — ${x.prom.toFixed(1)}</li>`)+`</ul>`;
+    if(faltones.length) h+=`<h4>${es?'Asistencia':'Attendance'}</h4><ul>`+li(faltones.slice(0,8),x=>`<li>${nom(x)} — ${x.ausencias} ${es?plural(x.ausencias,'falta','faltas'):plural(x.ausencias,'absence','absences')}</li>`)+`</ul>`;
+    const consejos=[];
+    if(callados.length>lista.length/3) consejos.push(es?'Muchos estudiantes no recibieron insignias: prueba el sorteo «Al azar» para repartir la participación.':'Many students got no badges: try the random picker to spread participation.');
+    if(enRiesgo.length) consejos.push(es?`Cita a los ${enRiesgo.length} estudiantes con promedio bajo antes de cerrar el periodo.`:`Meet the ${enRiesgo.length} students with a low average before the term ends.`);
+    if(faltones.length) consejos.push(es?'Avisa a las familias de quienes están faltando; el acceso de invitados les muestra la asistencia al día.':'Tell the families of those missing classes; guest access shows them the attendance.');
+    if(totalSem===0) consejos.push(es?'Esta semana no se entregaron insignias. Repartir una por clase mantiene el ánimo arriba.':'No badges were given this week. One per class keeps motivation up.');
+    if(!consejos.length) consejos.push(es?'El grupo va bien: mantén el ritmo y sigue reconociendo la participación.':'The group is doing well: keep the pace and keep recognising participation.');
+    h+=`<h4>${es?'Qué hacer':'What to do'}</h4><ul>`+consejos.map(c=>`<li>${escapeHtml(c)}</li>`).join('')+`</ul>`;
+    return h;
+}
+
+// ===================== COMENTARIOS DEL BOLETIN ============================
 // La IA escribe un borrador por estudiante con sus notas, asistencia e insignias.
 // El docente lo revisa, lo cambia si quiere y guarda solo los que marca.
 //
@@ -10073,6 +10438,23 @@ function biaResumen(s, periodo){
         insignias:{ total:insignias.reduce((a,x)=>a+x[1],0), principales:insignias.slice(0,6).map(x=>x[0]+(x[1]>1?` x${x[1]}`:'')) }
     };
 }
+// Con clave de Gemini se puede elegir; sin clave, escribe siempre la plataforma.
+function biaMotorElegido(){
+    const el=document.getElementById('biaMotor');
+    const v=el?el.value:'propio';
+    return (v==='gemini' && hasApiKey()) ? 'gemini' : 'propio';
+}
+window.biaCambiarMotor=function(){
+    const el=document.getElementById('biaMotor');
+    if(el && el.value==='gemini' && !hasApiKey()){
+        el.value='propio';
+        showNotification(currentLanguage==='es'
+            ? 'Para usar Gemini hay que configurar una clave (botón 🔐 Configurar IA). Mientras tanto escribe la plataforma.'
+            : 'Gemini needs an API key (🔐 Configure AI). Meanwhile the platform writes them.','info');
+    }
+    try{ localStorage.setItem('lt_biaMotor', el?el.value:'propio'); }catch(e){}
+    textosComentariosBoletin();
+};
 function biaOpciones(){
     const v=(id,def)=>{ const el=document.getElementById(id); return el&&el.value?el.value:def; };
     const p=v('biaPeriodo',String(activePeriod));
@@ -10088,7 +10470,7 @@ function biaAlumnosObjetivo(op){
     return op.para==='todos' ? lista.slice() : lista.filter(s=>!(s.comment&&s.comment.trim()) || _bia.borradores[s.id]!==undefined || _bia.guardados[s.id]);
 }
 function biaGuardarPreferencias(){
-    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara'].forEach(id=>{ const el=document.getElementById(id); if(el) localStorage.setItem('lt_'+id, el.value); }); }catch(e){}
+    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara','biaMotor'].forEach(id=>{ const el=document.getElementById(id); if(el) localStorage.setItem('lt_'+id, el.value); }); }catch(e){}
 }
 function abrirComentariosBoletin(){
     const es=currentLanguage==='es';
@@ -10101,7 +10483,9 @@ function abrirComentariosBoletin(){
             + `<option value="anual">${es?'Año completo (nota final)':'Whole year (final grade)'}</option>`;
         sel.value = actual || String(activePeriod);
     }
-    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara'].forEach(id=>{ const el=document.getElementById(id), g=localStorage.getItem('lt_'+id); if(el&&g&&[...el.options].some(o=>o.value===g)) el.value=g; }); }catch(e){}
+    try{ ['biaTono','biaLargo','biaIdioma','biaNombre','biaPara','biaMotor'].forEach(id=>{ const el=document.getElementById(id), g=localStorage.getItem('lt_'+id); if(el&&g&&[...el.options].some(o=>o.value===g)) el.value=g; }); }catch(e){}
+    const mot=document.getElementById('biaMotor');
+    if(mot && !hasApiKey()) mot.value='propio';
     textosComentariosBoletin();
     biaPintarLista();
     showModal('biaModal');
@@ -10158,7 +10542,8 @@ function biaActualizarBotones(){
     const gen=document.getElementById('biaGenerarBtn');
     if(gen){
         gen.disabled=false;
-        gen.innerHTML = _bia.generando ? (es?'⏹ Detener':'⏹ Stop') : ('✨ '+(es?'Generar borradores':'Write drafts'));
+        gen.innerHTML = _bia.generando ? (es?'⏹ Detener':'⏹ Stop')
+            : ((biaMotorElegido()==='propio'?'⚡ ':'✨ ')+(es?'Generar borradores':'Write drafts'));
     }
 }
 function biaProgreso(hechos,total,texto){
@@ -10236,6 +10621,7 @@ async function biaPedir(grupo, op, variar){
 async function biaGenerar(){
     const es=currentLanguage==='es';
     if(_bia.generando){ _bia.detener=true; return; }
+    if(biaMotorElegido()==='propio') return biaGenerarPropio();
     if(!ensureAiKey()) return;
     biaGuardarPreferencias();
     const op=biaOpciones();
@@ -10274,10 +10660,41 @@ async function biaGenerar(){
     const listos=grupo.filter(s=>String(_bia.borradores[s.id]||'').trim()).length;
     if(listos) showNotification(es?`✨ ${listos} borrador(es) listos. Léelos antes de guardar.`:`✨ ${listos} draft(s) ready. Read them before saving.`,'success');
 }
+// Con el motor propio es instantaneo: no hay que llamar a nadie.
+function biaGenerarPropio(){
+    const es=currentLanguage==='es';
+    biaGuardarPreferencias();
+    const op=biaOpciones();
+    const todos=biaAlumnosObjetivo(op);
+    const pendientes=todos.filter(s=>!String(_bia.borradores[s.id]||'').trim());
+    let grupo=pendientes;
+    if(!pendientes.length){
+        if(!todos.length) return;
+        if(!confirm(es?'Todos ya tienen borrador. ¿Escribirlos todos de nuevo?':'Everyone already has a draft. Write them all again?')) return;
+        grupo=todos;
+    }
+    grupo.forEach(s=>{
+        _bia.borradores[s.id]=comentarioPropio(s,op);
+        _bia.marcados[s.id]=true;
+        delete _bia.errores[s.id]; delete _bia.guardados[s.id];
+    });
+    biaPintarLista();
+    showNotification(es?`⚡ ${grupo.length} borrador(es) listos. Léelos antes de guardar.`:`⚡ ${grupo.length} draft(s) ready. Read them before saving.`,'success');
+}
 async function biaOtraVersion(id){
     const es=currentLanguage==='es';
     if(_bia.generando) return;
     const s=(currentStudents||[]).find(x=>x.id===id); if(!s) return;
+    if(biaMotorElegido()==='propio'){
+        const op=biaOpciones();
+        const antes=_bia.borradores[s.id]||'';
+        let nuevo=comentarioPropio(s,op);
+        for(let i=0;i<4 && nuevo===antes;i++) nuevo=comentarioPropio(s,op);   // que no salga el mismo
+        _bia.borradores[s.id]=nuevo; _bia.marcados[s.id]=true;
+        delete _bia.errores[s.id]; delete _bia.guardados[s.id];
+        biaPintarLista();
+        return;
+    }
     if(!ensureAiKey()) return;
     const fila=document.querySelector(`#biaLista .bia-fila[data-id="${Number(id)}"]`);
     const btn=fila&&fila.querySelector('.bia-otra');
@@ -10312,13 +10729,19 @@ function textosComentariosBoletin(){
     const t=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
     t('biaBtnText', es?'Comentarios del boletín (IA)':'Report card comments (AI)');
     t('biaTituloModal', es?'✍️ Comentarios para el boletín':'✍️ Report card comments');
-    t('biaIntro', es?'La IA escribe un borrador para cada estudiante con sus notas, su asistencia y sus insignias. Tú lo lees, lo cambias si quieres y guardas los que marques.':'The AI writes a draft for each student from their scores, attendance and badges. You read it, edit it if you like, and save the ones you tick.');
+    const propio = biaMotorElegido()==='propio';
+    t('biaIntro', propio
+        ? (es?'La plataforma escribe un borrador para cada estudiante con sus notas, su asistencia y sus insignias. Tú lo lees, lo cambias si quieres y guardas los que marques.'
+             :'The platform writes a draft for each student from their scores, attendance and badges. You read it, edit it if you like, and save the ones you tick.')
+        : (es?'La IA escribe un borrador para cada estudiante con sus notas, su asistencia y sus insignias. Tú lo lees, lo cambias si quieres y guardas los que marques.'
+             :'The AI writes a draft for each student from their scores, attendance and badges. You read it, edit it if you like, and save the ones you tick.'));
     t('biaPeriodoLbl', es?'Sobre':'About');
     t('biaTonoLbl', es?'Tono':'Tone');
     t('biaLargoLbl', es?'Extensión':'Length');
     t('biaIdiomaLbl', es?'Idioma':'Language');
     t('biaNombreLbl', es?'Nombre en el texto':'Name in the text');
     t('biaParaLbl', es?'Para':'For');
+    t('biaMotorLbl', es?'Quién escribe':'Written by');
     t('biaExtraLbl', es?'Indicación para todos (opcional)':'Note for all (optional)');
     t('biaPrivacidad', es?'🔒 A Google llegan las notas, la asistencia y las insignias con un código (E01, E02…). Los nombres se ponen aquí, en tu equipo.':'🔒 Google receives scores, attendance and badges under a code (E01, E02…). Names are filled in here, on your device.');
     t('biaCerrarBtn', es?'Cerrar':'Close');
@@ -10329,6 +10752,11 @@ function textosComentariosBoletin(){
     opt('biaIdioma', es?['Español','Inglés']:['Spanish','English']);
     opt('biaNombre', es?['Nombre completo','Solo la primera palabra','Sin nombre']:['Full name','First word only','No name']);
     opt('biaPara', es?['Quienes no tienen comentario','Todos los estudiantes']:['Students without a comment','All students']);
+    opt('biaMotor', es?['⚡ La plataforma','✨ Gemini (IA)']:['⚡ The platform','✨ Gemini (AI)']);
+    const pv=document.getElementById('biaPrivacidad');
+    if(pv && biaMotorElegido()==='propio') pv.textContent = es
+        ? '⚡ La plataforma los escribe aquí mismo, con los datos de cada estudiante. No se envía nada a internet y funciona sin conexión.'
+        : '⚡ The platform writes them right here from each student’s data. Nothing is sent to the internet and it works offline.';
     biaActualizarBotones();
 }
 </script>
