@@ -1605,6 +1605,52 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 @keyframes celCorreBrazoL { 0%,100%{ rotate:24deg; } 50%{ rotate:-18deg; } }
 @keyframes celCorreBrazoR { 0%,100%{ rotate:-18deg; } 50%{ rotate:24deg; } }
 
+
+/* --- Movimiento 7: reverencia --- */
+.mov-reverencia { animation:celEntra .5s var(--ease-out-back) both, celReverencia .95s .5s 2 var(--ease-in-out); }
+@keyframes celReverencia { 0%,100%{ transform:translateY(0) scaleY(1); } 38%{ transform:translateY(16px) scaleY(.86); } 70%{ transform:translateY(-4px) scaleY(1.03); } }
+.mov-reverencia .cel-cabeza { animation:celReverenciaCabeza .95s .5s 2 var(--ease-in-out); }
+@keyframes celReverenciaCabeza { 0%,100%{ transform:rotate(0deg) translateY(0); } 38%{ transform:rotate(16deg) translateY(10px); } }
+.mov-reverencia .cel-brazo-l { animation:celReverenciaBrazoL .95s .5s 2 var(--ease-in-out); }
+.mov-reverencia .cel-brazo-r { animation:celReverenciaBrazoR .95s .5s 2 var(--ease-in-out); }
+@keyframes celReverenciaBrazoL { 0%,100%{ rotate:0deg; } 38%{ rotate:-54deg; } }
+@keyframes celReverenciaBrazoR { 0%,100%{ rotate:0deg; } 38%{ rotate:54deg; } }
+
+/* --- Movimiento 8: la ola --- */
+.mov-ola { animation:celEntra .5s var(--ease-out-back) both, celOla 1.1s .5s 2 var(--ease-in-out); }
+@keyframes celOla { 0%,50%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-10px) rotate(-7deg); } 75%{ transform:translateY(-10px) rotate(7deg); } }
+.mov-ola .cel-brazo-l { animation:celOlaBrazoL 1.1s .5s 2 var(--ease-in-out); }
+.mov-ola .cel-brazo-r { animation:celOlaBrazoR 1.1s .5s 2 var(--ease-in-out); }
+@keyframes celOlaBrazoL { 0%,60%,100%{ rotate:0deg; } 20%{ rotate:-48deg; } 35%{ rotate:-20deg; } }
+@keyframes celOlaBrazoR { 0%,35%,100%{ rotate:0deg; } 60%{ rotate:48deg; } 78%{ rotate:20deg; } }
+.mov-ola .cel-cabeza { animation:celCabezaSaludo 1.1s .5s 2 ease-in-out; }
+.mov-ola .cel-pierna-l { animation:celPiernaL 1.1s .5s 2 var(--ease-in-out); }
+.mov-ola .cel-pierna-r { animation:celPiernaR 1.1s .5s 2 var(--ease-in-out); }
+
+/* --- Escena: mariposa --- */
+.fig-mariposa { animation:celEntra .5s var(--ease-out-back) both, figMariposa 2.6s .4s 1 ease-in-out forwards; }
+@keyframes figMariposa { 0%{ transform:translate(0,0) rotate(0deg); } 30%{ transform:translate(-34px,-44px) rotate(-9deg); } 62%{ transform:translate(24px,-74px) rotate(9deg); } 100%{ transform:translate(0,-104px) rotate(0deg); } }
+.fig-ala-i { transform-origin:100px 142px; animation:figAlaI .3s ease-in-out infinite alternate; }
+.fig-ala-d { transform-origin:100px 142px; animation:figAlaD .3s ease-in-out infinite alternate; }
+@keyframes figAlaI { from { transform:scaleX(1); } to { transform:scaleX(.5); } }
+@keyframes figAlaD { from { transform:scaleX(1); } to { transform:scaleX(.5); } }
+
+/* --- Escena: fuegos artificiales --- */
+.fig-fuegos svg { overflow:visible; }
+.fig-fuegos .fuego { animation:figFuego 1.15s var(--ease-out) both; animation-delay:var(--d,0s); }
+@keyframes figFuego { 0%{ opacity:0; transform:scale(.12); } 12%{ opacity:1; } 70%{ opacity:.9; } 100%{ opacity:0; transform:scale(1.25); } }
+.fig-fuegos .mecha { animation:figMecha .45s var(--ease-out) both; animation-delay:var(--d,0s); }
+@keyframes figMecha { 0%{ opacity:1; transform:translateY(70px) scaleY(.4); } 80%{ opacity:.9; } 100%{ opacity:0; transform:translateY(0) scaleY(1); } }
+
+/* --- Escena: corazon con alas --- */
+.fig-corazon { animation:celEntra .5s var(--ease-out-back) both, figCorazonSube 2.5s .4s 1 ease-in-out forwards; }
+@keyframes figCorazonSube { 0%{ transform:translateY(0); } 100%{ transform:translateY(-70px); } }
+.fig-latido { transform-origin:100px 162px; animation:figLatido .58s ease-in-out infinite; }
+@keyframes figLatido { 0%,100%{ transform:scale(1); } 18%{ transform:scale(1.14); } 36%{ transform:scale(1); } 54%{ transform:scale(1.08); } }
+.fig-alita-i { transform-origin:72px 146px; animation:figAlitaI .26s ease-in-out infinite alternate; }
+.fig-alita-d { transform-origin:128px 146px; animation:figAlitaD .26s ease-in-out infinite alternate; }
+@keyframes figAlitaI { from { rotate:-16deg; } to { rotate:18deg; } }
+@keyframes figAlitaD { from { rotate:16deg; } to { rotate:-18deg; } }
 /* --- Escenas sin muñequito --- */
 .cel-figura { position:relative; animation:celEntra .55s var(--ease-out-back) both; }
 .cel-figura svg { height:min(44vh,320px); width:auto; display:block; filter:drop-shadow(0 16px 28px rgba(31,35,64,.28)); }
@@ -5116,7 +5162,7 @@ function celNombreDe(s){ return (typeof biaTitulo==='function') ? biaTitulo(s&&s
 // --- Escenas de la bienvenida ------------------------------------------------
 // Para que pasar lista no sea siempre lo mismo: unas veces sale el muñequito
 // haciendo un movimiento distinto, y otras una escena sin personaje.
-const CEL_MOVS = ['salto','baile','giro','saludo','tijera','corre'];
+const CEL_MOVS = ['salto','baile','giro','saludo','tijera','corre','reverencia','ola'];
 const CEL_FIGURAS = {
   cohete: `<svg viewBox="0 0 200 270" aria-hidden="true">
     <g class="fig-cohete">
@@ -5175,6 +5221,33 @@ const CEL_FIGURAS = {
     <g class="fig-nube" style="animation-delay:.6s"><ellipse cx="40" cy="150" rx="20" ry="13" fill="#e2e8f0"/><ellipse cx="56" cy="154" rx="14" ry="10" fill="#e2e8f0"/></g>
     <ellipse cx="100" cy="212" rx="88" ry="12" fill="rgba(34,197,94,.35)"/>
   </svg>`,
+  mariposa: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-ala-i">
+      <path d="M97 128C70 88 28 84 28 122c0 28 32 42 69 26Z" fill="#a855f7"/>
+      <path d="M97 160c-26 32-56 32-60 6-3-19 24-32 60-16Z" fill="#ec4899"/>
+      <circle cx="58" cy="112" r="9" fill="#f5d0fe"/><circle cx="62" cy="168" r="6" fill="#fbcfe8"/>
+    </g>
+    <g class="fig-ala-d">
+      <path d="M103 128C130 88 172 84 172 122c0 28-32 42-69 26Z" fill="#a855f7"/>
+      <path d="M103 160c26 32 56 32 60 6 3-19-24-32-60-16Z" fill="#ec4899"/>
+      <circle cx="142" cy="112" r="9" fill="#f5d0fe"/><circle cx="138" cy="168" r="6" fill="#fbcfe8"/>
+    </g>
+    <ellipse cx="100" cy="152" rx="8" ry="36" fill="#4c1d95"/>
+    <circle cx="100" cy="112" r="10" fill="#4c1d95"/>
+    <path d="M96 104c-6-10-14-14-20-14M104 104c6-10 14-14 20-14" stroke="#4c1d95" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="86" cy="88" r="4" fill="#4c1d95"/><circle cx="124" cy="88" r="4" fill="#4c1d95"/>
+    <circle cx="96" cy="110" r="2.2" fill="#fff"/><circle cx="104" cy="110" r="2.2" fill="#fff"/>
+  </svg>`,
+  corazon: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-alita-i"><path d="M72 146C56 78 10 52 3 92c-8 44 24 68 69 60Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+      <path d="M58 132C44 104 26 88 14 88M52 146C36 128 22 118 10 116" stroke="#e2e8f0" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+    <g class="fig-alita-d"><path d="M128 146c16-68 62-94 69-54 8 44-24 68-69 60Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+      <path d="M142 132c14-28 32-44 44-44M148 146c16-18 30-28 42-30" stroke="#e2e8f0" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+    <g class="fig-latido">
+      <path d="M100 224c-44-30-64-56-64-82 0-23 17-37 37-37 13 0 23 7 27 16 4-9 14-16 27-16 20 0 37 14 37 37 0 26-20 52-64 82Z" fill="#ef4467"/>
+      <path d="M72 126c-6-12 2-22 14-22-8 4-10 12-6 20Z" fill="rgba(255,255,255,.65)"/>
+    </g>
+  </svg>`,
   calabaza: `<svg viewBox="0 0 200 270" aria-hidden="true">
     <g class="fig-calabaza">
       <path d="M92 108h16V86c0-9 7-16 16-16-7 7-8 11-8 18v20Z" fill="#16a34a"/>
@@ -5195,8 +5268,31 @@ const CEL_FIGURAS = {
     </g>
   </svg>`
 };
+// Los fuegos artificiales se dibujan con un bucle: tres estallidos de rayos.
+CEL_FIGURAS.fuegos = (function(){
+    const estallidos=[
+        { x:100, y:96,  r:58, color:'#fbbf24', punta:'#fde68a', retraso:'0s' },
+        { x:52,  y:162, r:42, color:'#ec4899', punta:'#f9a8d4', retraso:'.5s' },
+        { x:152, y:150, r:46, color:'#38bdf8', punta:'#bae6fd', retraso:'.95s' }
+    ];
+    let svg='<svg viewBox="0 0 200 270" aria-hidden="true">';
+    estallidos.forEach(e=>{
+        // La mecha que sube antes de reventar.
+        svg+=`<line class="mecha" style="--d:${e.retraso}" x1="${e.x}" y1="${e.y}" x2="${e.x}" y2="${e.y+64}" stroke="${e.color}" stroke-width="3" stroke-linecap="round" opacity=".8"/>`;
+        svg+=`<g class="fuego" style="--d:${e.retraso};transform-origin:${e.x}px ${e.y}px">`;
+        for(let i=0;i<12;i++){
+            const a=(Math.PI*2*i)/12;
+            const x1=e.x+Math.cos(a)*e.r*0.32, y1=e.y+Math.sin(a)*e.r*0.32;
+            const x2=e.x+Math.cos(a)*e.r,      y2=e.y+Math.sin(a)*e.r;
+            svg+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${e.color}" stroke-width="5" stroke-linecap="round"/>`;
+            svg+=`<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="4" fill="${e.punta}"/>`;
+        }
+        svg+=`<circle cx="${e.x}" cy="${e.y}" r="7" fill="${e.punta}"/></g>`;
+    });
+    return svg+'</svg>';
+})();
 function celFigurasDisponibles(){
-    const base=['cohete','globos','estrella','trofeo','arcoiris','perro'];
+    const base=['cohete','globos','estrella','trofeo','arcoiris','perro','mariposa','fuegos','corazon'];
     return esHalloween() ? base.concat(['calabaza','fantasma']) : base;
 }
 function celFiguraHtml(id){
