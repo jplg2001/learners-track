@@ -1504,24 +1504,134 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 @keyframes celRayos { to { rotate:360deg; } }
 @keyframes celRayosEntra { from { opacity:0; scale:.6; } to { opacity:.2; scale:1; } }
 /* El personaje: entra de golpe y despues da dos saltos */
-.cel-kid { position:relative; animation:celEntra .5s var(--ease-out-back) both, celSalta .62s .52s 2 var(--ease-in-out); }
+.cel-kid { position:relative; animation:celEntra .5s var(--ease-out-back) both; }
 .cel-kid svg { height:min(46vh,340px); width:auto; display:block; filter:drop-shadow(0 18px 30px rgba(31,35,64,.28)); }
 @keyframes celEntra { 0%{ opacity:0; transform:scale(.55) translateY(40px); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1) translateY(0); } }
+/* Piezas del muñequito: cada movimiento las usa a su manera. */
+.cel-cuerpo { transform-origin:100px 254px; }
+.cel-sombra { fill:rgba(31,35,64,.16); transform-origin:100px 254px; }
+.cel-brazo-l { transform-origin:71px 130px; }
+.cel-brazo-r { transform-origin:129px 130px; }
+.cel-pierna-l { transform-origin:89px 190px; }
+.cel-pierna-r { transform-origin:110px 190px; }
+.cel-cabeza { transform-origin:100px 100px; }
+
+/* --- Movimiento 1: dos saltos --- */
+.mov-salto { animation:celEntra .5s var(--ease-out-back) both, celSalta .62s .52s 2 var(--ease-in-out); }
 @keyframes celSalta { 0%,100%{ transform:translateY(0); } 42%{ transform:translateY(-34px); } }
-.cel-cuerpo { animation:celEstira .62s .52s 2 var(--ease-in-out); transform-origin:100px 254px; }
+.mov-salto .cel-cuerpo { animation:celEstira .62s .52s 2 var(--ease-in-out); }
 @keyframes celEstira { 0%,100%{ transform:scaleY(.94) scaleX(1.03); } 42%{ transform:scaleY(1.03) scaleX(.98); } }
-.cel-sombra { fill:rgba(31,35,64,.16); animation:celSombra .62s .52s 2 var(--ease-in-out); transform-origin:100px 254px; }
+.mov-salto .cel-sombra { animation:celSombra .62s .52s 2 var(--ease-in-out); }
 @keyframes celSombra { 0%,100%{ transform:scale(1); opacity:.55; } 42%{ transform:scale(.62); opacity:.28; } }
-.cel-brazo-l { transform-origin:71px 130px; animation:celBrazoL .34s ease-in-out infinite alternate; }
-.cel-brazo-r { transform-origin:129px 130px; animation:celBrazoR .34s ease-in-out infinite alternate; }
+.mov-salto .cel-brazo-l { animation:celBrazoL .34s ease-in-out infinite alternate; }
+.mov-salto .cel-brazo-r { animation:celBrazoR .34s ease-in-out infinite alternate; }
 @keyframes celBrazoL { from { rotate:-9deg; } to { rotate:9deg; } }
 @keyframes celBrazoR { from { rotate:9deg; } to { rotate:-9deg; } }
-.cel-pierna-l { transform-origin:89px 190px; animation:celPiernaL .62s .52s 2 var(--ease-in-out); }
-.cel-pierna-r { transform-origin:110px 190px; animation:celPiernaR .62s .52s 2 var(--ease-in-out); }
+.mov-salto .cel-pierna-l { animation:celPiernaL .62s .52s 2 var(--ease-in-out); }
+.mov-salto .cel-pierna-r { animation:celPiernaR .62s .52s 2 var(--ease-in-out); }
 @keyframes celPiernaL { 0%,100%{ rotate:0deg; } 42%{ rotate:-13deg; } }
 @keyframes celPiernaR { 0%,100%{ rotate:0deg; } 42%{ rotate:13deg; } }
-.cel-cabeza { transform-origin:100px 100px; animation:celCabeza .62s .52s 2 var(--ease-in-out); }
+.mov-salto .cel-cabeza { animation:celCabeza .62s .52s 2 var(--ease-in-out); }
 @keyframes celCabeza { 0%,100%{ rotate:0deg; } 30%{ rotate:-5deg; } 70%{ rotate:5deg; } }
+
+/* --- Movimiento 2: baile --- */
+.mov-baile { animation:celEntra .5s var(--ease-out-back) both, celBaile .7s .45s 3 var(--ease-in-out); }
+@keyframes celBaile { 0%,50%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-12px) rotate(-9deg); } 75%{ transform:translateY(-12px) rotate(9deg); } }
+.mov-baile .cel-cabeza { animation:celBaileCabeza .7s .45s 3 var(--ease-in-out); }
+@keyframes celBaileCabeza { 0%,50%,100%{ rotate:0deg; } 25%{ rotate:10deg; } 75%{ rotate:-10deg; } }
+.mov-baile .cel-brazo-l { animation:celBaileBrazoL .35s .45s 6 ease-in-out alternate; }
+.mov-baile .cel-brazo-r { animation:celBaileBrazoR .35s .45s 6 ease-in-out alternate; }
+@keyframes celBaileBrazoL { from { rotate:-22deg; } to { rotate:16deg; } }
+@keyframes celBaileBrazoR { from { rotate:16deg; } to { rotate:-22deg; } }
+.mov-baile .cel-pierna-l { animation:celPasoL .35s .45s 6 ease-in-out alternate; }
+.mov-baile .cel-pierna-r { animation:celPasoR .35s .45s 6 ease-in-out alternate; }
+@keyframes celPasoL { from { rotate:0deg; } to { rotate:-15deg; } }
+@keyframes celPasoR { from { rotate:-15deg; } to { rotate:0deg; } }
+
+/* --- Movimiento 3: vuelta en el aire --- */
+.mov-giro { animation:celEntra .5s var(--ease-out-back) both, celGiro 1.05s .5s 1 var(--ease-in-out); }
+@keyframes celGiro {
+  0%   { transform:translateY(0) rotate(0deg) scale(1,1); }
+  12%  { transform:translateY(6px) rotate(0deg) scale(1.08,.9); }
+  45%  { transform:translateY(-70px) rotate(-200deg) scale(.95,1.05); }
+  80%  { transform:translateY(0) rotate(-360deg) scale(1,1); }
+  90%  { transform:translateY(5px) rotate(-360deg) scale(1.1,.88); }
+  100% { transform:translateY(0) rotate(-360deg) scale(1,1); }
+}
+.mov-giro .cel-sombra { animation:celSombraGiro 1.05s .5s 1 var(--ease-in-out); }
+@keyframes celSombraGiro { 0%,100%{ transform:scale(1); opacity:.55; } 45%{ transform:scale(.5); opacity:.2; } }
+.mov-giro .cel-brazo-l { animation:celBrazoL .28s ease-in-out infinite alternate; }
+.mov-giro .cel-brazo-r { animation:celBrazoR .28s ease-in-out infinite alternate; }
+
+/* --- Movimiento 4: saludo con las dos manos --- */
+.mov-saludo { animation:celEntra .5s var(--ease-out-back) both, celBrinquito .45s .5s 4 var(--ease-in-out); }
+@keyframes celBrinquito { 0%,100%{ transform:translateY(0); } 45%{ transform:translateY(-14px); } }
+.mov-saludo .cel-brazo-l { animation:celSaludoL .26s .5s 12 ease-in-out alternate; }
+.mov-saludo .cel-brazo-r { animation:celSaludoR .26s .5s 12 ease-in-out alternate; }
+@keyframes celSaludoL { from { rotate:-16deg; } to { rotate:14deg; } }
+@keyframes celSaludoR { from { rotate:16deg; } to { rotate:-14deg; } }
+.mov-saludo .cel-cabeza { animation:celCabezaSaludo .9s .5s 2 ease-in-out; }
+@keyframes celCabezaSaludo { 0%,100%{ rotate:0deg; } 25%{ rotate:-7deg; } 75%{ rotate:7deg; } }
+.mov-saludo .cel-cuerpo { animation:celEstira .45s .5s 4 var(--ease-in-out); }
+
+/* --- Movimiento 5: saltos de tijera --- */
+.mov-tijera { animation:celEntra .5s var(--ease-out-back) both, celTijera .56s .5s 3 var(--ease-in-out); }
+@keyframes celTijera { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-26px); } }
+.mov-tijera .cel-brazo-l { animation:celTijeraBrazoL .56s .5s 3 var(--ease-in-out); }
+.mov-tijera .cel-brazo-r { animation:celTijeraBrazoR .56s .5s 3 var(--ease-in-out); }
+@keyframes celTijeraBrazoL { 0%,100%{ rotate:38deg; } 50%{ rotate:-12deg; } }
+@keyframes celTijeraBrazoR { 0%,100%{ rotate:-38deg; } 50%{ rotate:12deg; } }
+.mov-tijera .cel-pierna-l { animation:celTijeraPiernaL .56s .5s 3 var(--ease-in-out); }
+.mov-tijera .cel-pierna-r { animation:celTijeraPiernaR .56s .5s 3 var(--ease-in-out); }
+@keyframes celTijeraPiernaL { 0%,100%{ rotate:0deg; } 50%{ rotate:-24deg; } }
+@keyframes celTijeraPiernaR { 0%,100%{ rotate:0deg; } 50%{ rotate:24deg; } }
+.mov-tijera .cel-sombra { animation:celSombra .56s .5s 3 var(--ease-in-out); }
+
+/* --- Movimiento 6: corre en el puesto --- */
+.mov-corre { animation:celEntra .5s var(--ease-out-back) both, celCorre .3s .5s 7 var(--ease-in-out); }
+@keyframes celCorre { 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-10px) rotate(3deg); } }
+.mov-corre .cel-pierna-l { animation:celCorrePiernaL .3s .5s 7 ease-in-out; }
+.mov-corre .cel-pierna-r { animation:celCorrePiernaR .3s .5s 7 ease-in-out; }
+@keyframes celCorrePiernaL { 0%,100%{ rotate:26deg; } 50%{ rotate:-26deg; } }
+@keyframes celCorrePiernaR { 0%,100%{ rotate:-26deg; } 50%{ rotate:26deg; } }
+.mov-corre .cel-brazo-l { animation:celCorreBrazoL .3s .5s 7 ease-in-out; }
+.mov-corre .cel-brazo-r { animation:celCorreBrazoR .3s .5s 7 ease-in-out; }
+@keyframes celCorreBrazoL { 0%,100%{ rotate:24deg; } 50%{ rotate:-18deg; } }
+@keyframes celCorreBrazoR { 0%,100%{ rotate:-18deg; } 50%{ rotate:24deg; } }
+
+/* --- Escenas sin muñequito --- */
+.cel-figura { position:relative; animation:celEntra .55s var(--ease-out-back) both; }
+.cel-figura svg { height:min(44vh,320px); width:auto; display:block; filter:drop-shadow(0 16px 28px rgba(31,35,64,.28)); }
+.fig-cohete { animation:celEntra .5s var(--ease-out-back) both, figSube 1.9s .45s 1 var(--ease-in-out) forwards; }
+@keyframes figSube { 0%{ transform:translateY(0) rotate(0deg); } 30%{ transform:translateY(-16px) rotate(-3deg); } 100%{ transform:translateY(-120px) rotate(3deg); } }
+.fig-llama { transform-origin:100px 214px; animation:figLlama .12s ease-in-out infinite alternate; }
+@keyframes figLlama { from { transform:scaleY(.75) scaleX(.9); opacity:.85; } to { transform:scaleY(1.25) scaleX(1.08); opacity:1; } }
+.fig-globos { animation:celEntra .5s var(--ease-out-back) both, figFlota 2.4s .4s 1 ease-in-out forwards; }
+@keyframes figFlota { 0%{ transform:translateY(0) rotate(0deg); } 35%{ transform:translateY(-34px) rotate(4deg); } 70%{ transform:translateY(-62px) rotate(-4deg); } 100%{ transform:translateY(-96px) rotate(2deg); } }
+.fig-estrella { animation:celEntra .5s var(--ease-out-back) both, figGira 2.6s .4s 1 var(--ease-in-out); }
+@keyframes figGira { 0%{ transform:rotate(0deg) scale(1); } 50%{ transform:rotate(180deg) scale(1.12); } 100%{ transform:rotate(360deg) scale(1); } }
+.fig-trofeo { animation:celEntra .5s var(--ease-out-back) both, figLate .7s .5s 3 var(--ease-in-out); }
+@keyframes figLate { 0%,100%{ transform:scale(1) rotate(0deg); } 45%{ transform:scale(1.08) rotate(-3deg); } }
+.fig-brillo { animation:figBrillo 1.4s .4s 2 var(--ease-in-out); transform-origin:center; }
+@keyframes figBrillo { 0%{ opacity:0; transform:translateX(-90px) skewX(-18deg); } 40%{ opacity:.85; } 100%{ opacity:0; transform:translateX(90px) skewX(-18deg); } }
+.fig-arco path { stroke-dasharray:260; stroke-dashoffset:260; animation:figTraza .9s var(--ease-out) forwards; }
+.fig-arco path:nth-child(2){ animation-delay:.1s; } .fig-arco path:nth-child(3){ animation-delay:.2s; }
+.fig-arco path:nth-child(4){ animation-delay:.3s; } .fig-arco path:nth-child(5){ animation-delay:.4s; }
+@keyframes figTraza { to { stroke-dashoffset:0; } }
+.fig-nube { animation:figNube 2.6s ease-in-out infinite alternate; }
+@keyframes figNube { from { transform:translateX(-6px); } to { transform:translateX(8px); } }
+.fig-sol { transform-origin:46px 60px; animation:figSol 9s linear infinite; }
+@keyframes figSol { to { rotate:360deg; } }
+.fig-perro { animation:celEntra .5s var(--ease-out-back) both, celSalta .55s .5s 3 var(--ease-in-out); }
+.fig-cola { transform-origin:88px 106px; animation:figCola .18s ease-in-out infinite alternate; }
+@keyframes figCola { from { rotate:-18deg; } to { rotate:20deg; } }
+.fig-fantasma { animation:celEntra .5s var(--ease-out-back) both, figFantasma 2.2s .4s 1 ease-in-out; }
+@keyframes figFantasma { 0%,100%{ transform:translateY(0) rotate(0deg); } 30%{ transform:translateY(-30px) rotate(-5deg); } 65%{ transform:translateY(-10px) rotate(5deg); } }
+.fig-calabaza { animation:celEntra .5s var(--ease-out-back) both, figLate .6s .5s 3 var(--ease-in-out); }
+@media (prefers-reduced-motion:reduce){
+  .cel-kid,.cel-figura,[class*="mov-"],[class*="fig-"] { animation:none !important; }
+  .fig-arco path { stroke-dashoffset:0 !important; }
+}
 /* El saludo y el nombre */
 .cel-texto { text-align:center; animation:celTexto .55s .16s var(--ease-out) both; }
 @keyframes celTexto { from { opacity:0; transform:translateY(26px) scale(.9); } to { opacity:1; transform:translateY(0) scale(1); } }
@@ -4992,7 +5102,107 @@ function celMostrar(capa, duracion){
 }
 function celNombreDe(s){ return (typeof biaTitulo==='function') ? biaTitulo(s&&s.name) : String((s&&s.name)||''); }
 
-// Llegada: el muñequito entra de un salto y estalla el confeti.
+// --- Escenas de la bienvenida ------------------------------------------------
+// Para que pasar lista no sea siempre lo mismo: unas veces sale el muñequito
+// haciendo un movimiento distinto, y otras una escena sin personaje.
+const CEL_MOVS = ['salto','baile','giro','saludo','tijera','corre'];
+const CEL_FIGURAS = {
+  cohete: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-cohete">
+      <path d="M100 26c27 28 35 64 35 100H65c0-36 8-72 35-100Z" fill="#e2e8f0"/>
+      <path d="M100 26c14 15 23 33 28 54H72c5-21 14-39 28-54Z" fill="#ef4467"/>
+      <circle cx="100" cy="106" r="17" fill="#38bdf8"/><circle cx="100" cy="106" r="17" fill="none" stroke="#94a3b8" stroke-width="5"/>
+      <path d="M65 128 41 170l24-8z" fill="#ef4467"/><path d="M135 128l24 42-24-8z" fill="#ef4467"/>
+      <rect x="82" y="182" width="36" height="16" rx="5" fill="#94a3b8"/>
+      <g class="fig-llama"><path d="M100 254c-17-11-23-26-14-41 4 9 8 11 10 6 2-9 0-15 6-21 9 13 25 21 13 45-4 8-11 11-15 11Z" fill="#f59e0b"/>
+        <path d="M100 244c-9-6-12-15-8-23 2 5 4 6 5 3 1-5 0-8 3-12 5 7 13 12 7 25-2 5-5 7-7 7Z" fill="#fde68a"/></g>
+    </g>
+    <circle cx="34" cy="70" r="4" fill="#fbbf24"/><circle cx="168" cy="52" r="5" fill="#fbbf24"/><circle cx="156" cy="120" r="3.5" fill="#f8fafc"/><circle cx="40" cy="140" r="3" fill="#f8fafc"/>
+  </svg>`,
+  globos: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-globos">
+      <path d="M62 136q12 54 38 108M138 126q-10 58-38 118M100 100q3 62 0 134" stroke="#94a3b8" stroke-width="2.5" fill="none"/>
+      <ellipse cx="62" cy="98" rx="30" ry="36" fill="#ef4467"/><path d="M62 134l-6 8h12z" fill="#ef4467"/>
+      <ellipse cx="138" cy="88" rx="28" ry="34" fill="#38bdf8"/><path d="M138 122l-6 8h12z" fill="#38bdf8"/>
+      <ellipse cx="100" cy="60" rx="32" ry="38" fill="#fbbf24"/><path d="M100 98l-6 8h12z" fill="#fbbf24"/>
+      <ellipse cx="52" cy="86" rx="7" ry="10" fill="rgba(255,255,255,.55)"/>
+      <ellipse cx="128" cy="76" rx="6" ry="9" fill="rgba(255,255,255,.55)"/>
+      <ellipse cx="90" cy="48" rx="7" ry="10" fill="rgba(255,255,255,.55)"/>
+    </g>
+  </svg>`,
+  estrella: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-estrella" style="transform-origin:100px 135px">
+      <path d="M100 32l23 54 58 6-44 39 13 57-50-29-50 29 13-57-44-39 58-6z" fill="#fbbf24" stroke="#f59e0b" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M82 128q7-9 14 0" stroke="#78350f" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M104 128q7-9 14 0" stroke="#78350f" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M88 146q12 16 24 0Z" fill="#78350f"/>
+      <circle cx="76" cy="144" r="7" fill="#fb7185" opacity=".65"/><circle cx="124" cy="144" r="7" fill="#fb7185" opacity=".65"/>
+    </g>
+  </svg>`,
+  trofeo: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-trofeo">
+      <path d="M62 46h76v44a38 38 0 0 1-76 0z" fill="#fbbf24"/>
+      <path d="M62 56H42a24 24 0 0 0 22 24M138 56h20a24 24 0 0 1-22 24" fill="none" stroke="#f59e0b" stroke-width="8"/>
+      <rect x="92" y="126" width="16" height="28" fill="#f59e0b"/>
+      <rect x="68" y="154" width="64" height="16" rx="5" fill="#f59e0b"/>
+      <rect x="56" y="170" width="88" height="22" rx="7" fill="#b45309"/>
+      <path d="m100 58 6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2z" fill="#fff7ed"/>
+      <rect class="fig-brillo" x="74" y="44" width="16" height="86" fill="rgba(255,255,255,.5)"/>
+    </g>
+  </svg>`,
+  arcoiris: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-arco" fill="none" stroke-width="15" stroke-linecap="round">
+      <path d="M26 196a74 74 0 0 1 148 0" stroke="#ef4467"/>
+      <path d="M44 196a56 56 0 0 1 112 0" stroke="#f59e0b"/>
+      <path d="M62 196a38 38 0 0 1 76 0" stroke="#fbbf24"/>
+      <path d="M80 196a20 20 0 0 1 40 0" stroke="#22c55e"/>
+      <path d="M96 196a4 4 0 0 1 8 0" stroke="#38bdf8"/>
+    </g>
+    <g class="fig-sol"><circle cx="46" cy="60" r="17" fill="#fbbf24"/>
+      <path d="M46 30v-10M46 100v10M16 60H6M86 60h10M25 39l-7-7M67 81l7 7M67 39l7-7M25 81l-7 7" stroke="#fbbf24" stroke-width="5" stroke-linecap="round"/></g>
+    <g class="fig-nube"><ellipse cx="152" cy="92" rx="26" ry="17" fill="#f8fafc"/><ellipse cx="170" cy="98" rx="18" ry="13" fill="#f8fafc"/><ellipse cx="136" cy="100" rx="17" ry="12" fill="#f8fafc"/></g>
+    <g class="fig-nube" style="animation-delay:.6s"><ellipse cx="40" cy="150" rx="20" ry="13" fill="#e2e8f0"/><ellipse cx="56" cy="154" rx="14" ry="10" fill="#e2e8f0"/></g>
+    <ellipse cx="100" cy="212" rx="88" ry="12" fill="rgba(34,197,94,.35)"/>
+  </svg>`,
+  calabaza: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-calabaza">
+      <path d="M92 108h16V86c0-9 7-16 16-16-7 7-8 11-8 18v20Z" fill="#16a34a"/>
+      <path d="M108 92c10-10 22-8 26-2-10-2-16 2-20 8Z" fill="#22c55e"/>
+      <ellipse cx="100" cy="162" rx="76" ry="64" fill="#f97316"/>
+      <ellipse cx="70" cy="162" rx="24" ry="62" fill="#fb923c" opacity=".55"/>
+      <ellipse cx="130" cy="162" rx="24" ry="62" fill="#fb923c" opacity=".55"/>
+      <path d="M62 140l28 10-28 12z" fill="#7c2d12"/><path d="M138 140l-28 10 28 12z" fill="#7c2d12"/>
+      <path d="M62 182h76l-10 14-12-8-14 10-12-8-10 10z" fill="#7c2d12"/>
+    </g>
+  </svg>`,
+  fantasma: `<svg viewBox="0 0 200 270" aria-hidden="true">
+    <g class="fig-fantasma">
+      <path d="M100 44c35 0 58 27 58 62v84l-18-16-18 16-22-18-22 18-18-16-18 16v-84c0-35 23-62 58-62Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>
+      <ellipse cx="82" cy="112" rx="9" ry="12" fill="#1f2340"/><ellipse cx="118" cy="112" rx="9" ry="12" fill="#1f2340"/>
+      <ellipse cx="100" cy="146" rx="13" ry="16" fill="#1f2340"/>
+      <circle cx="68" cy="134" r="9" fill="#c4b5fd" opacity=".7"/><circle cx="132" cy="134" r="9" fill="#c4b5fd" opacity=".7"/>
+    </g>
+  </svg>`
+};
+function celFigurasDisponibles(){
+    const base=['cohete','globos','estrella','trofeo','arcoiris','perro'];
+    return esHalloween() ? base.concat(['calabaza','fantasma']) : base;
+}
+function celFiguraHtml(id){
+    if(id==='perro') return (typeof juyuSvgActual==='function') ? juyuSvgActual() : (ILLUS.juyu||'');
+    return CEL_FIGURAS[id]||CEL_FIGURAS.estrella;
+}
+// Saludos variados, para que el texto tampoco se repita.
+const CEL_SALUDOS = {
+  f: ['¡Bienvenida!','¡Qué alegría verte!','¡Presente!','¡Llegaste!','¡Hola, hola!'],
+  m: ['¡Bienvenido!','¡Qué alegría verte!','¡Presente!','¡Llegaste!','¡Hola, hola!'],
+  en:['Welcome!','Great to see you!','Present!','You made it!','Hello there!']
+};
+function celElegir(clave, lista){
+    if(typeof motorElegir==='function') return motorElegir(clave, lista);
+    return lista[Math.floor(Math.random()*lista.length)];
+}
+// Llegada: a veces el muñequito con un movimiento distinto, a veces otra escena.
 function celebrarLlegada(ancla,s){
     const g=generoDeAlumno(s);
     const es=currentLanguage==='es';
@@ -5000,9 +5210,21 @@ function celebrarLlegada(ancla,s){
     cerrarCelebracion();
     const { capa, escena } = celCapa(g);
     const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
-    const kid=document.createElement('div'); kid.className='cel-kid'; kid.innerHTML = g==='f' ? celSvgNina() : celSvgNino();
-    escena.appendChild(kid);
-    celTexto(escena, es ? (g==='f'?'¡Bienvenida!':'¡Bienvenido!') : 'Welcome!', celNombreDe(s));
+    if(Math.random()<0.42){
+        // Escena sin personaje: cohete, globos, estrella, trofeo, arcoiris, YUJU...
+        const id=celElegir('celFig', celFigurasDisponibles());
+        const fig=document.createElement('div');
+        fig.className='cel-figura fig-'+id;
+        fig.innerHTML=celFiguraHtml(id);
+        escena.appendChild(fig);
+    } else {
+        const mov=celElegir('celMov', CEL_MOVS);
+        const kid=document.createElement('div');
+        kid.className='cel-kid mov-'+mov;
+        kid.innerHTML = g==='f' ? celSvgNina() : celSvgNino();
+        escena.appendChild(kid);
+    }
+    celTexto(escena, celElegir('celSaludo'+(es?g:'en'), CEL_SALUDOS[es?g:'en']), celNombreDe(s));
     celConfeti(capa, esHalloween()?'hw':g, 34, true);
     celMostrar(capa, 1950);
     return g;
