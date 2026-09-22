@@ -1429,6 +1429,61 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   .voc-pistas { grid-template-columns:1fr; }
 }
 
+/* === BOMBA DE TIEMPO === */
+.bomba-modal { width:min(560px,96vw); text-align:center; }
+.bomba-modal:fullscreen { width:100vw; max-width:100vw; height:100vh; max-height:100vh; border-radius:0; display:flex; flex-direction:column; justify-content:center; }
+.bomba-modal:fullscreen .bomba-reloj { font-size:clamp(4rem,18vh,11rem); }
+.bomba-modal:fullscreen .bomba-dibujo { width:min(52vh,420px); }
+.bomba-intro { margin:-6px 0 14px; font-size:.9rem; color:var(--fg-muted); line-height:1.5; }
+.bomba-escena { position:relative; display:grid; place-items:center; margin-bottom:8px; }
+.bomba-dibujo { width:min(70vw,250px); display:block; }
+.bomba-andando .bomba-dibujo { animation:bombaTiembla 1s ease-in-out infinite; }
+@keyframes bombaTiembla { 0%,100%{ transform:translate(0,0) rotate(0deg); } 25%{ transform:translate(-1.5px,1px) rotate(-1deg); } 75%{ transform:translate(1.5px,-1px) rotate(1deg); } }
+.bomba-urgente .bomba-dibujo { animation:bombaTiemblaFuerte .18s ease-in-out infinite; }
+@keyframes bombaTiemblaFuerte { 0%,100%{ transform:translate(0,0) rotate(0deg) scale(1); } 25%{ transform:translate(-4px,2px) rotate(-3deg) scale(1.02); } 75%{ transform:translate(4px,-2px) rotate(3deg) scale(1.02); } }
+.bomba-chispa { filter:drop-shadow(0 0 6px #fbbf24); transition:opacity .2s var(--ease-out); }
+.bomba-andando .bomba-chispa { animation:bombaChispa .22s ease-in-out infinite alternate; }
+@keyframes bombaChispa { from { r:5; opacity:.85; } to { r:9; opacity:1; } }
+.bomba-reloj { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(2.6rem,12vw,4.4rem); line-height:1; color:var(--fg); letter-spacing:.02em; font-variant-numeric:tabular-nums; }
+.bomba-urgente .bomba-reloj { color:var(--danger); animation:bombaLate .5s ease-in-out infinite; }
+@keyframes bombaLate { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.07); } }
+.bomba-presets { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:14px 0 10px; }
+.bomba-preset { border:1.5px solid var(--border); background:var(--bg-card); color:var(--fg); border-radius:999px; padding:7px 14px; font:inherit; font-size:.86rem; font-weight:600; cursor:pointer; transition:border-color .2s var(--ease-out), background-color .2s var(--ease-out); }
+.bomba-preset:hover { border-color:var(--accent); }
+.bomba-preset[aria-pressed="true"] { background:var(--accent-strong); border-color:var(--accent-strong); color:#fff; }
+.bomba-campos { display:flex; gap:10px; justify-content:center; align-items:flex-end; flex-wrap:wrap; margin-bottom:12px; }
+.bomba-campos label { display:flex; flex-direction:column; gap:4px; font-size:.78rem; font-weight:600; color:var(--fg-muted); }
+.bomba-campos input { width:86px; padding:8px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:1rem; text-align:center; }
+.bomba-acciones { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.bomba-play { background:linear-gradient(135deg,#f59e0b,#ef4467); color:#fff; border:none; border-radius:14px; padding:13px 26px; font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; cursor:pointer; box-shadow:0 8px 20px rgba(239,68,103,.35); transition:transform .15s var(--ease-out), filter .2s var(--ease-out); }
+.bomba-play:hover { filter:brightness(1.08); }
+.bomba-play:active { transform:scale(.97); }
+.bomba-chico { background:var(--bg-card); color:var(--fg); border:1px solid var(--border); border-radius:10px; padding:9px 13px; font:inherit; font-size:.85rem; font-weight:600; cursor:pointer; }
+.bomba-chico:hover { border-color:var(--accent); }
+.bomba-estallo { animation:bombaSacude .5s var(--ease-out); }
+@keyframes bombaSacude { 0%,100%{ transform:translate(0,0); } 20%{ transform:translate(-10px,6px); } 40%{ transform:translate(9px,-5px); } 60%{ transform:translate(-6px,3px); } 80%{ transform:translate(4px,-2px); } }
+/* Pildora flotante con el tiempo, cuando la ventana esta cerrada */
+.bomba-pildora { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:2400; background:var(--bg-alt); color:var(--fg); border:1.5px solid var(--border); border-radius:999px; padding:9px 18px; font-family:'Montserrat',sans-serif; font-weight:800; font-size:1rem; box-shadow:var(--shadow-lg); cursor:pointer; font-variant-numeric:tabular-nums; }
+.bomba-pildora.urgente { background:var(--danger); border-color:var(--danger); color:#fff; animation:bombaLate .5s ease-in-out infinite; }
+/* El estallido */
+.boom-capa { position:fixed; inset:0; z-index:2700; pointer-events:none; display:grid; place-items:center; }
+.boom-flash { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(255,240,200,.95) 0%, rgba(249,115,22,.55) 25%, transparent 62%); animation:boomFlash .5s var(--ease-out) forwards; }
+@keyframes boomFlash { 0%{ opacity:0; transform:scale(.3); } 12%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:scale(1.25); } }
+.boom-onda { position:absolute; width:180px; height:180px; border-radius:50%; border:8px solid rgba(251,191,36,.85); animation:boomOnda .9s var(--ease-out) forwards; }
+.boom-onda.dos { border-color:rgba(239,68,103,.6); animation-delay:.12s; }
+@keyframes boomOnda { 0%{ transform:scale(.2); opacity:1; } 100%{ transform:scale(6); opacity:0; } }
+.boom-texto { position:relative; font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(2.4rem,9vw,5.5rem); color:#fff; text-shadow:0 4px 0 #ef4467, 0 10px 30px rgba(31,35,64,.5); animation:boomTexto 1.6s var(--ease-out-back) forwards; }
+@keyframes boomTexto { 0%{ opacity:0; transform:scale(.3) rotate(-8deg); } 18%{ opacity:1; transform:scale(1.1) rotate(2deg); } 40%{ transform:scale(1) rotate(0deg); } 80%{ opacity:1; } 100%{ opacity:0; transform:scale(1.05) translateY(-20px); } }
+.boom-capa i { position:absolute; left:50%; top:50%; display:block; border-radius:2px; opacity:0; animation:boomTrozo 1.1s var(--ease-out) both; }
+@keyframes boomTrozo {
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
+  8%   { opacity:1; }
+  100% { opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--giro)); }
+}
+@media (prefers-reduced-motion:reduce){
+  .bomba-andando .bomba-dibujo,.bomba-urgente .bomba-dibujo,.bomba-urgente .bomba-reloj,.bomba-andando .bomba-chispa,
+  .boom-flash,.boom-onda,.boom-texto,.boom-capa i,.bomba-pildora.urgente { animation:none; }
+}
 /* === BIENVENIDA AL PASAR LISTA === */
 /* Una celebracion grande, en medio de la pantalla, cuando el estudiante llega.
    La capa no recibe clics (pointer-events:none), asi que el docente puede seguir
@@ -1481,6 +1536,28 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   75%  { opacity:1; }
   100% { opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--giro)); }
 }
+/* --- Variantes: ausencia, racha y Halloween --- */
+.cel-aus { --cel-1:#64748b; --cel-2:#94a3b8; --cel-3:#cbd5e1; --cel-4:#475569; }
+.cel-racha { --cel-1:#f59e0b; --cel-2:#fbbf24; --cel-3:#f97316; --cel-4:#fcd34d; }
+.cel-hw.cel-f, .cel-hw.cel-m { --cel-1:#f97316; --cel-2:#a855f7; --cel-3:#fbbf24; --cel-4:#22c55e; }
+/* Ausencia: el pupitre vacio entra despacio y el sello cae encima */
+.cel-pupitre svg { height:min(30vh,230px); width:auto; display:block; animation:celPupitre .6s var(--ease-out) both; filter:drop-shadow(0 14px 24px rgba(31,35,64,.22)); }
+@keyframes celPupitre { from { opacity:0; transform:translateY(26px) scale(.92); } to { opacity:1; transform:none; } }
+.cel-polvo { animation:celPolvo 2s ease-in-out infinite; transform-origin:90px 155px; }
+@keyframes celPolvo { 0%,100%{ opacity:.5; transform:translateX(0); } 50%{ opacity:.8; transform:translateX(6px); } }
+.cel-sello { margin-top:-14px; padding:8px 26px; border:5px solid #9f1239; border-radius:10px; color:#9f1239; font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(1.3rem,4.2vw,2.2rem); letter-spacing:.14em; opacity:.9; background:rgba(255,255,255,.72); animation:celSello .5s .35s var(--ease-out) both; }
+@keyframes celSello { 0%{ opacity:0; transform:scale(2.4) rotate(-16deg); } 70%{ opacity:.95; transform:scale(.94) rotate(-9deg); } 100%{ opacity:.9; transform:scale(1) rotate(-9deg); } }
+.cel-aus .cel-saludo { font-size:clamp(1.3rem,4vw,2.2rem); }
+/* Racha: la medalla aparece girando con el numero encima */
+.cel-medalla { position:relative; display:grid; place-items:center; animation:celMedalla .6s var(--ease-out-back) both; }
+.cel-medalla svg { height:min(40vh,300px); width:auto; display:block; filter:drop-shadow(0 16px 28px rgba(180,83,9,.4)); }
+@keyframes celMedalla { 0%{ opacity:0; transform:scale(.35) rotate(-25deg); } 60%{ opacity:1; } 100%{ opacity:1; transform:scale(1) rotate(0deg); } }
+.cel-medalla-disco { animation:celBrillo 1.6s ease-in-out infinite; transform-origin:100px 140px; }
+@keyframes celBrillo { 0%,100%{ opacity:1; } 50%{ opacity:.82; } }
+.cel-numero { position:absolute; top:58%; transform:translateY(-50%); font-family:'Baloo 2','Montserrat',sans-serif; font-weight:800; font-size:clamp(2.6rem,9vw,5rem); color:#fff7ed; text-shadow:0 3px 0 #b45309, 0 8px 18px rgba(120,53,15,.5); animation:celNumero .5s .25s var(--ease-out-back) both; }
+@keyframes celNumero { from { opacity:0; transform:translateY(-50%) scale(.4); } to { opacity:1; transform:translateY(-50%) scale(1); } }
+/* Confeti con dibujos de Halloween */
+.cel-confeti i.emo { width:auto; height:auto; background:none; font-size:clamp(1.2rem,3vw,1.9rem); line-height:1; }
 /* El destello de la fila, del color de la celebracion */
 tr.flash-f td { animation:flashF .9s ease-out; }
 tr.flash-m td { animation:flashM .9s ease-out; }
@@ -1910,6 +1987,7 @@ tr.flash-m td { animation:flashM .9s ease-out; }
                 <button class="side-btn" onclick="goToStatisticsPage()"><span class="sb-ico blue">📊</span><span id="statisticsBtnText">Course Statistics</span></button>
                 <button class="side-btn" onclick="openProjector()"><span class="sb-ico violet">📺</span><span id="projectorBtnText">Modo proyector</span></button>
                 <button class="side-btn" onclick="abrirJuegosVocabulario()"><span class="sb-ico rose">🧩</span><span id="vocBtnText">Juegos de vocabulario</span></button>
+                <button class="side-btn" onclick="abrirBomba()"><span class="sb-ico amber">💣</span><span id="bombaBtnText">Bomba de tiempo</span></button>
                 <button class="side-btn" id="exportPdfBtn"><span class="sb-ico slate">📄</span><span id="exportPdfBtnText">Export Full Report PDF</span></button>
             </div>
 
@@ -2236,6 +2314,12 @@ tr.flash-m td { animation:flashM .9s ease-out; }
             <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;"><button type="button" class="btn-secondary" onclick="closeProfileModal()">Cancel</button><button type="submit" class="btn-primary">Save Changes</button></div>
             <hr style="margin:20px 0;border:none;border-top:1px solid var(--badge-border);">
             <button type="button" class="btn-secondary" id="juyuRestoreBtn" onclick="showJuyuAgain()" style="width:100%;margin-bottom:10px;">🐾 Mostrar a YUJU</button>
+            <div class="form-group"><label for="halloweenSel" id="halloweenLbl">🎃 Disfraces de Halloween</label>
+              <select id="halloweenSel" onchange="cambiarHalloween(this.value)">
+                <option value="auto">Automático (en octubre)</option>
+                <option value="si">Siempre</option>
+                <option value="no">Nunca</option>
+              </select></div>
             <button type="button" class="btn-danger" onclick="resetApplication()" style="width:100%;">🗑️ Reset Application (Delete all data)</button>
         </form>
     </div>
@@ -2526,6 +2610,38 @@ tr.flash-m td { animation:flashM .9s ease-out; }
     <div class="voc-acciones">
       <button type="button" class="btn-secondary" id="vocCerrarBtn" onclick="cerrarJuegosVocabulario()">Cerrar</button>
       <button type="button" class="btn-primary" id="vocPdfBtn" onclick="vocDescargarPdf()" disabled>📄 Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bomba de tiempo para las actividades de clase -->
+<div class="modal" id="bombaModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content bomba-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarBomba()">&times;</button>
+    <h3 id="bombaTitulo">💣 Bomba de tiempo</h3>
+    <p class="bomba-intro" id="bombaIntro"></p>
+    <div class="bomba-escena">
+      <svg class="bomba-dibujo" viewBox="0 0 240 212" aria-hidden="true">
+        <path id="bombaMecha" d="M120 56C128 30 152 26 168 14" pathLength="100" stroke="#a16207" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <circle id="bombaChispa" class="bomba-chispa" cx="168" cy="14" r="7" fill="#fbbf24"/>
+        <rect x="106" y="48" width="28" height="22" rx="6" fill="#475569"/>
+        <circle cx="120" cy="134" r="58" fill="#262b42"/>
+        <ellipse cx="98" cy="112" rx="19" ry="13" fill="rgba(255,255,255,.18)"/>
+        <ellipse cx="140" cy="164" rx="26" ry="10" fill="rgba(0,0,0,.25)"/>
+      </svg>
+      <div class="bomba-reloj" id="bombaReloj" aria-live="off">1:00</div>
+    </div>
+    <div class="bomba-presets" id="bombaPresets"></div>
+    <div class="bomba-campos">
+      <label for="bombaMin"><span id="bombaMinLbl">Minutos</span><input type="number" id="bombaMin" min="0" max="90" value="1" inputmode="numeric" onchange="bombaDesdeCampos()"></label>
+      <label for="bombaSeg"><span id="bombaSegLbl">Segundos</span><input type="number" id="bombaSeg" min="0" max="59" value="0" inputmode="numeric" onchange="bombaDesdeCampos()"></label>
+    </div>
+    <div class="bomba-acciones">
+      <button type="button" class="bomba-play" id="bombaPlay" onclick="bombaPlay()">▶ Empezar</button>
+      <button type="button" class="bomba-chico" id="bombaReiniciarBtn" onclick="bombaReiniciar()">↺ Reiniciar</button>
+      <button type="button" class="bomba-chico" id="bombaSonido" aria-pressed="true" onclick="bombaSonidoToggle()">🔔 Sonido</button>
+      <button type="button" class="bomba-chico" id="bombaPantallaBtn" onclick="bombaPantallaCompleta()">⛶ Pantalla completa</button>
+      <button type="button" class="bomba-chico" id="bombaCerrarBtn" onclick="cerrarBomba()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -3585,9 +3701,24 @@ function juyuVida(){
 // Al cambiar el tamaño de la ventana YUJU podría quedar fuera de la pantalla.
 window.addEventListener('resize',()=>{ clearTimeout(window._juyuResize); window._juyuResize=setTimeout(()=>juyuMoverA(_juyuPos),250); });
 
+// Alas de murcielago detras y sombrero de calabaza encima: solo en Halloween.
+const HW_YUJU_ALAS = '<g class="juyu-alas"><path d="M28 96q-22-18-26 2 10-2 14 6 6-10 12-8Z" fill="#4c1d95"/><path d="M92 96q22-18 26 2-10-2-14 6-6-10-12-8Z" fill="#4c1d95"/></g>';
+const HW_YUJU_GORRO = '<g class="juyu-gorro"><ellipse cx="60" cy="22" rx="17" ry="13" fill="#f97316"/><path d="M52 14q3-8 8-6-4 3-3 7Z" fill="#16a34a"/><path d="M55 18q2 8 0 12M65 18q-2 8 0 12" stroke="#c2410c" stroke-width="2" fill="none"/></g>';
+function juyuSvgActual(){
+    let svg=ILLUS.juyu;
+    if(esHalloween()){
+        svg=svg.replace('>', '>'+HW_YUJU_ALAS);        // detras del cuerpo
+        svg=svg.replace('</svg>', HW_YUJU_GORRO+'</svg>');
+    }
+    return svg;
+}
+function pintarDisfrazYuju(){
+    const svg=document.getElementById('juyuSvg');
+    if(svg){ svg.innerHTML=juyuSvgActual(); svg.dataset.filled='1'; }
+}
 function initJuyu(){
     const svg=document.getElementById('juyuSvg');
-    if(svg && !svg.dataset.filled){ svg.innerHTML=ILLUS.juyu; svg.dataset.filled='1'; }
+    if(svg && !svg.dataset.filled){ svg.innerHTML=juyuSvgActual(); svg.dataset.filled='1'; }
     try{
         if(localStorage.getItem('learnersTrackHideJuyu')==='1') document.getElementById('juyuMascot')?.classList.add('is-hidden');
     }catch(e){}
@@ -4698,13 +4829,43 @@ window.setGeneroAlumno=function(sid,g){
 };
 // Los dos personajes que celebran. Se dibujan con SVG (no son imagenes), asi que
 // se ven nitidos en cualquier pantalla y no pesan nada.
-const CEL_NINA = `<svg viewBox="0 0 200 270" aria-hidden="true">
+// --- Disfraces de Halloween --------------------------------------------------
+// En octubre (y los dos primeros dias de noviembre) los muñequitos y YUJU salen
+// disfrazados. El docente puede dejarlo automatico, forzarlo o apagarlo.
+function halloweenModo(){ try{ return localStorage.getItem('lt_halloween')||'auto'; }catch(e){ return 'auto'; } }
+function esHalloween(){
+    const modo=halloweenModo();
+    if(modo==='si') return true;
+    if(modo==='no') return false;
+    const hoy=new Date();
+    return hoy.getMonth()===9 || (hoy.getMonth()===10 && hoy.getDate()<=2);
+}
+window.cambiarHalloween=function(v){
+    const es=currentLanguage==='es';
+    try{ localStorage.setItem('lt_halloween', (v==='si'||v==='no')?v:'auto'); }catch(e){}
+    pintarDisfrazYuju();
+    showNotification(esHalloween()
+        ? (es?'🎃 Disfraces de Halloween activados':'🎃 Halloween costumes on')
+        : (es?'Disfraces de Halloween apagados':'Halloween costumes off'),'info');
+};
+// Piezas de disfraz que se insertan dentro del dibujo de cada muñequito.
+const HW_CAPA_NINA  = '<path d="M64 120q-16 62-10 112h92q6-50-10-112l-14-4q-18 16-44 0Z" fill="#4c1d95"/><path d="M70 120q-12 56-8 100h12q-6-52 6-98Z" fill="#6d28d9" opacity=".7"/>';
+const HW_CAPA_NINO  = '<path d="M64 118q-18 64-10 114h92q8-50-10-114l-15-4q-18 16-42 0Z" fill="#111827"/><path d="M70 118q-13 58-9 102h12q-6-54 7-100Z" fill="#4c1d95" opacity=".65"/>';
+const HW_SOMBRERO   = '<g><ellipse cx="100" cy="46" rx="50" ry="11" fill="#2e1065"/><path d="M100 0 74 46h52Z" fill="#4c1d95"/><path d="M84 36h32l2 8H82Z" fill="#fbbf24"/><circle cx="100" cy="40" r="4" fill="#f59e0b"/></g>';
+const HW_CUELLO     = '<path d="M76 114 100 132 124 114l14 6q-16 20-38 22-22-2-38-22Z" fill="#7f1d1d"/>';
+const HW_COLMILLOS  = '<path d="M93 94l3 8 3-8Z" fill="#fff"/><path d="M101 94l3 8 3-8Z" fill="#fff"/>';
+const HW_ARANA      = '<g><path d="M150 0v26" stroke="#64748b" stroke-width="2" fill="none"/><circle cx="150" cy="32" r="7" fill="#111827"/><path d="M143 28l-8-5M157 28l8-5M143 36l-8 5M157 36l8 5" stroke="#111827" stroke-width="2.5" stroke-linecap="round"/><circle cx="147.5" cy="30" r="1.6" fill="#fbbf24"/><circle cx="152.5" cy="30" r="1.6" fill="#fbbf24"/></g>';
+
+function celSvgNina(){
+    const hw=esHalloween();
+    return `<svg viewBox="0 0 200 270" aria-hidden="true">
   <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
   <g class="cel-cuerpo">
-    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="#ef4467"/></g>
-    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="#ef4467"/></g>
-    <path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="#ec4899"/>
-    <path d="M66 172h68l3 12H63Z" fill="#f9a8d4"/>
+    ${hw?HW_CAPA_NINA:''}
+    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="${hw?'#111827':'#ef4467'}"/></g>
+    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="${hw?'#111827':'#ef4467'}"/></g>
+    <path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="${hw?'#6d28d9':'#ec4899'}"/>
+    <path d="M66 172h68l3 12H63Z" fill="${hw?'#f59e0b':'#f9a8d4'}"/>
     <circle cx="100" cy="132" r="6" fill="#fbbf24"/>
     <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
     <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
@@ -4719,18 +4880,22 @@ const CEL_NINA = `<svg viewBox="0 0 200 270" aria-hidden="true">
       <circle cx="78" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/><circle cx="122" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/>
       <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
       <path d="M94 95q6 6 12 0Z" fill="#f9788f"/>
-      <g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>
+      ${hw ? HW_SOMBRERO : '<g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>'}
     </g>
   </g>
 </svg>`;
-const CEL_NINO = `<svg viewBox="0 0 200 270" aria-hidden="true">
+}
+function celSvgNino(){
+    const hw=esHalloween();
+    return `<svg viewBox="0 0 200 270" aria-hidden="true">
   <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
   <g class="cel-cuerpo">
+    ${hw?HW_CAPA_NINO:''}
     <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="#334155"/></g>
     <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="#334155"/></g>
-    <path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="#1e3a8a"/>
-    <path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="#2563eb"/>
-    <path d="m100 130 4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3-9.3-4.9-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#fbbf24"/>
+    <path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="${hw?'#111827':'#1e3a8a'}"/>
+    <path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="${hw?'#1f2937':'#2563eb'}"/>
+    ${hw ? HW_CUELLO : '<path d="m100 130 4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3-9.3-4.9-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#fbbf24"/>'}
     <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
     <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
     <rect x="92" y="96" width="16" height="24" rx="8" fill="#e8b68d"/>
@@ -4742,71 +4907,155 @@ const CEL_NINO = `<svg viewBox="0 0 200 270" aria-hidden="true">
       <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
       <circle cx="78" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/><circle cx="122" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/>
       <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
-      <path d="M94 95q6 6 12 0Z" fill="#f9788f"/>
+      ${hw ? HW_COLMILLOS : '<path d="M94 95q6 6 12 0Z" fill="#f9788f"/>'}
+      ${hw ? HW_ARANA : ''}
     </g>
   </g>
 </svg>`;
+}
+// Pupitre vacio para la ausencia: nada de burla, solo la silla sola.
+const CEL_PUPITRE = `<svg viewBox="0 0 220 200" aria-hidden="true">
+  <ellipse cx="110" cy="182" rx="76" ry="10" fill="rgba(31,35,64,.14)"/>
+  <rect x="34" y="96" width="112" height="13" rx="5" fill="#94a3b8"/>
+  <rect x="42" y="109" width="9" height="66" rx="4" fill="#64748b"/>
+  <rect x="129" y="109" width="9" height="66" rx="4" fill="#64748b"/>
+  <rect x="60" y="86" width="52" height="10" rx="3" fill="#cbd5e1"/>
+  <rect x="66" y="78" width="40" height="9" rx="3" fill="#e2e8f0"/>
+  <rect x="150" y="120" width="52" height="10" rx="4" fill="#64748b"/>
+  <rect x="192" y="74" width="10" height="50" rx="5" fill="#64748b"/>
+  <rect x="152" y="130" width="8" height="46" rx="4" fill="#475569"/>
+  <rect x="192" y="130" width="8" height="46" rx="4" fill="#475569"/>
+  <g class="cel-polvo"><circle cx="86" cy="150" r="7" fill="rgba(148,163,184,.5)"/><circle cx="104" cy="158" r="5" fill="rgba(148,163,184,.4)"/><circle cx="70" cy="160" r="4" fill="rgba(148,163,184,.35)"/></g>
+</svg>`;
+// Medalla para la racha de insignias.
+const CEL_MEDALLA = `<svg viewBox="0 0 200 230" aria-hidden="true">
+  <path d="M62 8h30l22 60H84Z" fill="#60a5fa"/><path d="M138 8h-30l-22 60h30Z" fill="#ef4467"/>
+  <circle class="cel-medalla-disco" cx="100" cy="140" r="72" fill="#fbbf24"/>
+  <circle cx="100" cy="140" r="58" fill="#f59e0b"/>
+  <circle cx="100" cy="140" r="50" fill="#fcd34d"/>
+  <path d="m100 96 13 27 30 4-22 21 5 30-26-14-26 14 5-30-22-21 30-4z" fill="#b45309"/>
+</svg>`;
 const CEL_COLORES = { f:['#ec4899','#a855f7','#fbbf24','#f472b6','#60a5fa','#fff'],
-                      m:['#2563eb','#06b6d4','#fbbf24','#22c55e','#f472b6','#fff'] };
+                      m:['#2563eb','#06b6d4','#fbbf24','#22c55e','#f472b6','#fff'],
+                      hw:['#f97316','#a855f7','#fbbf24','#22c55e','#111827','#fff'],
+                      oro:['#fbbf24','#f59e0b','#fcd34d','#fff','#f97316','#facc15'] };
+const CEL_EMOJIS_HW = ['🎃','👻','🦇','🕸️','🍬'];
 let _celCapa=null, _celTimers=[];
-// Celebracion grande: entra el personaje, salta dos veces, estalla el confeti y
-// se va sola en poco mas de dos segundos. Si se pasa lista rapido, cada llegada
-// reemplaza a la anterior en vez de amontonarse.
-function celebrarLlegada(ancla,s){
-    const g=generoDeAlumno(s);
-    const es=currentLanguage==='es';
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return g;
-    cerrarCelebracion();
-    const nombre=(typeof biaTitulo==='function') ? biaTitulo(s&&s.name) : String((s&&s.name)||'');
+
+// Arma la capa comun de las celebraciones: fondo, rayos, escena y confeti.
+function celCapa(tipo, tema){
     const capa=document.createElement('div');
-    capa.className='cel-capa cel-'+g;
+    capa.className='cel-capa cel-'+tipo+(esHalloween()?' cel-hw':'');
     capa.setAttribute('aria-hidden','true');
     const fondo=document.createElement('div'); fondo.className='cel-fondo'; capa.appendChild(fondo);
     const escena=document.createElement('div'); escena.className='cel-escena';
-    const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
-    const kid=document.createElement('div'); kid.className='cel-kid'; kid.innerHTML = g==='f' ? CEL_NINA : CEL_NINO;
-    escena.appendChild(kid);
-    const texto=document.createElement('div'); texto.className='cel-texto';
-    const saludo=document.createElement('span'); saludo.className='cel-saludo';
-    saludo.textContent = es ? (g==='f'?'¡Bienvenida!':'¡Bienvenido!') : 'Welcome!';
-    texto.appendChild(saludo);
-    if(nombre){ const quien=document.createElement('span'); quien.className='cel-quien'; quien.textContent=nombre; texto.appendChild(quien); }
-    escena.appendChild(texto);
     capa.appendChild(escena);
-    // Confeti que sale del centro hacia los lados y cae.
+    return { capa, escena };
+}
+function celConfeti(capa, paleta, cuantos, hwEmojis){
     const confeti=document.createElement('div'); confeti.className='cel-confeti';
-    const colores=CEL_COLORES[g];
-    for(let i=0;i<34;i++){
+    const colores=CEL_COLORES[paleta]||CEL_COLORES.oro;
+    const usarEmoji=hwEmojis && esHalloween();
+    for(let i=0;i<cuantos;i++){
         const trozo=document.createElement('i');
-        const ang=(Math.PI*2*i)/34 + Math.random()*0.3;
+        const ang=(Math.PI*2*i)/cuantos + Math.random()*0.3;
         const dist=120+Math.random()*260;
-        trozo.style.background=colores[i%colores.length];
+        if(usarEmoji && i%5===0){
+            trozo.className='emo';
+            trozo.textContent=CEL_EMOJIS_HW[(i/5|0)%CEL_EMOJIS_HW.length];
+        } else {
+            trozo.style.background=colores[i%colores.length];
+            trozo.style.width=(7+Math.random()*7).toFixed(0)+'px';
+            trozo.style.height=(10+Math.random()*9).toFixed(0)+'px';
+            if(i%4===0) trozo.style.borderRadius='50%';
+        }
         trozo.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(0)+'px');
-        trozo.style.setProperty('--dy',(Math.sin(ang)*dist*0.72+120).toFixed(0)+'px');   // caen un poco
+        trozo.style.setProperty('--dy',(Math.sin(ang)*dist*0.72+120).toFixed(0)+'px');
         trozo.style.setProperty('--giro',Math.round((Math.random()-0.5)*900)+'deg');
-        trozo.style.width=(7+Math.random()*7).toFixed(0)+'px';
-        trozo.style.height=(10+Math.random()*9).toFixed(0)+'px';
-        if(i%4===0) trozo.style.borderRadius='50%';
         trozo.style.animationDelay=(80+i*16)+'ms';
         trozo.style.animationDuration=(1300+Math.random()*700)+'ms';
         confeti.appendChild(trozo);
     }
     capa.appendChild(confeti);
+}
+function celTexto(escena, saludo, quien){
+    const texto=document.createElement('div'); texto.className='cel-texto';
+    const s1=document.createElement('span'); s1.className='cel-saludo'; s1.textContent=saludo; texto.appendChild(s1);
+    if(quien){ const s2=document.createElement('span'); s2.className='cel-quien'; s2.textContent=quien; texto.appendChild(s2); }
+    escena.appendChild(texto);
+}
+function celMostrar(capa, duracion){
     document.body.appendChild(capa);
     _celCapa=capa;
-    _celTimers.push(setTimeout(()=>{ capa.classList.add('saliendo'); },1950));
-    _celTimers.push(setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); if(_celCapa===capa) _celCapa=null; },2350));
+    _celTimers.push(setTimeout(()=>{ capa.classList.add('saliendo'); },duracion));
+    _celTimers.push(setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); if(_celCapa===capa) _celCapa=null; },duracion+400));
+}
+function celNombreDe(s){ return (typeof biaTitulo==='function') ? biaTitulo(s&&s.name) : String((s&&s.name)||''); }
+
+// Llegada: el muñequito entra de un salto y estalla el confeti.
+function celebrarLlegada(ancla,s){
+    const g=generoDeAlumno(s);
+    const es=currentLanguage==='es';
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return g;
+    cerrarCelebracion();
+    const { capa, escena } = celCapa(g);
+    const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
+    const kid=document.createElement('div'); kid.className='cel-kid'; kid.innerHTML = g==='f' ? celSvgNina() : celSvgNino();
+    escena.appendChild(kid);
+    celTexto(escena, es ? (g==='f'?'¡Bienvenida!':'¡Bienvenido!') : 'Welcome!', celNombreDe(s));
+    celConfeti(capa, esHalloween()?'hw':g, 34, true);
+    celMostrar(capa, 1950);
     return g;
+}
+// Ausencia: el pupitre vacio y el sello. Sin fiesta y sin burla.
+function celebrarAusencia(ancla,s){
+    const es=currentLanguage==='es';
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cerrarCelebracion();
+    const { capa, escena } = celCapa('aus');
+    const dib=document.createElement('div'); dib.className='cel-pupitre'; dib.innerHTML=CEL_PUPITRE;
+    escena.appendChild(dib);
+    const sello=document.createElement('div'); sello.className='cel-sello';
+    sello.textContent = es?'AUSENTE':'ABSENT';
+    escena.appendChild(sello);
+    celTexto(escena, es?'No vino hoy':'Not here today', celNombreDe(s));
+    celMostrar(capa, 1500);
+}
+// Racha: tres o mas insignias en la misma clase.
+function celebrarRacha(s, cuantas, compas){
+    const es=currentLanguage==='es';
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cerrarCelebracion();
+    const { capa, escena } = celCapa('racha');
+    const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
+    const med=document.createElement('div'); med.className='cel-medalla'; med.innerHTML=CEL_MEDALLA;
+    const num=document.createElement('span'); num.className='cel-numero'; num.textContent=cuantas;
+    med.appendChild(num);
+    escena.appendChild(med);
+    const titulo = es ? `¡${cuantas} insignias en esta clase!` : `${cuantas} badges in this class!`;
+    let quien=celNombreDe(s);
+    if(compas>0) quien += es?` y ${compas} compañero(s) más`:` and ${compas} more`;
+    celTexto(escena, titulo, quien);
+    celConfeti(capa, 'oro', 30, true);
+    celMostrar(capa, 2100);
+}
+// Se avisa al llegar a 3, 5, 8 y 12 insignias en la misma casilla.
+const RACHA_HITOS = [3,5,8,12];
+function revisarRacha(s, n, compas){
+    if(RACHA_HITOS.indexOf(n)<0) return;
+    celebrarRacha(s, n, compas||0);
 }
 function cerrarCelebracion(){
     _celTimers.forEach(clearTimeout); _celTimers=[];
     if(_celCapa && _celCapa.parentNode) _celCapa.parentNode.removeChild(_celCapa);
     _celCapa=null;
 }
+
 function animarAsistencia(btn,estado,s){
     if(!btn) return;
-    // Solo se celebra la llegada; la ausencia se marca en seco.
+    // La llegada se celebra; la ausencia se marca con el pupitre vacio.
     const g = estado==='p' ? celebrarLlegada(btn,s) : null;
+    if(estado==='a') celebrarAusencia(btn,s);
     btn.classList.remove('att-anim'); void btn.offsetWidth; btn.classList.add('att-anim');
     setTimeout(()=>btn.classList.remove('att-anim'),700);
     // Globo que sube y se desvanece: confirma el registro sin tapar la lista.
@@ -5176,9 +5425,22 @@ function applyBadgeToRow(ri,ci,badge){
     const es=currentLanguage==='es';
     const si=ri*groupSize; const ei=Math.min(si+groupSize,currentStudents.length);
     let cuantos=0;
-    for(let i=si;i<ei;i++){const s=currentStudents[i];if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){s.gridBadges[ci].push(badge);cuantos++;}}
+    const enRacha=[];
+    for(let i=si;i<ei;i++){
+        const s=currentStudents[i];
+        if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){
+            s.gridBadges[ci].push(badge); cuantos++;
+            if(typeof RACHA_HITOS!=='undefined' && RACHA_HITOS.indexOf(s.gridBadges[ci].length)>=0) enRacha.push(s);
+        }
+    }
     if(cuantos){
         saveData();renderCurrentView();updateStats();
+        // Si varios del grupo llegaron al hito, se celebra con el primero y se
+        // nombra a los demas: no tiene sentido encadenar seis celebraciones.
+        if(enRacha.length && typeof celebrarRacha==='function'){
+            const primero=enRacha[0];
+            celebrarRacha(primero, primero.gridBadges[ci].length, enRacha.length-1);
+        }
         // Se avisa de que fue al grupo entero, no a una sola persona.
         showNotification(es
             ? `🏅 ${escapeHtml(badge.name)} para el Grupo ${ri+1} · ${cuantos} integrante(s)`
@@ -5202,7 +5464,14 @@ function gruposDelSalon(){
     return grupos;
 }
 window.updateStudentNameGrid=function(sid,val){const s=currentStudents.find(x=>x.id===sid);if(s){s.name=val.trim();saveData();updateStats();}};
-function addGridBadgeToCell(sid,ci,badge){const s=currentStudents.find(x=>x.id===sid);if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){s.gridBadges[ci].push(badge);saveData();renderCurrentView();updateStats();}}
+function addGridBadgeToCell(sid,ci,badge){
+    const s=currentStudents.find(x=>x.id===sid);
+    if(!(s && s.gridBadges[ci]) || s.gridBadges[ci].find(b=>b.id===badge.id)) return;
+    s.gridBadges[ci].push(badge);
+    saveData(); renderCurrentView(); updateStats();
+    // Tres o mas insignias en la misma clase merecen su propia celebracion.
+    if(typeof revisarRacha==='function') revisarRacha(s, s.gridBadges[ci].length, 0);
+}
 window.removeGridBadge=function(sid,ci,bi){const s=currentStudents.find(x=>x.id===sid);if(s&&s.gridBadges[ci]){s.gridBadges[ci].splice(bi,1);saveData();renderCurrentView();updateStats();}};
 
 // === MODALS ===
@@ -6147,6 +6416,7 @@ function updateNewFeaturesText(){
     const ib=document.getElementById('importStudentsBtnText'); if(ib)ib.textContent=es?'Importar lista':'Import list';
     const ws=document.getElementById('weeklySummaryBtnText'); if(ws)ws.textContent=es?'Resumen semanal (IA)':'Weekly summary (AI)';
     if(typeof textosJuegosVocabulario==='function') textosJuegosVocabulario();
+    if(typeof textosBomba==='function') textosBomba();
     if(typeof textosComentariosBoletin==='function') textosComentariosBoletin();
     const sc=document.getElementById('suggestCommentBtn'); if(sc && !sc.disabled) sc.innerHTML='✨ '+(es?'Sugerir con IA':'Suggest with AI');
     if(typeof updateCloudStatusPill==='function') updateCloudStatusPill();
@@ -6213,6 +6483,13 @@ function updateNewFeaturesText(){
     initJuyu();
     renderAvatarFrames();
     const jb=document.getElementById('juyuRestoreBtn'); if(jb)jb.textContent=es?'🐾 Mostrar a YUJU':'🐾 Show YUJU';
+    const hl=document.getElementById('halloweenLbl'); if(hl)hl.textContent=es?'🎃 Disfraces de Halloween':'🎃 Halloween costumes';
+    const hs=document.getElementById('halloweenSel');
+    if(hs){
+        const vals=es?['Automático (en octubre)','Siempre','Nunca']:['Automatic (in October)','Always','Never'];
+        [...hs.options].forEach((o,i)=>{ o.textContent=vals[i]; });
+        if(typeof halloweenModo==='function') hs.value=halloweenModo();
+    }
     const jh=document.getElementById('juyuHideBtn'); if(jh)jh.setAttribute('aria-label',es?'Ocultar a YUJU':'Hide YUJU');
     setTxt('lpTitle','📝 Planeaciones con IA','📝 AI Lesson Plans');
     setTxt('lpIntro','Sube tus planeaciones para que la IA aprenda tu estilo, y genera la de la próxima clase en Word.','Upload your lesson plans so the AI learns your style, then generate the next class as a Word file.');
@@ -10007,6 +10284,267 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',()=>{ if(rulAbierta()) rulDibujar(); });
 document.addEventListener('fullscreenchange',()=>{ if(rulAbierta()) setTimeout(rulDibujar,120); });
+// ===================== BOMBA DE TIEMPO =====================================
+// Un cronometro para las actividades de clase: se pone el tiempo, la mecha se
+// va consumiendo y al llegar a cero la bomba explota con sonido. Todo el sonido
+// se fabrica aqui con el oscilador del navegador: no hay archivos de audio.
+const BOMBA_PRESETS = [30, 60, 120, 180, 300, 600];
+let _bomba = { total:60, quedan:60, corriendo:false, fin:0, timer:null, sonido:true, ultimoTic:-1, audio:null, ruido:null };
+try{ _bomba.sonido = localStorage.getItem('lt_bombaSonido')!=='0'; }catch(e){}
+try{ const g=parseInt(localStorage.getItem('lt_bombaTotal'),10); if(g>=5 && g<=5400){ _bomba.total=g; _bomba.quedan=g; } }catch(e){}
+
+function bombaAudio(){
+    if(_bomba.audio) return _bomba.audio;
+    try{
+        const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+        _bomba.audio=new AC();
+        const n=Math.floor(_bomba.audio.sampleRate*1.5);
+        _bomba.ruido=_bomba.audio.createBuffer(1,n,_bomba.audio.sampleRate);
+        const d=_bomba.ruido.getChannelData(0);
+        for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    }catch(e){ _bomba.audio=null; }
+    return _bomba.audio;
+}
+// El tic-tac. En los ultimos diez segundos suena mas agudo y mas fuerte.
+function bombaTic(urgente){
+    if(!_bomba.sonido) return;
+    const ac=bombaAudio(); if(!ac || ac.state==='suspended') return;
+    try{
+        const t=ac.currentTime;
+        const o=ac.createOscillator(), g=ac.createGain(), f=ac.createBiquadFilter();
+        o.type='square'; o.frequency.value=urgente?1500:950;
+        f.type='bandpass'; f.frequency.value=urgente?1800:1200; f.Q.value=1.6;
+        g.gain.setValueAtTime(urgente?0.09:0.05,t);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+(urgente?0.07:0.05));
+        o.connect(f); f.connect(g); g.connect(ac.destination);
+        o.start(t); o.stop(t+0.09);
+    }catch(e){}
+}
+// La explosion: un golpe de ruido que se va apagando y un retumbe grave debajo.
+function bombaEstallido(){
+    if(!_bomba.sonido) return;
+    const ac=bombaAudio(); if(!ac) return;
+    if(ac.state==='suspended') ac.resume().catch(()=>{});
+    try{
+        const t=ac.currentTime;
+        const salida=ac.createGain(); salida.gain.value=0.55; salida.connect(ac.destination);
+        if(_bomba.ruido){
+            const n=ac.createBufferSource(); n.buffer=_bomba.ruido;
+            const lp=ac.createBiquadFilter(); lp.type='lowpass';
+            lp.frequency.setValueAtTime(7000,t);
+            lp.frequency.exponentialRampToValueAtTime(140,t+0.9);
+            const g=ac.createGain();
+            g.gain.setValueAtTime(0.0001,t);
+            g.gain.exponentialRampToValueAtTime(1,t+0.012);
+            g.gain.exponentialRampToValueAtTime(0.18,t+0.35);
+            g.gain.exponentialRampToValueAtTime(0.0008,t+1.2);
+            n.connect(lp); lp.connect(g); g.connect(salida);
+            n.start(t); n.stop(t+1.3);
+        }
+        const o=ac.createOscillator(), og=ac.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(90,t);
+        o.frequency.exponentialRampToValueAtTime(24,t+0.8);
+        og.gain.setValueAtTime(0.0001,t);
+        og.gain.exponentialRampToValueAtTime(0.9,t+0.02);
+        og.gain.exponentialRampToValueAtTime(0.0008,t+1);
+        o.connect(og); og.connect(salida);
+        o.start(t); o.stop(t+1.1);
+    }catch(e){}
+}
+function bombaFormato(seg){
+    seg=Math.max(0,Math.ceil(seg));
+    const m=Math.floor(seg/60), s=seg%60;
+    return m+':'+String(s).padStart(2,'0');
+}
+function bombaPintar(){
+    const es=currentLanguage==='es';
+    const reloj=document.getElementById('bombaReloj');
+    const caja=document.getElementById('bombaModal');
+    const p=_bomba.total>0 ? Math.max(0,_bomba.quedan)/_bomba.total : 0;
+    if(reloj) reloj.textContent=bombaFormato(_bomba.quedan);
+    // La mecha se acorta con el tiempo y la chispa viaja por ella.
+    const mecha=document.getElementById('bombaMecha'), chispa=document.getElementById('bombaChispa');
+    if(mecha){
+        mecha.style.strokeDasharray=(p*100).toFixed(1)+' 100';
+        if(chispa){
+            try{
+                const largo=mecha.getTotalLength();
+                const pt=mecha.getPointAtLength(largo*p);
+                chispa.setAttribute('cx',pt.x); chispa.setAttribute('cy',pt.y);
+                chispa.style.opacity=(_bomba.corriendo && p>0)?'1':'0';
+            }catch(e){}
+        }
+    }
+    if(caja){
+        caja.classList.toggle('bomba-urgente', _bomba.corriendo && _bomba.quedan<=10);
+        caja.classList.toggle('bomba-andando', _bomba.corriendo);
+    }
+    const btn=document.getElementById('bombaPlay');
+    if(btn) btn.innerHTML = _bomba.corriendo ? ('⏸ '+(es?'Pausar':'Pause')) : ('▶ '+(es?(_bomba.quedan<_bomba.total?'Seguir':'Empezar'):(_bomba.quedan<_bomba.total?'Resume':'Start')));
+    const son=document.getElementById('bombaSonido');
+    if(son){ son.setAttribute('aria-pressed', _bomba.sonido?'true':'false'); son.textContent=(_bomba.sonido?'🔔 ':'🔕 ')+(es?'Sonido':'Sound'); }
+    bombaPildora();
+}
+// Pildora flotante: si se cierra la ventana, el tiempo sigue a la vista.
+function bombaPildora(){
+    let pil=document.getElementById('bombaPildora');
+    const abierto=document.getElementById('bombaModal')?.style.display==='flex';
+    const mostrar=_bomba.corriendo && !abierto;
+    if(!mostrar){ if(pil) pil.remove(); return; }
+    if(!pil){
+        pil=document.createElement('button');
+        pil.id='bombaPildora'; pil.type='button'; pil.className='bomba-pildora';
+        pil.onclick=()=>abrirBomba();
+        document.body.appendChild(pil);
+    }
+    pil.classList.toggle('urgente', _bomba.quedan<=10);
+    pil.textContent='💣 '+bombaFormato(_bomba.quedan);
+}
+function bombaLatido(){
+    if(!_bomba.corriendo) return;
+    _bomba.quedan=(_bomba.fin-Date.now())/1000;
+    const entero=Math.ceil(_bomba.quedan);
+    if(entero!==_bomba.ultimoTic && entero>0){
+        _bomba.ultimoTic=entero;
+        bombaTic(entero<=10);
+    }
+    if(_bomba.quedan<=0){
+        _bomba.quedan=0; _bomba.corriendo=false;
+        clearInterval(_bomba.timer); _bomba.timer=null;
+        bombaPintar();
+        bombaExplotar();
+        return;
+    }
+    bombaPintar();
+}
+window.bombaPlay=function(){
+    if(_bomba.corriendo){ bombaPausa(); return; }
+    const ac=bombaAudio();
+    if(ac && ac.state==='suspended') ac.resume().catch(()=>{});
+    if(_bomba.quedan<=0) _bomba.quedan=_bomba.total;
+    _bomba.fin=Date.now()+_bomba.quedan*1000;
+    _bomba.corriendo=true; _bomba.ultimoTic=-1;
+    clearInterval(_bomba.timer);
+    _bomba.timer=setInterval(bombaLatido,120);
+    bombaPintar();
+};
+window.bombaPausa=function(){
+    _bomba.corriendo=false;
+    clearInterval(_bomba.timer); _bomba.timer=null;
+    bombaPintar();
+};
+window.bombaReiniciar=function(){
+    bombaPausa();
+    _bomba.quedan=_bomba.total;
+    bombaPintar();
+};
+window.bombaPoner=function(seg){
+    seg=Math.max(5,Math.min(5400,Math.round(seg)||60));
+    bombaPausa();
+    _bomba.total=seg; _bomba.quedan=seg;
+    try{ localStorage.setItem('lt_bombaTotal',String(seg)); }catch(e){}
+    bombaSincronizar();
+    bombaPintar();
+};
+// Deja los campos y los botones de acuerdo con el tiempo elegido, sin tocar la cuenta.
+function bombaSincronizar(){
+    const seg=_bomba.total;
+    const mi=document.getElementById('bombaMin'), si=document.getElementById('bombaSeg');
+    if(mi && document.activeElement!==mi) mi.value=Math.floor(seg/60);
+    if(si && document.activeElement!==si) si.value=seg%60;
+    document.querySelectorAll('#bombaModal .bomba-preset').forEach(b=>b.setAttribute('aria-pressed', Number(b.dataset.seg)===seg?'true':'false'));
+}
+window.bombaDesdeCampos=function(){
+    const m=parseInt((document.getElementById('bombaMin')||{}).value,10)||0;
+    const s=parseInt((document.getElementById('bombaSeg')||{}).value,10)||0;
+    bombaPoner(m*60+s);
+};
+window.bombaSonidoToggle=function(){
+    _bomba.sonido=!_bomba.sonido;
+    try{ localStorage.setItem('lt_bombaSonido', _bomba.sonido?'1':'0'); }catch(e){}
+    if(_bomba.sonido) bombaTic(false);
+    bombaPintar();
+};
+window.bombaPantallaCompleta=function(){
+    const m=document.querySelector('#bombaModal .bomba-modal'); if(!m) return;
+    try{
+        if(document.fullscreenElement) document.exitFullscreen();
+        else if(m.requestFullscreen) m.requestFullscreen().catch(()=>{});
+    }catch(e){}
+};
+// El estallido: destello, onda expansiva y pedazos volando.
+function bombaExplotar(){
+    const es=currentLanguage==='es';
+    bombaEstallido();
+    const reducido=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const capa=document.createElement('div');
+    capa.className='boom-capa';
+    capa.innerHTML='<div class="boom-flash"></div><div class="boom-onda"></div><div class="boom-onda dos"></div>'
+        + '<div class="boom-texto">💥 '+(es?'¡BOOM!':'BOOM!')+'</div>';
+    if(!reducido){
+        const colores=['#f59e0b','#ef4467','#fbbf24','#f97316','#fff','#64748b'];
+        for(let i=0;i<30;i++){
+            const t=document.createElement('i');
+            const ang=(Math.PI*2*i)/30+Math.random()*0.35;
+            const dist=140+Math.random()*320;
+            t.style.background=colores[i%colores.length];
+            t.style.setProperty('--dx',(Math.cos(ang)*dist).toFixed(0)+'px');
+            t.style.setProperty('--dy',(Math.sin(ang)*dist*0.8+90).toFixed(0)+'px');
+            t.style.setProperty('--giro',Math.round((Math.random()-0.5)*900)+'deg');
+            t.style.width=(6+Math.random()*10).toFixed(0)+'px';
+            t.style.height=(6+Math.random()*12).toFixed(0)+'px';
+            t.style.animationDuration=(900+Math.random()*600)+'ms';
+            capa.appendChild(t);
+        }
+    }
+    document.body.appendChild(capa);
+    setTimeout(()=>{ if(capa.parentNode) capa.parentNode.removeChild(capa); }, 1900);
+    const m=document.getElementById('bombaModal');
+    if(m && m.style.display==='flex'){
+        m.classList.add('bomba-estallo');
+        setTimeout(()=>m.classList.remove('bomba-estallo'),900);
+    }
+    showNotification(es?'💥 ¡Se acabó el tiempo!':'💥 Time is up!','info');
+    // Lista para otra ronda.
+    setTimeout(()=>{ _bomba.quedan=_bomba.total; bombaPintar(); },1200);
+}
+window.abrirBomba=function(){
+    const es=currentLanguage==='es';
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('bombaTitulo', es?'💣 Bomba de tiempo':'💣 Time bomb');
+    t('bombaIntro', es?'Pon el tiempo de la actividad. Cuando la mecha se acabe, la bomba explota con sonido.'
+                     :'Set the time for the activity. When the fuse runs out, the bomb goes off with a bang.');
+    t('bombaMinLbl', es?'Minutos':'Minutes');
+    t('bombaSegLbl', es?'Segundos':'Seconds');
+    t('bombaReiniciarBtn', '↺ '+(es?'Reiniciar':'Reset'));
+    t('bombaPantallaBtn', '⛶ '+(es?'Pantalla completa':'Full screen'));
+    t('bombaCerrarBtn', es?'Cerrar':'Close');
+    const caja=document.getElementById('bombaPresets');
+    if(caja && !caja.dataset.listo){
+        caja.innerHTML=BOMBA_PRESETS.map(s=>{
+            const txt = s<60 ? (s+'s') : (s/60+' min');
+            return `<button type="button" class="bomba-preset" data-seg="${s}" aria-pressed="false" onclick="bombaPoner(${s})">${txt}</button>`;
+        }).join('');
+        caja.dataset.listo='1';
+    }
+    bombaSincronizar();
+    if(!_bomba.corriendo && !(_bomba.quedan>0)) _bomba.quedan=_bomba.total;
+    showModal('bombaModal');
+    bombaPintar();
+};
+window.cerrarBomba=function(){
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+    hideModal('bombaModal');
+    bombaPildora();
+};
+function textosBomba(){
+    const es=currentLanguage==='es';
+    const b=document.getElementById('bombaBtnText'); if(b) b.textContent=es?'Bomba de tiempo':'Time bomb';
+    if(document.getElementById('bombaModal')?.style.display==='flex') abrirBomba();
+    else bombaPintar();
+}
+
 function textosJuegosVocabulario(){
     const es=currentLanguage==='es';
     const t=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
