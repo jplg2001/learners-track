@@ -2033,6 +2033,9 @@ tr.flash-m td { animation:flashM .9s ease-out; }
                 <input type="checkbox" id="keepSessionOptIn" style="width:auto;transform:scale(1.1);">
                 <label for="keepSessionOptIn" id="keepSessionLabel" style="margin:0;cursor:pointer;">Keep me signed in on this device</label>
             </div>
+            <div style="margin:-6px 0 10px;">
+                <small id="keepSessionHint" style="font-size:.78rem;color:var(--fg-muted);">Reloading the page never signs you out.</small>
+            </div>
             <button type="submit" class="auth-button" id="loginBtn">Sign In</button>
             <div style="text-align:center;margin-top:12px;"><a href="#" id="forgotPasswordLink" role="button" onclick="firebasePasswordReset();return false;" style="color:var(--accent);font-weight:600;font-size:0.9rem;text-decoration:none;">Forgot your password?</a></div>
             <div class="auth-switch"><span id="noAccountText">Don't have an account?</span> <a href="#" id="showRegisterLink" role="button">Register</a></div>
@@ -4240,6 +4243,7 @@ async function cerrarSesionSegura(){
     }
 }
 function logout() {
+    if(typeof olvidarSesionDeEstaPestana==='function') olvidarSesionDeEstaPestana();
     if(typeof ocultarAvisoNube==='function') ocultarAvisoNube();
     // Se corta el mando: al salir de la cuenta nadie debe seguir mandando ordenes.
     if(typeof desconectarControl==="function"){ try{ desconectarControl(); }catch(e){} }
@@ -6763,7 +6767,12 @@ function updateNewFeaturesText(){
     const cch=document.getElementById('clearChatBtn'); if(cch)cch.textContent=es?'🧹 Nueva conversación':'🧹 New conversation';
     const rml=document.getElementById('rememberEmailLabel'); if(rml)rml.textContent=es?'Recordar mi correo en este dispositivo':'Remember my email on this device';
     const rrl=document.getElementById('rememberRegisterEmailLabel'); if(rrl)rrl.textContent=es?'Recordar este correo en este dispositivo':'Remember this email on this device';
-    const ksl=document.getElementById('keepSessionLabel'); if(ksl)ksl.textContent=es?'Mantener la sesión iniciada en este dispositivo':'Keep me signed in on this device';
+    const ksl=document.getElementById('keepSessionLabel'); if(ksl)ksl.textContent=es
+        ? 'Seguir con la sesión abierta aunque cierre el navegador'
+        : 'Stay signed in even after closing the browser';
+    const kst=document.getElementById('keepSessionHint'); if(kst)kst.textContent=es
+        ? 'Al recargar la página nunca se cierra la sesión.'
+        : 'Reloading the page never signs you out.';
     const bpt=document.getElementById('badgePointsToggleLabel'); if(bpt)bpt.textContent=es?'🏅 Sumar puntos de insignias a las notas':'🏅 Add badge points to scores';
     const bpv=document.getElementById('badgePointsValueLabel'); if(bpv)bpv.textContent=es?'Valor por insignia:':'Value per badge:';
     const bph=document.getElementById('badgePointsHelp'); if(bph)bph.textContent=es
@@ -8618,6 +8627,8 @@ window.reconectarNube=async function(){
     const btn=document.getElementById('reconectarBtn'); if(btn) btn.disabled=true;
     try{
         _manualAuthInFlight=true;
+        marcarSesionDeEstaPestana();
+        await aplicarPersistencia();
         const cred=await firebase.auth().signInWithEmailAndPassword(email,pw);
         // Tiene que ser LA MISMA cuenta: subir estos salones a otra la pisaria.
         if(currentUser.id && cred.user.uid!==currentUser.id){
@@ -8651,6 +8662,23 @@ let _authRestoreDone = false;
 // pide la contrasena en cada visita: en un movil compartido o extraviado, entrar
 // solo al abrir el enlace expondria los datos de todo el salon.
 function keepSessionEnabled(){ return localStorage.getItem('learnersTrackKeepSession')==='1'; }
+// RECARGAR NO DEBE PEDIR LA CONTRASEÑA. La marca se guarda en sessionStorage:
+// sobrevive a F5 y a Ctrl+Shift+R, pero muere al cerrar la pestaña o el navegador.
+// Asi el docente no vuelve a escribir la clave en toda la clase, y en un equipo
+// compartido la sesion no queda abierta para el siguiente que lo prenda.
+function sesionDeEstaPestana(){ try{ return sessionStorage.getItem('ltSesionPestana')==='1'; }catch(e){ return false; } }
+function marcarSesionDeEstaPestana(){ try{ sessionStorage.setItem('ltSesionPestana','1'); }catch(e){} }
+function olvidarSesionDeEstaPestana(){ try{ sessionStorage.removeItem('ltSesionPestana'); }catch(e){} }
+function puedeRestaurarSesion(){ return keepSessionEnabled() || sesionDeEstaPestana(); }
+// Con "mantener la sesion" Firebase la guarda para siempre en este equipo; sin
+// ella, solo mientras la pestaña siga abierta.
+function aplicarPersistencia(){
+    try{
+        const P=firebase.auth.Auth.Persistence;
+        return firebase.auth().setPersistence(keepSessionEnabled()?P.LOCAL:P.SESSION)
+            .catch(e=>{ console.warn('persistencia',e); });
+    }catch(e){ return Promise.resolve(); }
+}
 function setKeepSession(on){ try{ localStorage.setItem('learnersTrackKeepSession', on?'1':'0'); }catch(e){} }
 function initAuthPersistence(){
   // Enlace de clase para padres: no hay login de docente, va directo al buscador.
@@ -8661,23 +8689,27 @@ function initAuthPersistence(){
   }
   // Sin nube no hay nada que esperar: se retira la pantalla de carga enseguida.
   if(!window.FIREBASE_ON){ if(window.__closeBootLoader) window.__closeBootLoader(); return; }
-  try{
+  const escuchar=function(){
     firebase.auth().onAuthStateChanged(function(user){
       // Ya sabemos si había sesión: se puede retirar la pantalla de carga.
-      if(!user || !keepSessionEnabled()){ if(window.__closeBootLoader) window.__closeBootLoader(); }
+      if(!user || !puedeRestaurarSesion()){ if(window.__closeBootLoader) window.__closeBootLoader(); }
       if(!user){ _authRestoreDone=true; if(currentUser) avisarSesionNubeCerrada(); return; }
       if(currentUser && _avisoNubeVisible && (!currentUser.id || user.uid===currentUser.id)) ocultarAvisoNube();
       // Si el usuario acaba de pulsar "Iniciar sesion"/"Registrarse", esa ruta ya carga los datos.
       if(_manualAuthInFlight || _authRestoreDone || currentUser) return;
       _authRestoreDone = true;
-      if(!keepSessionEnabled()){
-        // Habia sesion guardada pero no se pidio mantenerla: se cierra y se pide la contrasena.
+      if(!puedeRestaurarSesion()){
+        // Sesion vieja de otra visita, sin "mantener la sesion" y sin haber entrado
+        // en esta pestaña: se cierra y se pide la contraseña.
         firebase.auth().signOut().catch(()=>{});
         return;
       }
+      marcarSesionDeEstaPestana();
       loadUserFromCloud(user.uid, user.email);
     });
-  }catch(e){ console.error('auth persistence',e); }
+  };
+  try{ aplicarPersistencia().then(escuchar); }
+  catch(e){ console.error('auth persistence',e); escuchar(); }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initAuthPersistence);
 else initAuthPersistence();
@@ -8779,8 +8811,10 @@ function firebaseLogin(){
   _manualAuthInFlight = true;
   persistRememberedEmails();
   setKeepSession(!!document.getElementById('keepSessionOptIn')?.checked);
+  marcarSesionDeEstaPestana();
   showAppLoader(currentLanguage==='es'?'Entrando…':'Signing in…');
-  firebase.auth().signInWithEmailAndPassword(email,pw)
+  aplicarPersistencia()
+    .then(()=>firebase.auth().signInWithEmailAndPassword(email,pw))
     .then(cred=>{ setLoaderMessage(currentLanguage==='es'?'Cargando tu salón…':'Loading your classroom…'); return loadUserFromCloud(cred.user.uid,email); })
     .catch(err=>{ console.error(err); hideAppLoader(); showNotification((currentLanguage==='es'?'No se pudo iniciar sesión: ':'Sign-in failed: ')+fbErr(err),'error'); })
     .finally(()=>{ _manualAuthInFlight=false; _authRestoreDone=true; });
@@ -8797,8 +8831,10 @@ function firebaseRegister(){
   if(!emailValid){ showNotification(es?'Ingresa un correo válido':'Enter a valid email address','error'); return; }
   _manualAuthInFlight = true;
   persistRememberedEmails();
+  marcarSesionDeEstaPestana();
   showAppLoader(es?'Creando tu cuenta…':'Creating your account…');
-  firebase.auth().createUserWithEmailAndPassword(email,pw)
+  aplicarPersistencia()
+    .then(()=>firebase.auth().createUserWithEmailAndPassword(email,pw))
     .then(cred=>{
       const uid=cred.user.uid;
       return db.collection('users').doc(uid).set({ email, data:JSON.stringify({ name, school, avatar:'', grade:'', institutionLogo:null, classrooms:[], gridWeeks:1, weekTitles:["Week 1"], noteColumns:["Evaluation 1","Evaluation 2"], activeClassroomIndex:0 }), updatedAt:Date.now() },{merge:true}).then(()=>uid);
