@@ -8938,9 +8938,18 @@ window.abrirSorteo=function(){
     t('preguntaFrenteTxt', es?'Pregunta sorpresa':'Surprise question');
     t('preguntaDescubrirTxt', es?'Descubrir pregunta':'Reveal question');
     pintarContadorPreguntas();
+    // Si el que salio ya no esta en el salon (cambio de aula), se empieza de cero.
+    if(_sorteoElegido && !(currentStudents||[]).some(x=>x.id===_sorteoElegido.id)) _sorteoElegido=null;
     pintarPremioSorteo();
-    pintarSorteo(null);
-    sortearEstudiante();
+    if(_sorteoElegido){
+        // Se vuelve con el mismo estudiante: salir a poner una nota no debe
+        // gastar un turno ni sacar a otro sin que el docente lo pida.
+        pintarSorteo(_sorteoElegido);
+        habilitarPremio(true);
+    } else {
+        pintarSorteo(null);
+        sortearEstudiante();
+    }
 };
 // Insignia que se le da al que responde bien. Se recuerda la elegida.
 function habilitarPremio(activo){
@@ -8994,12 +9003,13 @@ window.premiarElegido=function(){
     showNotification((es?'🏅 ':'🏅 ')+escapeHtml(badge.name||'')+' · '+escapeHtml(s.name||''),'success');
 };
 window.cerrarSorteo=function(){
-    _sorteoElegido=null;
     cancelarSecuencia();
     hideModal('sorteoModal');
 };
 window.reiniciarSorteo=function(){
-    _yaSorteados=[]; _preguntasUsadas=[];
+    _yaSorteados=[]; _preguntasUsadas=[]; _sorteoElegido=null;
+    habilitarPremio(false);
+    ocultarPregunta();
     pintarSorteo(null);
     showNotification(currentLanguage==='es'?'Ronda reiniciada: vuelven a entrar todos, y todas las preguntas':'Round reset: everyone and every question is back in','info');
 };
@@ -9107,7 +9117,6 @@ let _sorteoElegido=null;
 function rematarSorteo(elegido){
     _sorteoElegido=elegido;
     habilitarPremio(true);
-    _yaSorteados.push(elegido.id);
     pintarSorteo(elegido);
     const conf=document.getElementById('sorteoConfeti');
     if(conf){ conf.classList.remove('lanzar'); void conf.offsetWidth; conf.classList.add('lanzar'); }
@@ -9160,7 +9169,7 @@ window.descubrirPregunta=function(){
 // --- La secuencia completa -------------------------------------------------
 window.sortearEstudiante=function(){
     const es=currentLanguage==='es';
-    _sorteoElegido=null; habilitarPremio(false);
+    habilitarPremio(false);
     const c=candidatosSorteo();
     if(!c.lista.length){ pintarSorteo(null, es?'Nadie disponible':'Nobody available'); return; }
     let pozo=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0);
@@ -9173,6 +9182,10 @@ window.sortearEstudiante=function(){
         showNotification(es?'Ya salieron todos: empieza una vuelta nueva':'Everyone has had a turn: starting a new round','info');
     }
     const elegido=pozo[Math.floor(Math.random()*pozo.length)];
+    // Se apunta ya: aunque se cierre la ventana a mitad de la animacion, ese
+    // estudiante no vuelve a entrar hasta la proxima vuelta.
+    _yaSorteados.push(elegido.id);
+    _sorteoElegido=elegido;
     cancelarSecuencia();
     ocultarPregunta();
     const caja=document.getElementById('sorteoNombre');
