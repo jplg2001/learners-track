@@ -529,10 +529,16 @@ tr.fila-remota td { animation:filaRemota 1.7s ease-out; }
 .score-high { color:var(--success); }
 .score-mid { color:var(--warning); }
 .score-low { color:var(--danger); }
-#statisticsPage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
+#statisticsPage { display:none; padding:0; background:var(--bg-gradient); position:fixed; inset:0; z-index:100; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
 #statisticsPage.show { display:block; animation:fadeIn .3s; }
 /* === SORTEO DE ESTUDIANTE === */
 .sorteo-modal { max-width:640px; text-align:center; }
+.sorteo-premio { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin:10px 0 2px; font-size:.85rem; color:var(--fg-muted); }
+.sorteo-premio select { max-width:240px; padding:7px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.86rem; }
+.sorteo-premio-btn { background:linear-gradient(135deg,#f59e0b,#ef4467); }
+.sorteo-premio-btn:disabled { opacity:.5; cursor:not-allowed; filter:none; transform:none; }
+.sorteo-nombre.premiado { animation:sorteoPremiado .7s var(--ease-out-back); }
+@keyframes sorteoPremiado { 0%{ transform:scale(1); } 35%{ transform:scale(1.14); color:#f59e0b; } 100%{ transform:scale(1); } }
 .sorteo-modal h3 { margin:0 0 18px; font-size:1.4rem; }
 .sorteo-escenario { position:relative; display:flex; align-items:center; justify-content:center; min-height:150px; padding:18px 14px; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
 /* El nombre grande, para que se lea desde el fondo del salon. */
@@ -786,7 +792,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .fam-final span { font-size:.84rem; font-weight:700; color:var(--fg-muted); }
 .fam-estado.curso { color:var(--accent-strong); background:rgba(99,102,241,.1); }
 /* === PLANILLA DE ASISTENCIA === */
-#attendancePage { display:none; width:100vw; min-height:100vh; padding:0; background:var(--bg-gradient); position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
+#attendancePage { display:none; padding:0; background:var(--bg-gradient); position:fixed; inset:0; z-index:100; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
 #attendancePage.show { display:block; animation:fadeIn .3s; }
 #attendancePage .statistics-content { max-width:1180px; }
 .planilla-barra { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:20px; }
@@ -794,7 +800,7 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .planilla-barra select { font-family:inherit; font-size:.9rem; font-weight:600; color:var(--fg); background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:8px 11px; }
 /* La planilla de un mes es ancha: se desliza dentro de su recuadro y el
    nombre queda fijo a la izquierda para no perder de vista de quien es la fila. */
-.planilla-scroll { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-alt); }
+.planilla-scroll { overflow-x:auto; overflow-y:visible; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-alt); }
 .planilla-table { border-collapse:separate; border-spacing:0; width:100%; font-size:.82rem; }
 .planilla-table th,.planilla-table td { border-bottom:1px solid var(--border); border-right:1px solid var(--border); padding:7px 6px; text-align:center; white-space:nowrap; }
 .planilla-table thead th { position:sticky; top:0; z-index:2; background:var(--surface-2); color:var(--fg); font-weight:700; font-size:.76rem; }
@@ -2262,8 +2268,13 @@ tr.flash-m td { animation:flashM .9s ease-out; }
       </div>
       <button class="btn-primary pregunta-descubrir" type="button" id="preguntaDescubrir" onclick="descubrirPregunta()">👀 <span id="preguntaDescubrirTxt">Descubrir pregunta</span></button>
     </div>
+    <div class="sorteo-premio" id="sorteoPremio" hidden>
+      <label for="sorteoInsignia" id="sorteoInsigniaLbl">Insignia:</label>
+      <select id="sorteoInsignia" onchange="guardarInsigniaSorteo()"></select>
+    </div>
     <p class="sorteo-info" id="sorteoInfo"></p>
     <div class="sorteo-acciones">
+      <button class="btn-primary sorteo-premio-btn" type="button" id="sorteoDarBtn" onclick="premiarElegido()" disabled>🏅 <span id="sorteoDarTxt">Respondió bien</span></button>
       <button class="btn-primary" type="button" id="sorteoOtra" onclick="sortearEstudiante()">🎲 Sacar otro</button>
       <button class="btn-secondary" type="button" id="sorteoReset" onclick="reiniciarSorteo()">↻ Nueva ronda</button>
       <button class="btn-secondary" type="button" id="sorteoPreguntasBtn" onclick="abrirPreguntas()">✏️ <span id="sorteoPreguntasTxt">Preguntas del día</span> <span id="sorteoPreguntasN"></span></button>
@@ -5650,7 +5661,7 @@ function applyBadgeToRow(ri,ci,badge){
     const enRacha=[];
     for(let i=si;i<ei;i++){
         const s=currentStudents[i];
-        if(s&&s.gridBadges[ci]&&!s.gridBadges[ci].find(b=>b.id===badge.id)){
+        if(s&&s.gridBadges[ci]&&s.gridBadges[ci].length<MAX_INSIGNIAS_CELDA){
             s.gridBadges[ci].push(badge); cuantos++;
             if(typeof RACHA_HITOS!=='undefined' && RACHA_HITOS.indexOf(s.gridBadges[ci].length)>=0) enRacha.push(s);
         }
@@ -5686,9 +5697,18 @@ function gruposDelSalon(){
     return grupos;
 }
 window.updateStudentNameGrid=function(sid,val){const s=currentStudents.find(x=>x.id===sid);if(s){s.name=val.trim();saveData();updateStats();}};
+// Una misma insignia se puede repetir en la misma casilla: dos participaciones
+// en la misma clase valen dos. El tope evita que un clic pegado llene la celda.
+const MAX_INSIGNIAS_CELDA = 12;
 function addGridBadgeToCell(sid,ci,badge){
     const s=currentStudents.find(x=>x.id===sid);
-    if(!(s && s.gridBadges[ci]) || s.gridBadges[ci].find(b=>b.id===badge.id)) return;
+    if(!(s && s.gridBadges[ci])) return;
+    if(s.gridBadges[ci].length>=MAX_INSIGNIAS_CELDA){
+        showNotification(currentLanguage==='es'
+            ? `Esa casilla ya tiene ${MAX_INSIGNIAS_CELDA} insignias.`
+            : `That cell already has ${MAX_INSIGNIAS_CELDA} badges.`,'info');
+        return;
+    }
     s.gridBadges[ci].push(badge);
     saveData(); renderCurrentView(); updateStats();
     // Tres o mas insignias en la misma clase merecen su propia celebracion.
@@ -8822,10 +8842,63 @@ window.abrirSorteo=function(){
     t('preguntaFrenteTxt', es?'Pregunta sorpresa':'Surprise question');
     t('preguntaDescubrirTxt', es?'Descubrir pregunta':'Reveal question');
     pintarContadorPreguntas();
+    pintarPremioSorteo();
     pintarSorteo(null);
     sortearEstudiante();
 };
+// Insignia que se le da al que responde bien. Se recuerda la elegida.
+function habilitarPremio(activo){
+    const b=document.getElementById('sorteoDarBtn');
+    if(b) b.disabled=!activo || !(currentBadges||[]).length;
+}
+window.guardarInsigniaSorteo=function(){
+    const sel=document.getElementById('sorteoInsignia');
+    try{ if(sel) localStorage.setItem('lt_sorteoInsignia', sel.value); }catch(e){}
+};
+function pintarPremioSorteo(){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('sorteoPremio');
+    const sel=document.getElementById('sorteoInsignia');
+    const lista=(currentBadges||[]);
+    if(!caja||!sel) return;
+    caja.hidden = lista.length===0;
+    sel.innerHTML=lista.map(b=>`<option value="${escapeHtml(String(b.id))}">${escapeHtml(((b.icon&&!b.image)?b.icon+' ':'')+(b.name||''))}</option>`).join('');
+    let guardada=null;
+    try{ guardada=localStorage.getItem('lt_sorteoInsignia'); }catch(e){}
+    // Por defecto, la de participacion si existe.
+    const participacion=lista.find(b=>/particip/i.test(b.name||''));
+    const elegida = (guardada && lista.some(b=>String(b.id)===guardada)) ? guardada
+                  : (participacion ? String(participacion.id) : (lista[0]?String(lista[0].id):''));
+    if(elegida) sel.value=elegida;
+    const lbl=document.getElementById('sorteoInsigniaLbl'); if(lbl) lbl.textContent=es?'Insignia:':'Badge:';
+    const txt=document.getElementById('sorteoDarTxt'); if(txt) txt.textContent=es?'Respondió bien':'Good answer';
+    habilitarPremio(!!_sorteoElegido);
+}
+// Le da la insignia elegida al estudiante que acaba de salir, en la casilla de hoy.
+window.premiarElegido=function(){
+    const es=currentLanguage==='es';
+    const s=_sorteoElegido;
+    if(!s){ showNotification(es?'Primero saca a un estudiante':'Pick a student first','info'); return; }
+    const sel=document.getElementById('sorteoInsignia');
+    const badge=(currentBadges||[]).find(b=>String(b.id)===String(sel&&sel.value));
+    if(!badge){ showNotification(es?'Crea primero una insignia':'Create a badge first','info'); return; }
+    // Fin de semana: no hay columna de hoy, se usa el primer dia de la semana.
+    const ci = (typeof celdaDeHoy==='function' && celdaDeHoy()!==null)
+        ? celdaDeHoy()
+        : (Math.max(1,gridWeeks)-1)*weekDays.length;
+    addGridBadgeToCell(s.id, ci, badge);
+    const caja=document.getElementById('sorteoNombre');
+    if(caja){ caja.classList.remove('premiado'); void caja.offsetWidth; caja.classList.add('premiado'); }
+    const b=document.getElementById('sorteoDarBtn');
+    if(b){
+        b.disabled=true;
+        b.innerHTML='✅ '+(es?'¡Dada!':'Given!');
+        setTimeout(()=>{ b.innerHTML='🏅 <span id="sorteoDarTxt">'+(es?'Respondió bien':'Good answer')+'</span>'; habilitarPremio(!!_sorteoElegido); },1200);
+    }
+    showNotification((es?'🏅 ':'🏅 ')+escapeHtml(badge.name||'')+' · '+escapeHtml(s.name||''),'success');
+};
 window.cerrarSorteo=function(){
+    _sorteoElegido=null;
     cancelarSecuencia();
     hideModal('sorteoModal');
 };
@@ -8934,7 +9007,10 @@ function girarRuleta(lista,elegido,alTerminar){
 }
 
 // --- Etapa 3: el ganador ---------------------------------------------------
+let _sorteoElegido=null;
 function rematarSorteo(elegido){
+    _sorteoElegido=elegido;
+    habilitarPremio(true);
     _yaSorteados.push(elegido.id);
     pintarSorteo(elegido);
     const conf=document.getElementById('sorteoConfeti');
@@ -8988,6 +9064,7 @@ window.descubrirPregunta=function(){
 // --- La secuencia completa -------------------------------------------------
 window.sortearEstudiante=function(){
     const es=currentLanguage==='es';
+    _sorteoElegido=null; habilitarPremio(false);
     const c=candidatosSorteo();
     if(!c.lista.length){ pintarSorteo(null, es?'Nadie disponible':'Nobody available'); return; }
     let pozo=c.lista.filter(s=>_yaSorteados.indexOf(s.id)<0);
@@ -9620,7 +9697,7 @@ window.mandoInsignia=function(bid){
     const s=(currentStudents||[]).find(x=>x.id===_remoteAlumno);
     if(b&&s){
         // El celular no guarda nada: solo refleja lo que acaba de pedir.
-        if(Array.isArray(s.gridBadges[ci]) && !s.gridBadges[ci].find(x=>x.id===b.id)) s.gridBadges[ci].push(b);
+        if(Array.isArray(s.gridBadges[ci]) && s.gridBadges[ci].length<MAX_INSIGNIAS_CELDA) s.gridBadges[ci].push(b);
         showNotification(`🏅 ${b.name} → ${s.name}`,'success');
     }
 };
