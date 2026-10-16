@@ -2818,6 +2818,10 @@ tr.flash-m td { animation:flashM .9s ease-out; }
         <option value="noticias">Proyecto de noticias</option>
         <option value="comunidad">La comunidad</option>
         <option value="ciencia">Ciencia y espacio</option>
+        <option value="oficios">Oficios y construcción</option>
+        <option value="comida">Comida y servicio</option>
+        <option value="deportes">Deportes</option>
+        <option value="fantasia">Fantasía</option>
         <option value="todos">Todos los disfraces</option>
       </select>
       <button type="button" class="btn-secondary" id="disfracesRepartirBtn" onclick="repartirDisfraces()">🎬 Repartir roles</button>
@@ -5100,65 +5104,294 @@ function edadDeAlumno(s){
     return g>=4 ? 'joven' : 'peque';
 }
 
-// --- Catalogo de disfraces ---------------------------------------------------
-// Cada uno define el color de la ropa, lo que lleva en la cabeza, lo que sostiene
-// en cada mano y algun detalle en el pecho. Las manos van DENTRO del brazo, para
-// que los objetos se muevan con el.
-const DISFRACES = {
-  reportero: { emoji:'🎤', es:{f:'la reportera', m:'el reportero'}, en:'the reporter', color:'#1e3a8a', detalle:'#60a5fa',
-    pecho:'<rect x="112" y="134" width="20" height="14" rx="3" fill="#f8fafc"/><rect x="115" y="138" width="14" height="2.5" fill="#94a3b8"/><rect x="115" y="143" width="9" height="2.5" fill="#94a3b8"/>',
-    propD:'<rect x="-4" y="-78" width="8" height="26" rx="4" fill="#334155"/><circle cx="0" cy="-82" r="9" fill="#64748b"/><circle cx="-3" cy="-84" r="2.5" fill="#94a3b8"/>' },
-  camarografo: { emoji:'🎥', es:{f:'la camarógrafa', m:'el camarógrafo'}, en:'the camera operator', color:'#475569', detalle:'#94a3b8',
-    gorro:'<path d="M70 50q30-20 60 0l2 8H68Z" fill="#1e3a8a"/><path d="M68 56h26l-4 10q-18 0-22-10Z" fill="#1e40af"/>',
-    propD:'<rect x="-16" y="-86" width="34" height="24" rx="4" fill="#1f2937"/><circle cx="20" cy="-74" r="9" fill="#334155"/><circle cx="20" cy="-74" r="5" fill="#60a5fa"/><rect x="-12" y="-94" width="12" height="10" rx="3" fill="#374151"/><circle cx="-6" cy="-66" r="3" fill="#ef4467"/>' },
-  bombero: { emoji:'🚒', es:{f:'la bombera', m:'el bombero'}, en:'the firefighter', color:'#f59e0b', detalle:'#e2e8f0',
-    gorro:'<path d="M62 54q8-34 38-34t38 34q-16-12-38-12t-38 12Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="50" ry="10" fill="#b91c1c"/><path d="M92 28h16l4 22H88Z" fill="#fbbf24"/>',
-    propD:'<rect x="-3" y="-80" width="6" height="30" rx="3" fill="#92400e"/><path d="M-14 -86h20l6 8-6 8h-20Z" fill="#cbd5e1"/>' },
-  policia: { emoji:'👮', es:{f:'la policía', m:'el policía'}, en:'the police officer', color:'#1e40af', detalle:'#fbbf24',
-    gorro:'<path d="M66 50q34-24 68 0l2 8H64Z" fill="#1e3a8a"/><rect x="62" y="54" width="76" height="9" rx="4" fill="#111827"/><path d="M62 63h50q-8 10-26 10t-24-10Z" fill="#1f2937"/><circle cx="100" cy="42" r="6" fill="#fbbf24"/>',
-    pecho:'<path d="m118 134 4 4 6 1-4 5 1 6-5-3-5 3 1-6-4-5 6-1z" fill="#fbbf24"/>' },
-  doctor: { emoji:'🩺', es:{f:'la doctora', m:'el doctor'}, en:'the doctor', color:'#f8fafc', detalle:'#38bdf8',
-    pecho:'<path d="M88 122q-6 26 12 28t12-28" stroke="#334155" stroke-width="3.5" fill="none"/><circle cx="112" cy="152" r="6" fill="#64748b"/>',
-    propD:'<rect x="-11" y="-84" width="22" height="28" rx="3" fill="#e2e8f0"/><rect x="-7" y="-78" width="14" height="2.6" fill="#94a3b8"/><rect x="-7" y="-72" width="14" height="2.6" fill="#94a3b8"/><rect x="-7" y="-66" width="9" height="2.6" fill="#94a3b8"/>' },
-  chef: { emoji:'👨‍🍳', es:{f:'la chef', m:'el chef'}, en:'the chef', color:'#f8fafc', detalle:'#ef4467',
-    gorro:'<path d="M74 44h52v14H74Z" fill="#f1f5f9"/><circle cx="78" cy="34" r="15" fill="#f8fafc"/><circle cx="100" cy="26" r="18" fill="#f8fafc"/><circle cx="122" cy="34" r="15" fill="#f8fafc"/>',
-    pecho:'<path d="M84 128h32l6 46H78Z" fill="#fef3c7"/>',
-    propD:'<rect x="-3" y="-78" width="6" height="28" rx="3" fill="#b45309"/><ellipse cx="0" cy="-82" rx="11" ry="9" fill="#d97706"/>' },
-  astronauta: { emoji:'🚀', es:{f:'la astronauta', m:'el astronauta'}, en:'the astronaut', color:'#e2e8f0', detalle:'#38bdf8',
-    pecho:'<rect x="86" y="130" width="28" height="18" rx="4" fill="#cbd5e1"/><circle cx="94" cy="139" r="3" fill="#22c55e"/><circle cx="104" cy="139" r="3" fill="#ef4467"/>',
-    casco:'<circle cx="100" cy="72" r="43" fill="#bae6fd" opacity=".45"/><circle cx="100" cy="72" r="43" fill="none" stroke="#e2e8f0" stroke-width="7"/><path d="M74 48q16-12 34-8" stroke="#f8fafc" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>',
-    propD:'<rect x="-2" y="-84" width="5" height="34" rx="2" fill="#94a3b8"/><path d="M3 -84h26l-6 9 6 9H3Z" fill="#38bdf8"/>' },
-  cientifico: { emoji:'🔬', es:{f:'la científica', m:'el científico'}, en:'the scientist', color:'#f8fafc', detalle:'#a855f7',
-    gafas:'<circle cx="88" cy="76" r="11" fill="none" stroke="#334155" stroke-width="3.5"/><circle cx="112" cy="76" r="11" fill="none" stroke="#334155" stroke-width="3.5"/><path d="M99 76h2" stroke="#334155" stroke-width="3.5"/>',
-    propD:'<path d="M-7 -84h14v10l9 22a4 4 0 0 1-4 6h-24a4 4 0 0 1-4-6l9-22Z" fill="#c4b5fd" opacity=".85"/><path d="M-12 -58h24l-5-12h-14Z" fill="#22c55e"/><circle cx="-2" cy="-64" r="2.5" fill="#86efac"/>' },
-  futbolista: { emoji:'⚽', es:{f:'la futbolista', m:'el futbolista'}, en:'the footballer', color:'#16a34a', detalle:'#f8fafc',
-    pecho:'<path d="M90 120h8v56h-8ZM110 120h8v56h-8Z" fill="#f8fafc" opacity=".85"/>',
-    suelo:'<circle cx="150" cy="232" r="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><path d="m150 220 7 5-3 9h-8l-3-9z" fill="#1f2937"/><path d="m137 228 5 8M163 228l-5 8" stroke="#1f2937" stroke-width="3"/>' },
-  artista: { emoji:'🎨', es:{f:'la artista', m:'el artista'}, en:'the artist', color:'#0ea5e9', detalle:'#fbbf24',
-    gorro:'<ellipse cx="100" cy="44" rx="38" ry="14" fill="#ef4467"/><circle cx="100" cy="30" r="6" fill="#be123c"/>',
-    pecho:'<circle cx="86" cy="150" r="5" fill="#fbbf24"/><circle cx="104" cy="160" r="4" fill="#22c55e"/><circle cx="116" cy="144" r="4" fill="#ef4467"/>',
-    propI:'<ellipse cx="0" cy="-74" rx="18" ry="14" fill="#d9a066"/><circle cx="-6" cy="-80" r="3.5" fill="#ef4467"/><circle cx="2" cy="-82" r="3.5" fill="#38bdf8"/><circle cx="8" cy="-74" r="3.5" fill="#fbbf24"/><circle cx="-2" cy="-68" r="3.5" fill="#22c55e"/>',
-    propD:'<rect x="-2" y="-82" width="5" height="26" rx="2" fill="#b45309"/><path d="M-4 -86h9l-2-8h-5Z" fill="#334155"/>' },
-  superheroe: { emoji:'🦸', es:{f:'la superheroína', m:'el superhéroe'}, en:'the superhero', color:'#2563eb', detalle:'#fbbf24',
-    capa:'<path d="M66 120q-20 64-12 112h92q8-48-12-112l-16-4q-18 16-36 0Z" fill="#dc2626"/><path d="M72 120q-14 58-10 102h12q-6-52 8-98Z" fill="#ef4444" opacity=".8"/>',
-    pecho:'<path d="m104 126-14 24h10l-6 20 18-26h-10l8-18z" fill="#fbbf24"/>',
-    antifaz:'<path d="M70 70h60l-4 16q-14 6-26 0-12 6-26 0Z" fill="#1d4ed8"/><path d="M82 76q6-6 12 0M106 76q6-6 12 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/>' },
-  explorador: { emoji:'🧭', es:{f:'la exploradora', m:'el explorador'}, en:'the explorer', color:'#65a30d', detalle:'#a16207',
-    gorro:'<ellipse cx="100" cy="52" rx="52" ry="12" fill="#a16207"/><path d="M72 50q6-26 28-26t28 26q-14-8-28-8t-28 8Z" fill="#ca8a04"/><path d="M50 50h100v5H50Z" fill="#854d0e"/>',
-    pecho:'<rect x="84" y="134" width="18" height="14" rx="3" fill="#ca8a04"/><rect x="110" y="134" width="18" height="14" rx="3" fill="#ca8a04"/>',
-    propD:'<rect x="-13" y="-80" width="26" height="16" rx="4" fill="#1f2937"/><circle cx="-7" cy="-72" r="7" fill="#334155"/><circle cx="7" cy="-72" r="7" fill="#334155"/><circle cx="-7" cy="-72" r="3" fill="#60a5fa"/><circle cx="7" cy="-72" r="3" fill="#60a5fa"/>' },
-  mago: { emoji:'🪄', es:{f:'la maga', m:'el mago'}, en:'the magician', color:'#6d28d9', detalle:'#fbbf24',
-    gorro:'<ellipse cx="100" cy="46" rx="50" ry="11" fill="#2e1065"/><path d="M100 0 74 46h52Z" fill="#4c1d95"/><path d="M84 36h32l2 8H82Z" fill="#fbbf24"/>',
-    pecho:'<path d="m100 130 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fbbf24"/>',
-    propD:'<rect x="-2" y="-86" width="5" height="32" rx="2" fill="#1f2937"/><path d="m0 -94 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fde68a"/>' },
-  cantante: { emoji:'🎙️', es:{f:'la cantante', m:'el cantante'}, en:'the singer', color:'#db2777', detalle:'#fbbf24',
-    pecho:'<path d="M88 126q12 10 24 0l4 10q-16 12-32 0Z" fill="#fbbf24"/>',
-    propD:'<rect x="-3" y="-76" width="7" height="24" rx="3.5" fill="#1f2937"/><ellipse cx="0" cy="-82" rx="10" ry="12" fill="#475569"/><ellipse cx="0" cy="-84" rx="6" ry="7" fill="#94a3b8"/>' },
-  jardinero: { emoji:'🌻', es:{f:'la jardinera', m:'el jardinero'}, en:'the gardener', color:'#15803d', detalle:'#a3e635',
-    gorro:'<ellipse cx="100" cy="50" rx="48" ry="13" fill="#fcd34d"/><path d="M76 48q4-24 24-24t24 24q-12-8-24-8t-24 8Z" fill="#fbbf24"/>',
-    propD:'<rect x="-2" y="-80" width="5" height="30" rx="2" fill="#16a34a"/><circle cx="0" cy="-86" r="8" fill="#fbbf24"/><circle cx="0" cy="-86" r="3.5" fill="#92400e"/><path d="M-10 -62q10-6 18 0" stroke="#16a34a" stroke-width="3" fill="none"/>' }
+// --- Piezas sueltas de los disfraces ----------------------------------------
+// Sombreros, cascos y objetos que se repiten en varias profesiones. Las piezas de
+// cabeza van en coordenadas del dibujo (la cara esta en 100,74); las de las manos
+// van en coordenadas del brazo, con la mano en (0,-64).
+const PZ = {
+  gorra:(c,v)=>`<path d="M66 50q34-24 68 0l2 8H64Z" fill="${c}"/><path d="M60 56h32l-4 10q-24 0-28-10Z" fill="${v||c}"/>`,
+  gorraAtras:(c,v)=>`<path d="M70 50q30-20 60 0l2 8H68Z" fill="${c}"/><path d="M130 56h26l-4 10h-22Z" fill="${v||c}"/>`,
+  casco:(c,b)=>`<path d="M62 54q8-34 38-34t38 34q-16-12-38-12t-38 12Z" fill="${c}"/><ellipse cx="100" cy="56" rx="50" ry="10" fill="${b||c}"/>`,
+  cascoObra:(c)=>`<path d="M66 52q6-32 34-32t34 32q-16-10-34-10t-34 10Z" fill="${c}"/><rect x="94" y="20" width="12" height="28" rx="5" fill="#f8fafc" opacity=".5"/><ellipse cx="100" cy="54" rx="48" ry="9" fill="${c}"/>`,
+  cascoRedondo:(c,v)=>`<path d="M66 60q0-38 34-38t34 38q-16-10-34-10t-34 10Z" fill="${c}"/><path d="M62 58h76v7H62Z" fill="${v||'#1f2937'}"/>`,
+  sombrero:(ala,copa)=>`<ellipse cx="100" cy="50" rx="50" ry="12" fill="${ala}"/><path d="M74 48q6-26 26-26t26 26q-13-8-26-8t-26 8Z" fill="${copa}"/>`,
+  sombreroCopa:(c,cinta)=>`<ellipse cx="100" cy="52" rx="44" ry="11" fill="${c}"/><path d="M76 52V20h48v32Z" fill="${c}"/><path d="M76 42h48v8H76Z" fill="${cinta||'#fbbf24'}"/>`,
+  gorroAlto:(c)=>`<path d="M74 44h52v14H74Z" fill="#f1f5f9"/><circle cx="78" cy="34" r="15" fill="${c}"/><circle cx="100" cy="26" r="18" fill="${c}"/><circle cx="122" cy="34" r="15" fill="${c}"/>`,
+  boina:(c)=>`<ellipse cx="100" cy="44" rx="38" ry="14" fill="${c}"/><circle cx="100" cy="30" r="6" fill="${c}"/>`,
+  cofia:(cruz)=>`<path d="M72 48q28-18 56 0l-3 11H75Z" fill="#f8fafc"/>${cruz?'<path d="M96 44h8v5h5v8h-5v5h-8v-5h-5v-8h5z" fill="#ef4467"/>':''}`,
+  panoleta:(c)=>`<path d="M70 54q30-22 60 0l-6 8H76Z" fill="${c}"/><path d="M124 58l14 10-16 2Z" fill="${c}"/>`,
+  pico:(c,cinta)=>`<ellipse cx="100" cy="46" rx="50" ry="11" fill="${c}"/><path d="M100 0 74 46h52Z" fill="${c}"/>${cinta?`<path d="M84 36h32l2 8H82Z" fill="${cinta}"/>`:''}`,
+  corona:()=>`<path d="M70 50 64 20l18 12 18-18 18 18 18-12-6 30z" fill="#fbbf24"/><circle cx="100" cy="36" r="4" fill="#ef4467"/>`,
+  diadema:(c)=>`<path d="M68 54q32-26 64 0" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="68" cy="56" r="5" fill="${c}"/><circle cx="132" cy="56" r="5" fill="${c}"/>`,
+  audifonos:(c,mic)=>`<path d="M68 74V62q0-32 32-32t32 32v12" stroke="${c}" stroke-width="7" fill="none"/><rect x="58" y="66" width="16" height="24" rx="7" fill="${c}"/><rect x="126" y="66" width="16" height="24" rx="7" fill="${c}"/>${mic?`<path d="M66 88q0 14 18 14" stroke="${c}" stroke-width="4" fill="none"/><circle cx="86" cy="102" r="5" fill="${c}"/>`:''}`,
+  gafas:(c)=>`<circle cx="88" cy="76" r="11" fill="none" stroke="${c}" stroke-width="3.5"/><circle cx="112" cy="76" r="11" fill="none" stroke="${c}" stroke-width="3.5"/><path d="M99 76h2" stroke="${c}" stroke-width="3.5"/>`,
+  gafasSol:()=>`<path d="M74 70h52v6q0 14-13 14t-13-12q0 12-13 12t-13-14Z" fill="#1f2937"/>`,
+  gafasBuceo:()=>`<rect x="70" y="64" width="60" height="26" rx="10" fill="#bae6fd" opacity=".8"/><rect x="70" y="64" width="60" height="26" rx="10" fill="none" stroke="#0ea5e9" stroke-width="4"/><path d="M62 70h-8M146 70h8" stroke="#0ea5e9" stroke-width="5"/>`,
+  mascarilla:(c)=>`<path d="M74 86q26 14 52 0l-5 18q-21 11-42 0Z" fill="${c||'#bae6fd'}"/><path d="M74 88l-12-6M126 88l12-6" stroke="#cbd5e1" stroke-width="3"/>`,
+  antifaz:(c)=>`<path d="M70 70h60l-4 16q-14 6-26 0-12 6-26 0Z" fill="${c}"/><path d="M82 76q6-6 12 0M106 76q6-6 12 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  // --- en las manos ---
+  palo:(c,alto,x)=>`<rect x="${(x||0)-3}" y="${-52-(alto||26)}" width="6" height="${alto||26}" rx="3" fill="${c}"/>`,
+  libro:(c)=>`<path d="M-15 -84h30v26h-30Z" fill="${c}"/><path d="M-15 -84h14v26h-14Z" fill="#f8fafc" opacity=".4"/><path d="M-15 -84h30v4h-30Z" fill="#f8fafc" opacity=".6"/>`,
+  maletin:(c)=>`<rect x="-15" y="-78" width="30" height="24" rx="4" fill="${c}"/><rect x="-6" y="-83" width="12" height="7" rx="3" fill="${c}"/><rect x="-15" y="-68" width="30" height="4" fill="#00000022"/>`,
+  tableta:(c,p)=>`<rect x="-13" y="-86" width="26" height="32" rx="4" fill="${c}"/><rect x="-9" y="-82" width="18" height="24" rx="2" fill="${p||'#bae6fd'}"/>`,
+  bola:(c,r)=>`<circle cx="0" cy="-74" r="${r||12}" fill="${c}"/>`,
+  banderin:(c)=>`<rect x="-2" y="-92" width="5" height="38" rx="2" fill="#94a3b8"/><path d="M3 -92h26l-7 9 7 9H3Z" fill="${c}"/>`,
+  flor:(c)=>`<rect x="-2" y="-78" width="5" height="26" rx="2" fill="#16a34a"/><circle cx="0" cy="-84" r="8" fill="${c}"/><circle cx="0" cy="-84" r="3.5" fill="#fbbf24"/>`,
+  lupa:()=>`<circle cx="0" cy="-82" r="11" fill="#bae6fd" opacity=".7"/><circle cx="0" cy="-82" r="11" fill="none" stroke="#475569" stroke-width="4"/><rect x="-2" y="-70" width="5" height="16" rx="2" fill="#475569" transform="rotate(20)"/>`,
+  llaveInglesa:()=>`<rect x="-3" y="-84" width="7" height="30" rx="3" fill="#94a3b8"/><path d="M-9 -92h18l-4 8h-10Z" fill="#64748b"/>`,
+  martillo:()=>`<rect x="-3" y="-80" width="6" height="26" rx="3" fill="#a16207"/><rect x="-14" y="-92" width="28" height="12" rx="3" fill="#64748b"/>`,
+  tijeras:()=>`<path d="M-8 -82 4 -60M8 -82-4 -60" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><circle cx="-6" cy="-56" r="5" fill="none" stroke="#334155" stroke-width="3"/><circle cx="6" cy="-56" r="5" fill="none" stroke="#334155" stroke-width="3"/>`,
+  camara:()=>`<rect x="-14" y="-84" width="28" height="20" rx="4" fill="#1f2937"/><circle cx="0" cy="-74" r="8" fill="#334155"/><circle cx="0" cy="-74" r="4" fill="#60a5fa"/><rect x="-6" y="-90" width="12" height="7" rx="2" fill="#374151"/>`,
+  microfono:()=>`<rect x="-4" y="-78" width="8" height="26" rx="4" fill="#334155"/><circle cx="0" cy="-82" r="9" fill="#64748b"/><circle cx="-3" cy="-84" r="2.5" fill="#94a3b8"/>`,
+  raqueta:(c)=>`<rect x="-3" y="-74" width="6" height="22" rx="3" fill="#a16207"/><ellipse cx="0" cy="-86" rx="13" ry="17" fill="none" stroke="${c}" stroke-width="5"/><path d="M-9 -86h18M0 -101v30" stroke="${c}" stroke-width="2" opacity=".6"/>`,
+  guitarra:()=>`<rect x="2" y="-104" width="7" height="34" rx="3" fill="#a16207" transform="rotate(14)"/><ellipse cx="-4" cy="-62" rx="18" ry="22" fill="#d97706" transform="rotate(14)"/><circle cx="-4" cy="-64" r="6" fill="#78350f"/>`,
+  carta:()=>`<rect x="-13" y="-80" width="26" height="18" rx="2" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><path d="M-13 -80 0 -70l13-10" fill="none" stroke="#cbd5e1" stroke-width="2"/>`,
+  helado:()=>`<path d="M-9 -74h18l-9 22Z" fill="#d97706"/><circle cx="-4" cy="-80" r="8" fill="#f9a8d4"/><circle cx="5" cy="-82" r="8" fill="#bae6fd"/><circle cx="0" cy="-90" r="8" fill="#fde68a"/>`,
+  bandeja:()=>`<ellipse cx="0" cy="-70" rx="22" ry="7" fill="#cbd5e1"/><rect x="-7" y="-82" width="14" height="12" rx="3" fill="#f8fafc"/><circle cx="0" cy="-86" r="5" fill="#fbbf24"/>`,
+  vaso:(c)=>`<path d="M-9 -84h18l-3 26h-12Z" fill="#f8fafc"/><rect x="-10" y="-88" width="20" height="6" rx="3" fill="${c||'#92400e'}"/><path d="M-6 -62h12" stroke="#cbd5e1" stroke-width="2"/>`,
+  pan:()=>`<ellipse cx="0" cy="-76" rx="20" ry="10" fill="#d97706" transform="rotate(-20)"/><path d="M-12 -84l6 6M-4 -88l6 6M4 -92l6 6" stroke="#92400e" stroke-width="2.5"/>`,
+  telescopio:()=>`<rect x="-6" y="-96" width="12" height="40" rx="5" fill="#334155" transform="rotate(26)"/><circle cx="12" cy="-92" r="7" fill="#60a5fa"/>`,
+  planos:()=>`<rect x="-15" y="-80" width="30" height="22" rx="3" fill="#dbeafe"/><path d="M-10 -74h20M-10 -68h14M-10 -62h8" stroke="#2563eb" stroke-width="2.5"/>`,
+  portapapeles:()=>`<rect x="-11" y="-84" width="22" height="28" rx="3" fill="#e2e8f0"/><rect x="-5" y="-88" width="10" height="7" rx="2" fill="#94a3b8"/><path d="M-6 -76h12M-6 -70h12M-6 -64h8" stroke="#94a3b8" stroke-width="2.5"/>`,
+  mazo:()=>`<rect x="-3" y="-78" width="6" height="24" rx="3" fill="#a16207"/><rect x="-13" y="-92" width="26" height="14" rx="4" fill="#92400e"/>`,
+  balanza:()=>`<rect x="-2" y="-88" width="5" height="34" rx="2" fill="#94a3b8"/><path d="M-16 -86h34" stroke="#94a3b8" stroke-width="4"/><path d="M-16 -86 -22 -74h12ZM18 -86l-6 12h12Z" fill="#cbd5e1"/>`,
+  linterna:()=>`<rect x="-5" y="-78" width="10" height="22" rx="3" fill="#334155"/><path d="M-9 -88h18l4-8h-26Z" fill="#fbbf24" opacity=".8"/>`,
+  flotador:()=>`<circle cx="0" cy="-76" r="16" fill="#ef4467"/><circle cx="0" cy="-76" r="7" fill="#f8fafc"/><path d="M-16 -76h32" stroke="#f8fafc" stroke-width="4"/>`,
+  cana:()=>`<rect x="-2" y="-104" width="5" height="46" rx="2" fill="#a16207" transform="rotate(16)"/><path d="M14 -98q8 18 2 30" stroke="#94a3b8" stroke-width="2" fill="none"/><path d="m16 -66 4 6-6 2Z" fill="#60a5fa"/>`,
+  pala:()=>`<rect x="-3" y="-86" width="6" height="30" rx="3" fill="#a16207"/><path d="M-10 -56h20l-4 16h-12Z" fill="#94a3b8"/>`,
+  regadera:()=>`<rect x="-14" y="-78" width="24" height="20" rx="4" fill="#38bdf8"/><path d="M10 -74h12l6-8" stroke="#38bdf8" stroke-width="5" fill="none"/><path d="M-14 -72h-6" stroke="#38bdf8" stroke-width="5"/>`,
+  extintor:()=>`<rect x="-8" y="-84" width="16" height="28" rx="6" fill="#dc2626"/><rect x="-3" y="-90" width="6" height="8" rx="2" fill="#64748b"/><rect x="-8" y="-72" width="16" height="5" fill="#f8fafc" opacity=".6"/>`,
+  jeringa:()=>`<rect x="-3" y="-86" width="7" height="24" rx="2" fill="#e0f2fe"/><rect x="-3" y="-80" width="7" height="12" fill="#38bdf8"/><rect x="-1" y="-62" width="3" height="10" fill="#94a3b8"/><rect x="-7" y="-90" width="14" height="5" rx="2" fill="#94a3b8"/>`,
+  gato:()=>`<ellipse cx="0" cy="-66" rx="15" ry="12" fill="#fbbf24"/><circle cx="0" cy="-80" r="11" fill="#fbbf24"/><path d="M-9 -88l-2-10 9 5zM9 -88l2-10-9 5z" fill="#fbbf24"/><circle cx="-4" cy="-81" r="2" fill="#1f2937"/><circle cx="4" cy="-81" r="2" fill="#1f2937"/>`,
+  robot:()=>`<rect x="-12" y="-84" width="24" height="22" rx="4" fill="#94a3b8"/><circle cx="-5" cy="-76" r="3.5" fill="#38bdf8"/><circle cx="5" cy="-76" r="3.5" fill="#38bdf8"/><rect x="-6" y="-68" width="12" height="3" fill="#475569"/>`,
+  paleta:()=>`<ellipse cx="0" cy="-74" rx="18" ry="14" fill="#d9a066"/><circle cx="-6" cy="-80" r="3.5" fill="#ef4467"/><circle cx="2" cy="-82" r="3.5" fill="#38bdf8"/><circle cx="8" cy="-74" r="3.5" fill="#fbbf24"/><circle cx="-2" cy="-68" r="3.5" fill="#22c55e"/>`,
+  pincel:()=>`<rect x="-2" y="-82" width="5" height="26" rx="2" fill="#b45309"/><path d="M-4 -86h9l-2-8h-5Z" fill="#334155"/>`,
+  batuta:()=>`<rect x="-2" y="-92" width="4" height="34" rx="2" fill="#f8fafc" transform="rotate(18)"/><circle cx="-8" cy="-56" r="4" fill="#92400e"/>`,
+  mapa:()=>`<path d="M-16 -80 -4 -84l10 4 10-4v26l-10 4-10-4-12 4Z" fill="#fde68a" stroke="#d97706" stroke-width="2"/><path d="M-4 -84v26M6 -80v26" stroke="#d97706" stroke-width="2"/>`,
+  hueso:()=>`<rect x="-14" y="-76" width="28" height="7" rx="3" fill="#f8fafc"/><circle cx="-15" cy="-78" r="5" fill="#f8fafc"/><circle cx="-15" cy="-70" r="5" fill="#f8fafc"/><circle cx="15" cy="-78" r="5" fill="#f8fafc"/><circle cx="15" cy="-70" r="5" fill="#f8fafc"/>`,
+  volante:()=>`<circle cx="0" cy="-74" r="16" fill="none" stroke="#1f2937" stroke-width="6"/><path d="M-16 -74h32M0 -74v16" stroke="#1f2937" stroke-width="5"/>`,
+  ancla:()=>`<rect x="-2" y="-88" width="5" height="30" rx="2" fill="#94a3b8"/><circle cx="0" cy="-90" r="6" fill="none" stroke="#94a3b8" stroke-width="4"/><path d="M-14 -66q14 16 28 0" stroke="#94a3b8" stroke-width="5" fill="none"/>`,
+  silbato:()=>`<path d="M-12 -78h16l8 6-8 6h-16a6 6 0 0 1 0-12Z" fill="#fbbf24"/><circle cx="-10" cy="-72" r="3" fill="#92400e"/>`,
+  escoba:()=>`<rect x="-2" y="-94" width="5" height="34" rx="2" fill="#a16207"/><path d="M-10 -60h18l4 16h-26Z" fill="#d97706"/>`,
+  bolsaReciclaje:()=>`<path d="M-13 -78h26l-3 26h-20Z" fill="#22c55e"/><path d="M-6 -84h12v6h-12Z" fill="#16a34a"/><path d="M-4 -70h8l-4 8Z" fill="#dcfce7"/>`,
+  canasta:()=>`<path d="M-14 -76h28l-4 20h-20Z" fill="#d97706"/><path d="M-14 -76q14-14 28 0" fill="none" stroke="#92400e" stroke-width="3"/>`,
+  calculadora:()=>`<rect x="-11" y="-82" width="22" height="28" rx="3" fill="#334155"/><rect x="-7" y="-78" width="14" height="7" rx="2" fill="#bbf7d0"/><circle cx="-5" cy="-66" r="2" fill="#94a3b8"/><circle cx="1" cy="-66" r="2" fill="#94a3b8"/><circle cx="7" cy="-66" r="2" fill="#94a3b8"/>`,
+  cuchara:()=>`<rect x="-3" y="-78" width="6" height="28" rx="3" fill="#b45309"/><ellipse cx="0" cy="-82" rx="11" ry="9" fill="#d97706"/>`,
+  hacha:()=>`<rect x="-3" y="-80" width="6" height="30" rx="3" fill="#92400e"/><path d="M-14 -86h20l6 8-6 8h-20Z" fill="#cbd5e1"/>`,
+  matraz:()=>`<path d="M-7 -84h14v10l9 22a4 4 0 0 1-4 6h-24a4 4 0 0 1-4-6l9-22Z" fill="#c4b5fd" opacity=".85"/><path d="M-12 -58h24l-5-12h-14Z" fill="#22c55e"/>`,
+  varita:()=>`<rect x="-2" y="-86" width="5" height="32" rx="2" fill="#1f2937"/><path d="m0 -94 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fde68a"/>`,
+  serrucho:()=>`<path d="M-16 -80h30v8l-30 4Z" fill="#cbd5e1"/><path d="M-16 -68l4 4 4-4 4 4 4-4 4 4 4-4" fill="none" stroke="#94a3b8" stroke-width="3"/><rect x="14" y="-82" width="10" height="12" rx="3" fill="#92400e"/>`,
+  bombillo:()=>`<circle cx="0" cy="-82" r="11" fill="#fde68a"/><rect x="-5" y="-72" width="10" height="8" rx="2" fill="#94a3b8"/><path d="M-4 -84h8M-4 -79h8" stroke="#d97706" stroke-width="2"/>`,
+  llaveTubo:()=>`<rect x="-3" y="-86" width="7" height="30" rx="3" fill="#64748b"/><path d="M-12 -92h14v10h-8l-6-4Z" fill="#94a3b8"/>`,
+  cinta:()=>`<circle cx="0" cy="-74" r="13" fill="#fbbf24"/><circle cx="0" cy="-74" r="5" fill="#f8fafc"/><path d="M12 -70q10 8 14 18" stroke="#fbbf24" stroke-width="4" fill="none"/>`,
+  binoculares:()=>`<rect x="-13" y="-80" width="26" height="16" rx="4" fill="#1f2937"/><circle cx="-7" cy="-72" r="7" fill="#334155"/><circle cx="7" cy="-72" r="7" fill="#334155"/><circle cx="-7" cy="-72" r="3" fill="#60a5fa"/><circle cx="7" cy="-72" r="3" fill="#60a5fa"/>`,
+  bandera:(c)=>`<rect x="-2" y="-94" width="5" height="40" rx="2" fill="#94a3b8"/><path d="M3 -94h26l-6 9 6 9H3Z" fill="${c}"/>`,
+  nube:()=>`<ellipse cx="-2" cy="-74" rx="15" ry="10" fill="#f8fafc"/><ellipse cx="8" cy="-70" rx="10" ry="8" fill="#f8fafc"/><circle cx="10" cy="-84" r="8" fill="#fbbf24"/>`,
+  estetoscopio:()=>`<path d="M-10 -84q-8 16 4 24t12-10" stroke="#334155" stroke-width="3.5" fill="none"/><circle cx="8" cy="-58" r="6" fill="#64748b"/>`
 };
-const DISFRACES_ORDEN = ['reportero','camarografo','policia','bombero','doctor','chef','cientifico','astronauta','futbolista','artista','superheroe','explorador','mago','cantante','jardinero'];
+
+// --- Catalogo de disfraces ---------------------------------------------------
+// Cada profesion define el color de la ropa, lo que lleva en la cabeza y lo que
+// sostiene en las manos. Las manos van DENTRO del brazo, para que los objetos se
+// muevan con el. 'cat' agrupa el listado en la ventana de disfraces.
+const DIS_CATS = {
+  comunidad: { es:'Comunidad y salud', en:'Community and health' },
+  comida:    { es:'Comida y servicio', en:'Food and service' },
+  oficios:   { es:'Oficios y construcción', en:'Trades and building' },
+  viajes:    { es:'Viajes y rescate', en:'Travel and rescue' },
+  ciencia:   { es:'Ciencia y tecnología', en:'Science and technology' },
+  arte:      { es:'Arte, letras y escenario', en:'Arts, words and stage' },
+  deportes:  { es:'Deportes', en:'Sports' },
+  fantasia:  { es:'Fantasía', en:'Fantasy' }
+};
+const DISFRACES = {
+  // ---------------- Comunidad y salud ----------------
+  policia:     { cat:'comunidad', emoji:'👮', es:{f:'la policía', m:'el policía'}, en:'the police officer', color:'#1e40af',
+                 gorro:PZ.gorra('#1e3a8a','#111827'), pecho:'<path d="m118 134 4 4 6 1-4 5 1 6-5-3-5 3 1-6-4-5 6-1z" fill="#fbbf24"/>' },
+  bombero:     { cat:'comunidad', emoji:'🚒', es:{f:'la bombera', m:'el bombero'}, en:'the firefighter', color:'#f59e0b',
+                 gorro:PZ.casco('#dc2626','#b91c1c')+'<path d="M92 28h16l4 22H88Z" fill="#fbbf24"/>', propD:PZ.hacha() },
+  paramedico:  { cat:'comunidad', emoji:'🚑', es:{f:'la paramédica', m:'el paramédico'}, en:'the paramedic', color:'#f8fafc',
+                 pecho:'<path d="M94 128h12v8h8v12h-8v8H94v-8h-8v-12h8z" fill="#ef4467"/>', propD:PZ.maletin('#ef4467') },
+  doctor:      { cat:'comunidad', emoji:'🩺', es:{f:'la doctora', m:'el doctor'}, en:'the doctor', color:'#f8fafc',
+                 pecho:'<path d="M88 122q-6 26 12 28t12-28" stroke="#334155" stroke-width="3.5" fill="none"/><circle cx="112" cy="152" r="6" fill="#64748b"/>', propD:PZ.portapapeles() },
+  enfermero:   { cat:'comunidad', emoji:'💉', es:{f:'la enfermera', m:'el enfermero'}, en:'the nurse', color:'#bae6fd',
+                 gorro:PZ.cofia(true), propD:PZ.jeringa() },
+  dentista:    { cat:'comunidad', emoji:'🦷', es:{f:'la dentista', m:'el dentista'}, en:'the dentist', color:'#f8fafc',
+                 gafas:PZ.mascarilla('#99f6e4'), propD:'<rect x="-3" y="-78" width="6" height="24" rx="3" fill="#38bdf8"/><path d="M-9 -88q9-8 18 0 2 10-9 14-11-4-9-14Z" fill="#f8fafc"/>' },
+  veterinario: { cat:'comunidad', emoji:'🐾', es:{f:'la veterinaria', m:'el veterinario'}, en:'the vet', color:'#f8fafc',
+                 pecho:'<circle cx="104" cy="138" r="7" fill="#22c55e"/><circle cx="98" cy="129" r="3" fill="#22c55e"/><circle cx="110" cy="129" r="3" fill="#22c55e"/>', propD:PZ.gato() },
+  cartero:     { cat:'comunidad', emoji:'📬', es:{f:'la cartera', m:'el cartero'}, en:'the postal worker', color:'#2563eb',
+                 gorro:PZ.gorra('#1d4ed8','#1e3a8a'), propD:PZ.carta() },
+  vigilante:   { cat:'comunidad', emoji:'🔦', es:{f:'la vigilante', m:'el vigilante'}, en:'the security guard', color:'#334155',
+                 gorro:PZ.gorra('#1f2937','#111827'), propD:PZ.linterna() },
+  salvavidas:  { cat:'comunidad', emoji:'🛟', es:{f:'la salvavidas', m:'el salvavidas'}, en:'the lifeguard', color:'#ef4467',
+                 gafasSol:true, propD:PZ.flotador(), propI:PZ.silbato() },
+  reciclador:  { cat:'comunidad', emoji:'♻️', es:{f:'la recicladora', m:'el reciclador'}, en:'the recycler', color:'#16a34a',
+                 gorro:PZ.gorra('#15803d','#14532d'), propD:PZ.bolsaReciclaje() },
+  jardinero:   { cat:'comunidad', emoji:'🌻', es:{f:'la jardinera', m:'el jardinero'}, en:'the gardener', color:'#15803d',
+                 gorro:PZ.sombrero('#fcd34d','#fbbf24'), propD:PZ.flor('#fbbf24'), propI:PZ.regadera() },
+  campesino:   { cat:'comunidad', emoji:'🌽', es:{f:'la campesina', m:'el campesino'}, en:'the farmer', color:'#65a30d',
+                 gorro:PZ.sombrero('#ca8a04','#eab308'), propD:PZ.pala() },
+  pescador:    { cat:'comunidad', emoji:'🎣', es:{f:'la pescadora', m:'el pescador'}, en:'the fisher', color:'#0ea5e9',
+                 gorro:PZ.sombrero('#fbbf24','#f59e0b'), propD:PZ.cana() },
+  // ---------------- Comida y servicio ----------------
+  chef:        { cat:'comida', emoji:'👨‍🍳', es:{f:'la chef', m:'el chef'}, en:'the chef', color:'#f8fafc',
+                 gorro:PZ.gorroAlto('#f8fafc'), pecho:'<path d="M84 128h32l6 46H78Z" fill="#fef3c7"/>', propD:PZ.cuchara() },
+  panadero:    { cat:'comida', emoji:'🥖', es:{f:'la panadera', m:'el panadero'}, en:'the baker', color:'#fef3c7',
+                 gorro:PZ.cofia(false), pecho:'<path d="M84 128h32l6 46H78Z" fill="#fde68a"/>', propD:PZ.pan() },
+  heladero:    { cat:'comida', emoji:'🍦', es:{f:'la heladera', m:'el heladero'}, en:'the ice cream seller', color:'#38bdf8',
+                 gorro:PZ.gorra('#f8fafc','#bae6fd'), propD:PZ.helado() },
+  mesero:      { cat:'comida', emoji:'🍽️', es:{f:'la mesera', m:'el mesero'}, en:'the waiter', color:'#1f2937',
+                 pecho:'<path d="M92 120h16l-8 14Z" fill="#ef4467"/><path d="M84 126h32l4 48H80Z" fill="#f8fafc"/>', propD:PZ.bandeja() },
+  barista:     { cat:'comida', emoji:'☕', es:{f:'la barista', m:'el barista'}, en:'the barista', color:'#92400e',
+                 gorro:PZ.gorraAtras('#1f2937','#111827'), pecho:'<path d="M84 128h32l6 46H78Z" fill="#78350f"/>', propD:PZ.vaso('#f8fafc') },
+  cajero:      { cat:'comida', emoji:'🧾', es:{f:'la cajera', m:'el cajero'}, en:'the shopkeeper', color:'#0d9488',
+                 pecho:'<path d="M84 128h32l6 46H78Z" fill="#ccfbf1"/>', propD:PZ.calculadora() },
+  florista:    { cat:'comida', emoji:'💐', es:{f:'la florista', m:'el florista'}, en:'the florist', color:'#ec4899',
+                 propD:PZ.flor('#ef4467'), propI:PZ.flor('#a855f7') },
+  peluquero:   { cat:'comida', emoji:'💇', es:{f:'la peluquera', m:'el peluquero'}, en:'the hairdresser', color:'#a855f7',
+                 pecho:'<path d="M84 128h32l6 46H78Z" fill="#e9d5ff"/>', propD:PZ.tijeras() },
+  // ---------------- Oficios y construcción ----------------
+  ingeniero:   { cat:'oficios', emoji:'📐', es:{f:'la ingeniera', m:'el ingeniero'}, en:'the engineer', color:'#f59e0b',
+                 gorro:PZ.cascoObra('#fbbf24'), propD:PZ.planos() },
+  arquitecto:  { cat:'oficios', emoji:'🏛️', es:{f:'la arquitecta', m:'el arquitecto'}, en:'the architect', color:'#475569',
+                 gafas:PZ.gafas('#1f2937'), propD:PZ.planos() },
+  constructor: { cat:'oficios', emoji:'🧱', es:{f:'la constructora', m:'el constructor'}, en:'the builder', color:'#ea580c',
+                 gorro:PZ.cascoObra('#f97316'), propD:PZ.martillo() },
+  carpintero:  { cat:'oficios', emoji:'🪚', es:{f:'la carpintera', m:'el carpintero'}, en:'the carpenter', color:'#a16207',
+                 pecho:'<path d="M80 134h40v16H80Z" fill="#78350f"/>', propD:PZ.serrucho() },
+  mecanico:    { cat:'oficios', emoji:'🔧', es:{f:'la mecánica', m:'el mecánico'}, en:'the mechanic', color:'#1e40af',
+                 gorro:PZ.gorra('#1f2937','#111827'), propD:PZ.llaveInglesa() },
+  electricista:{ cat:'oficios', emoji:'💡', es:{f:'la electricista', m:'el electricista'}, en:'the electrician', color:'#eab308',
+                 gorro:PZ.cascoObra('#facc15'), propD:PZ.bombillo() },
+  plomero:     { cat:'oficios', emoji:'🚿', es:{f:'la plomera', m:'el plomero'}, en:'the plumber', color:'#0284c7',
+                 gorro:PZ.gorra('#dc2626','#991b1b'), propD:PZ.llaveTubo() },
+  modista:     { cat:'oficios', emoji:'🧵', es:{f:'la modista', m:'el modisto'}, en:'the tailor', color:'#db2777',
+                 pecho:'<path d="M78 126q22 10 44 0l2 8q-24 12-48 0Z" fill="#fbbf24"/>', propD:PZ.cinta() },
+  conductor:   { cat:'oficios', emoji:'🚌', es:{f:'la conductora', m:'el conductor'}, en:'the bus driver', color:'#0e7490',
+                 gorro:PZ.gorra('#164e63','#083344'), propD:PZ.volante() },
+  // ---------------- Viajes y rescate ----------------
+  piloto:      { cat:'viajes', emoji:'✈️', es:{f:'la piloto', m:'el piloto'}, en:'the pilot', color:'#1e3a8a',
+                 gorro:PZ.gorra('#f8fafc','#1f2937')+'<circle cx="100" cy="42" r="6" fill="#fbbf24"/>',
+                 pecho:'<path d="m112 132 10 4-10 4Z" fill="#fbbf24"/><path d="M104 136h10" stroke="#fbbf24" stroke-width="3"/>' },
+  azafata:     { cat:'viajes', emoji:'🧳', es:{f:'la auxiliar de vuelo', m:'el auxiliar de vuelo'}, en:'the flight attendant', color:'#1d4ed8',
+                 gorro:PZ.panoleta('#ef4467'), propD:PZ.maletin('#1e3a8a') },
+  marinero:    { cat:'viajes', emoji:'⚓', es:{f:'la marinera', m:'el marinero'}, en:'the sailor', color:'#f8fafc',
+                 gorro:PZ.gorra('#f8fafc','#1e3a8a'), pecho:'<path d="M80 120h40l-6 14H86Z" fill="#1e3a8a"/>', propD:PZ.ancla() },
+  buzo:        { cat:'viajes', emoji:'🤿', es:{f:'la buza', m:'el buzo'}, en:'the diver', color:'#0f766e',
+                 gafas:PZ.gafasBuceo(), pecho:'<rect x="86" y="126" width="28" height="16" rx="4" fill="#fbbf24"/>' },
+  astronauta:  { cat:'viajes', emoji:'🚀', es:{f:'la astronauta', m:'el astronauta'}, en:'the astronaut', color:'#e2e8f0',
+                 pecho:'<rect x="86" y="130" width="28" height="18" rx="4" fill="#cbd5e1"/><circle cx="94" cy="139" r="3" fill="#22c55e"/><circle cx="104" cy="139" r="3" fill="#ef4467"/>',
+                 casco:'<circle cx="100" cy="72" r="43" fill="#bae6fd" opacity=".45"/><circle cx="100" cy="72" r="43" fill="none" stroke="#e2e8f0" stroke-width="7"/><path d="M74 48q16-12 34-8" stroke="#f8fafc" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>',
+                 propD:PZ.bandera('#38bdf8') },
+  guia:        { cat:'viajes', emoji:'🧭', es:{f:'la guía', m:'el guía'}, en:'the tour guide', color:'#0891b2',
+                 gorro:PZ.gorra('#f8fafc','#0891b2'), propD:PZ.banderin('#ef4467'), propI:PZ.mapa() },
+  explorador:  { cat:'viajes', emoji:'🏕️', es:{f:'la exploradora', m:'el explorador'}, en:'the explorer', color:'#65a30d',
+                 gorro:PZ.sombrero('#a16207','#ca8a04'),
+                 pecho:'<rect x="84" y="134" width="18" height="14" rx="3" fill="#ca8a04"/><rect x="110" y="134" width="18" height="14" rx="3" fill="#ca8a04"/>', propD:PZ.binoculares() },
+  // ---------------- Ciencia y tecnología ----------------
+  cientifico:  { cat:'ciencia', emoji:'🔬', es:{f:'la científica', m:'el científico'}, en:'the scientist', color:'#f8fafc',
+                 gafas:PZ.gafas('#334155'), propD:PZ.matraz() },
+  astronomo:   { cat:'ciencia', emoji:'🔭', es:{f:'la astrónoma', m:'el astrónomo'}, en:'the astronomer', color:'#312e81',
+                 pecho:'<path d="m100 128 3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#fbbf24"/>', propD:PZ.telescopio() },
+  biologo:     { cat:'ciencia', emoji:'🌿', es:{f:'la bióloga', m:'el biólogo'}, en:'the biologist', color:'#15803d',
+                 propD:PZ.lupa(), propI:'<path d="M0 -58q-16-10-12-26 16-2 20 12 4-14 20-12 4 16-12 26Z" fill="#22c55e"/>' },
+  arqueologo:  { cat:'ciencia', emoji:'🦴', es:{f:'la arqueóloga', m:'el arqueólogo'}, en:'the archaeologist', color:'#a16207',
+                 gorro:PZ.sombrero('#92400e','#b45309'), propD:PZ.hueso(), propI:PZ.pincel() },
+  programador: { cat:'ciencia', emoji:'💻', es:{f:'la programadora', m:'el programador'}, en:'the programmer', color:'#334155',
+                 gorro:PZ.audifonos('#1f2937',false), propD:'<rect x="-16" y="-78" width="32" height="22" rx="3" fill="#1f2937"/><rect x="-13" y="-75" width="26" height="16" rx="2" fill="#22c55e" opacity=".8"/><path d="M-8 -70l4 4-4 4M0 -62h6" stroke="#052e16" stroke-width="2"/>' },
+  disenador:   { cat:'ciencia', emoji:'🖌️', es:{f:'la diseñadora', m:'el diseñador'}, en:'the designer', color:'#7c3aed',
+                 propD:PZ.tableta('#1f2937','#c4b5fd'), propI:PZ.pincel() },
+  meteorologo: { cat:'ciencia', emoji:'🌦️', es:{f:'la meteoróloga', m:'el meteorólogo'}, en:'the weather reporter', color:'#0ea5e9',
+                 propD:PZ.nube(), propI:PZ.microfono() },
+  // ---------------- Arte, letras y escenario ----------------
+  reportero:   { cat:'arte', emoji:'🎤', es:{f:'la reportera', m:'el reportero'}, en:'the reporter', color:'#1e3a8a',
+                 pecho:'<rect x="112" y="134" width="20" height="14" rx="3" fill="#f8fafc"/><rect x="115" y="138" width="14" height="2.5" fill="#94a3b8"/><rect x="115" y="143" width="9" height="2.5" fill="#94a3b8"/>',
+                 propD:PZ.microfono() },
+  camarografo: { cat:'arte', emoji:'🎥', es:{f:'la camarógrafa', m:'el camarógrafo'}, en:'the camera operator', color:'#475569',
+                 gorro:PZ.gorraAtras('#1e3a8a','#1e40af'), propD:PZ.camara() },
+  fotografo:   { cat:'arte', emoji:'📷', es:{f:'la fotógrafa', m:'el fotógrafo'}, en:'the photographer', color:'#0f172a',
+                 pecho:'<path d="M78 128h44" stroke="#78350f" stroke-width="5"/>', propD:'<rect x="-15" y="-80" width="30" height="20" rx="4" fill="#1f2937"/><circle cx="0" cy="-70" r="9" fill="#334155"/><circle cx="0" cy="-70" r="5" fill="#93c5fd"/><rect x="8" y="-86" width="9" height="6" rx="2" fill="#fbbf24"/>' },
+  escritor:    { cat:'arte', emoji:'✍️', es:{f:'la escritora', m:'el escritor'}, en:'the writer', color:'#7c3aed',
+                 gafas:PZ.gafas('#334155'), propD:'<rect x="-2" y="-88" width="5" height="26" rx="2" fill="#1f2937"/><path d="M-4 -92h9l-2-8h-5Z" fill="#fbbf24"/>', propI:PZ.libro('#a855f7') },
+  maestro:     { cat:'arte', emoji:'🍎', es:{f:'la maestra', m:'el maestro'}, en:'the teacher', color:'#be123c',
+                 gafas:PZ.gafas('#334155'), propD:PZ.libro('#2563eb'), propI:'<circle cx="0" cy="-72" r="11" fill="#ef4467"/><rect x="-1" y="-86" width="3" height="6" fill="#16a34a"/>' },
+  bibliotecario:{cat:'arte', emoji:'📚', es:{f:'la bibliotecaria', m:'el bibliotecario'}, en:'the librarian', color:'#0f766e',
+                 gafas:PZ.gafas('#334155'), propD:'<rect x="-15" y="-66" width="30" height="8" rx="2" fill="#ef4467"/><rect x="-13" y="-76" width="26" height="9" rx="2" fill="#2563eb"/><rect x="-11" y="-86" width="22" height="9" rx="2" fill="#fbbf24"/>' },
+  artista:     { cat:'arte', emoji:'🎨', es:{f:'la artista', m:'el artista'}, en:'the artist', color:'#0ea5e9',
+                 gorro:PZ.boina('#ef4467'),
+                 pecho:'<circle cx="86" cy="150" r="5" fill="#fbbf24"/><circle cx="104" cy="160" r="4" fill="#22c55e"/><circle cx="116" cy="144" r="4" fill="#ef4467"/>',
+                 propI:PZ.paleta(), propD:PZ.pincel() },
+  cantante:    { cat:'arte', emoji:'🎙️', es:{f:'la cantante', m:'el cantante'}, en:'the singer', color:'#db2777',
+                 pecho:'<path d="M88 126q12 10 24 0l4 10q-16 12-32 0Z" fill="#fbbf24"/>',
+                 propD:'<rect x="-3" y="-76" width="7" height="24" rx="3.5" fill="#1f2937"/><ellipse cx="0" cy="-82" rx="10" ry="12" fill="#475569"/><ellipse cx="0" cy="-84" rx="6" ry="7" fill="#94a3b8"/>' },
+  musico:      { cat:'arte', emoji:'🎸', es:{f:'la música', m:'el músico'}, en:'the musician', color:'#b45309',
+                 gafasSol:true, propD:PZ.guitarra() },
+  bailarin:    { cat:'arte', emoji:'🩰', es:{f:'la bailarina', m:'el bailarín'}, en:'the dancer', color:'#f472b6',
+                 gorro:PZ.diadema('#ec4899'), pecho:'<path d="M70 162q30 18 60 0l6 14q-36 20-72 0Z" fill="#f9a8d4"/>' },
+  actor:       { cat:'arte', emoji:'🎭', es:{f:'la actriz', m:'el actor'}, en:'the actor', color:'#7c3aed',
+                 propD:'<circle cx="0" cy="-76" r="13" fill="#fbbf24"/><path d="M-6 -80q6-5 12 0" stroke="#78350f" stroke-width="3" fill="none"/><path d="M-6 -70q6 7 12 0" stroke="#78350f" stroke-width="3" fill="none"/>',
+                 propI:'<circle cx="0" cy="-76" r="13" fill="#94a3b8"/><path d="M-6 -80q6-5 12 0" stroke="#1f2937" stroke-width="3" fill="none"/><path d="M-6 -66q6-7 12 0" stroke="#1f2937" stroke-width="3" fill="none"/>' },
+  director:    { cat:'arte', emoji:'🎼', es:{f:'la directora', m:'el director'}, en:'the conductor', color:'#1f2937',
+                 pecho:'<path d="M92 120h16l-8 16Z" fill="#f8fafc"/><path d="M86 126h28l4 48H82Z" fill="#111827"/>', propD:PZ.batuta() },
+  payaso:      { cat:'arte', emoji:'🤡', es:{f:'la payasa', m:'el payaso'}, en:'the clown', color:'#ef4467',
+                 gorro:'<circle cx="68" cy="56" r="14" fill="#f97316"/><circle cx="132" cy="56" r="14" fill="#f97316"/><path d="M100 10 78 46h44Z" fill="#38bdf8"/><circle cx="100" cy="8" r="7" fill="#fbbf24"/>',
+                 cara:'<circle cx="100" cy="88" r="9" fill="#ef4467"/>', propD:PZ.bola('#38bdf8',11) },
+  // ---------------- Deportes ----------------
+  futbolista:  { cat:'deportes', emoji:'⚽', es:{f:'la futbolista', m:'el futbolista'}, en:'the footballer', color:'#16a34a',
+                 pecho:'<path d="M90 120h8v56h-8ZM110 120h8v56h-8Z" fill="#f8fafc" opacity=".85"/>',
+                 suelo:'<circle cx="150" cy="232" r="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><path d="m150 220 7 5-3 9h-8l-3-9z" fill="#1f2937"/><path d="m137 228 5 8M163 228l-5 8" stroke="#1f2937" stroke-width="3"/>' },
+  basquetbolista:{cat:'deportes', emoji:'🏀', es:{f:'la basquetbolista', m:'el basquetbolista'}, en:'the basketball player', color:'#f97316',
+                 pecho:'<path d="M80 118h40v16H80Z" fill="#f97316"/><circle cx="100" cy="146" r="10" fill="#fff7ed"/>',
+                 propD:'<circle cx="0" cy="-76" r="14" fill="#f97316"/><path d="M-14 -76h28M0 -90v28M-10 -86q10 10 0 20M10 -86q-10 10 0 20" stroke="#7c2d12" stroke-width="2" fill="none"/>' },
+  nadador:     { cat:'deportes', emoji:'🏊', es:{f:'la nadadora', m:'el nadador'}, en:'the swimmer', color:'#0284c7',
+                 gorro:'<path d="M66 64q0-38 34-38t34 38q-16-14-34-14t-34 14Z" fill="#38bdf8"/>', gafas:PZ.gafasBuceo() },
+  ciclista:    { cat:'deportes', emoji:'🚴', es:{f:'la ciclista', m:'el ciclista'}, en:'the cyclist', color:'#dc2626',
+                 gorro:PZ.cascoRedondo('#f8fafc','#dc2626'), gafasSol:true,
+                 pecho:'<path d="M74 140h52v10H74Z" fill="#fbbf24"/>' },
+  tenista:     { cat:'deportes', emoji:'🎾', es:{f:'la tenista', m:'el tenista'}, en:'the tennis player', color:'#f8fafc',
+                 gorro:PZ.gorra('#bef264','#65a30d'), propD:PZ.raqueta('#1f2937'), propI:PZ.bola('#bef264',8) },
+  arbitro:     { cat:'deportes', emoji:'🟨', es:{f:'la árbitra', m:'el árbitro'}, en:'the referee', color:'#1f2937',
+                 pecho:'<path d="M86 120h8v56h-8ZM106 120h8v56h-8Z" fill="#f8fafc" opacity=".9"/><rect x="114" y="132" width="12" height="16" rx="2" fill="#fbbf24"/>',
+                 propD:PZ.silbato() },
+  karateka:    { cat:'deportes', emoji:'🥋', es:{f:'la karateka', m:'el karateka'}, en:'the karate student', color:'#f8fafc',
+                 pecho:'<path d="M84 118 100 146l16-28-8-2-8 12-8-12Z" fill="#e2e8f0"/><rect x="66" y="156" width="68" height="12" rx="3" fill="#1f2937"/>',
+                 gorro:'<path d="M66 56q34-22 68 0l-4 8H70Z" fill="#dc2626"/>' },
+  // ---------------- Fantasía ----------------
+  superheroe:  { cat:'fantasia', emoji:'🦸', es:{f:'la superheroína', m:'el superhéroe'}, en:'the superhero', color:'#2563eb',
+                 capa:'<path d="M66 120q-20 64-12 112h92q8-48-12-112l-16-4q-18 16-36 0Z" fill="#dc2626"/><path d="M72 120q-14 58-10 102h12q-6-52 8-98Z" fill="#ef4444" opacity=".8"/>',
+                 pecho:'<path d="m104 126-14 24h10l-6 20 18-26h-10l8-18z" fill="#fbbf24"/>', antifaz:PZ.antifaz('#1d4ed8') },
+  mago:        { cat:'fantasia', emoji:'🪄', es:{f:'la maga', m:'el mago'}, en:'the magician', color:'#6d28d9',
+                 gorro:PZ.pico('#4c1d95','#fbbf24'),
+                 pecho:'<path d="m100 130 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fbbf24"/>', propD:PZ.varita() },
+  pirata:      { cat:'fantasia', emoji:'🏴‍☠️', es:{f:'la pirata', m:'el pirata'}, en:'the pirate', color:'#991b1b',
+                 gorro:'<path d="M58 54q42-30 84 0l-6 10H64Z" fill="#1f2937"/><circle cx="100" cy="40" r="7" fill="#f8fafc"/><circle cx="96" cy="38" r="1.8" fill="#1f2937"/><circle cx="104" cy="38" r="1.8" fill="#1f2937"/>',
+                 cara:'<path d="M74 70h26v16H74Z" fill="#1f2937"/><path d="M74 70q-8 2-10 6" stroke="#1f2937" stroke-width="4" fill="none"/>',
+                 pecho:'<path d="M78 128q22 12 44 0l3 10q-25 14-50 0Z" fill="#fbbf24"/>' },
+  caballero:   { cat:'fantasia', emoji:'🛡️', es:{f:'la caballera', m:'el caballero'}, en:'the knight', color:'#94a3b8',
+                 gorro:'<path d="M68 60q0-36 32-36t32 36q-14-8-32-8t-32 8Z" fill="#cbd5e1"/><rect x="72" y="58" width="56" height="10" rx="3" fill="#94a3b8"/><rect x="96" y="30" width="8" height="30" fill="#64748b"/>',
+                 propI:'<path d="M-14 -84h28v16q0 16-14 22-14-6-14-22Z" fill="#60a5fa"/><path d="M0 -80v30M-10 -70h20" stroke="#f8fafc" stroke-width="3"/>' },
+  hada:        { cat:'fantasia', emoji:'🧚', es:{f:'el hada', m:'el hada'}, en:'the fairy', color:'#f0abfc',
+                 gorro:PZ.corona(),
+                 capa:'<path d="M60 130q-40-24-44 6 34 2 40 16ZM140 130q40-24 44 6-34 2-40 16Z" fill="#e9d5ff" opacity=".85"/>',
+                 propD:PZ.varita() },
+  ninja:       { cat:'fantasia', emoji:'🥷', es:{f:'la ninja', m:'el ninja'}, en:'the ninja', color:'#1f2937',
+                 gorro:'<path d="M64 74q0-40 36-40t36 40q-6-10-36-10t-36 10Z" fill="#111827"/>',
+                 cara:'<path d="M66 78h68v12H66Z" fill="#111827"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/>',
+                 pecho:'<rect x="70" y="140" width="60" height="10" rx="3" fill="#dc2626"/>' },
+  robot:       { cat:'fantasia', emoji:'🤖', es:{f:'la robot', m:'el robot'}, en:'the robot', color:'#94a3b8',
+                 gorro:'<rect x="94" y="22" width="12" height="16" rx="4" fill="#64748b"/><circle cx="100" cy="18" r="7" fill="#38bdf8"/>',
+                 cara:'<rect x="72" y="64" width="56" height="30" rx="8" fill="#cbd5e1"/><circle cx="88" cy="76" r="6" fill="#38bdf8"/><circle cx="112" cy="76" r="6" fill="#38bdf8"/><rect x="86" y="86" width="28" height="4" rx="2" fill="#475569"/>',
+                 pecho:'<rect x="84" y="130" width="32" height="22" rx="4" fill="#64748b"/><circle cx="94" cy="141" r="4" fill="#22c55e"/><circle cx="106" cy="141" r="4" fill="#ef4467"/>' },
+  vaquero:     { cat:'fantasia', emoji:'🤠', es:{f:'la vaquera', m:'el vaquero'}, en:'the cowboy', color:'#b45309',
+                 gorro:PZ.sombrero('#92400e','#b45309'),
+                 pecho:'<path d="M92 120h16l-8 16Z" fill="#dc2626"/><path d="m118 134 4 4 6 1-4 5 1 6-5-3-5 3 1-6-4-5 6-1z" fill="#fbbf24"/>' },
+  rey:         { cat:'fantasia', emoji:'👑', es:{f:'la reina', m:'el rey'}, en:'the royal', color:'#7e22ce',
+                 gorro:PZ.corona(), capa:'<path d="M64 122q-16 66-8 110h88q8-44-8-110l-16-4q-20 16-40 0Z" fill="#b91c1c"/><path d="M70 122q-12 60-8 102h12q-6-54 8-98Z" fill="#f8fafc" opacity=".6"/>',
+                 pecho:'<circle cx="100" cy="138" r="7" fill="#fbbf24"/>' }
+};
+const DISFRACES_ORDEN = Object.keys(DISFRACES);
+
 function disfrazDe(s){
     const id=s && s.disfraz;
     return (id && DISFRACES[id]) ? Object.assign({id:id}, DISFRACES[id]) : null;
@@ -5257,7 +5490,8 @@ function celSvgPersona(s, opciones){
       ${cachetes}
       <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
       ${bocaExtra}
-      ${(rol && rol.gafas) ? rol.gafas : ''}
+      ${(rol && rol.cara) ? rol.cara : ''}
+      ${(rol && (rol.gafas||rol.gafasSol)) ? (rol.gafas||PZ.gafasSol()) : ''}
       ${(rol && rol.gorro) ? rol.gorro : sombreroBase}
       ${(rol && rol.casco) ? rol.casco : ''}
       ${(hw && g==='m' && !rol) ? HW_ARANA : ''}
@@ -5312,9 +5546,13 @@ window.repartirDisfraces=function(){
     const sel=document.getElementById('disfracesReparto');
     const grupo=(sel&&sel.value)||'noticias';
     const paquetes={
-        noticias:['reportero','camarografo','cantante','artista'],
-        comunidad:['policia','bombero','doctor','chef','jardinero'],
-        ciencia:['cientifico','astronauta','doctor','explorador'],
+        noticias:['reportero','camarografo','fotografo','meteorologo','cantante','director','escritor'],
+        comunidad:['policia','bombero','paramedico','doctor','enfermero','cartero','jardinero','reciclador','vigilante'],
+        ciencia:['cientifico','astronauta','astronomo','biologo','arqueologo','programador','disenador'],
+        oficios:['ingeniero','arquitecto','constructor','carpintero','mecanico','electricista','plomero','modista','conductor'],
+        comida:['chef','panadero','heladero','mesero','barista','cajero','florista','peluquero'],
+        deportes:['futbolista','basquetbolista','nadador','ciclista','tenista','arbitro','karateka'],
+        fantasia:['superheroe','mago','pirata','caballero','hada','ninja','robot','vaquero','rey'],
         todos:DISFRACES_ORDEN
     };
     const lista=paquetes[grupo]||paquetes.todos;
@@ -5328,12 +5566,19 @@ function opcionesDeDisfraz(s){
     const es=currentLanguage==='es';
     const g=generoDeAlumno(s);
     const actual=s.disfraz||'';
-    return `<option value="">${es?'— Sin disfraz —':'— No costume —'}</option>`
-        + DISFRACES_ORDEN.map(id=>{
-            const r=DISFRACES[id];
-            const nombre=es ? r.es[g==='f'?'f':'m'].replace(/^(la|el)\s+/,'') : r.en.replace(/^the\s+/,'');
-            return `<option value="${id}"${id===actual?' selected':''}>${r.emoji} ${escapeHtml(nombre)}</option>`;
-        }).join('');
+    let html=`<option value="">${es?'— Sin disfraz —':'— No costume —'}</option>`;
+    Object.keys(DIS_CATS).forEach(cat=>{
+        const ids=DISFRACES_ORDEN.filter(id=>DISFRACES[id].cat===cat);
+        if(!ids.length) return;
+        html+=`<optgroup label="${escapeHtml(DIS_CATS[cat][es?'es':'en'])}">`
+            + ids.map(id=>{
+                const r=DISFRACES[id];
+                const nombre=es ? r.es[g==='f'?'f':'m'].replace(/^(la|el)\s+/,'') : r.en.replace(/^the\s+/,'');
+                return `<option value="${id}"${id===actual?' selected':''}>${r.emoji} ${escapeHtml(nombre)}</option>`;
+            }).join('')
+            + `</optgroup>`;
+    });
+    return html;
 }
 function tarjetaDisfraz(s){
     const es=currentLanguage==='es';
@@ -5379,16 +5624,16 @@ function textosDisfraces(){
     const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
     t('disfracesBtnText', es?'Disfraces':'Costumes');
     t('disfracesTitulo', es?'🎭 Disfraces del salón':'🎭 Classroom costumes');
-    t('disfracesIntro', es?'Cada estudiante tiene su muñequito, y puedes ponerle un disfraz. Aparece cuando llega a clase y marcas su asistencia.'
-                         :'Every student has their own character, and you can put a costume on them. It shows up when you mark them present.');
+    t('disfracesIntro', es?`Cada estudiante tiene su muñequito, y puedes ponerle uno de los ${DISFRACES_ORDEN.length} disfraces. Aparece cuando llega a clase y marcas su asistencia.`
+                         :`Every student has their own character, and you can pick one of ${DISFRACES_ORDEN.length} costumes. It shows up when you mark them present.`);
     t('disfracesRepartirBtn', es?'🎬 Repartir roles':'🎬 Hand out roles');
     t('disfracesQuitarBtn', es?'🧹 Quitar todos':'🧹 Remove all');
     t('disfracesCerrarBtn', es?'Cerrar':'Close');
     const b=document.getElementById('disfracesBuscar'); if(b) b.placeholder=es?'🔎 Buscar estudiante…':'🔎 Search student…';
     const sel=document.getElementById('disfracesReparto');
     if(sel){
-        const vals=es?['Proyecto de noticias','La comunidad','Ciencia y espacio','Todos los disfraces']
-                     :['News project','Community helpers','Science and space','Every costume'];
+        const vals=es?['Proyecto de noticias','La comunidad','Ciencia y espacio','Oficios y construcción','Comida y servicio','Deportes','Fantasía','Todos los disfraces']
+                     :['News project','Community helpers','Science and space','Trades and building','Food and service','Sports','Fantasy','Every costume'];
         [...sel.options].forEach((o,i)=>{ if(vals[i]) o.textContent=vals[i]; });
     }
 }
