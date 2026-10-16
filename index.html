@@ -1435,6 +1435,27 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
   .voc-pistas { grid-template-columns:1fr; }
 }
 
+/* === DISFRACES === */
+.disfraces-modal { width:min(980px,96vw); }
+.dis-intro { margin:-6px 0 14px; font-size:.9rem; color:var(--fg-muted); line-height:1.5; }
+.dis-barra { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.dis-barra input[type="search"] { flex:1 1 200px; min-width:0; padding:9px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.9rem; }
+.dis-barra select { padding:9px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.86rem; }
+.dis-barra .btn-secondary { padding:9px 13px; font-size:.85rem; }
+.dis-cuenta { font-size:.84rem; font-weight:700; color:var(--accent-strong); }
+.dis-lista { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; max-height:56vh; overflow-y:auto; padding:2px 4px 2px 2px; }
+.dis-card { display:flex; gap:10px; align-items:center; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card); padding:10px; transition:border-color .2s var(--ease-out); }
+.dis-card:hover { border-color:var(--accent); }
+.dis-fig { flex:0 0 auto; width:62px; }
+.dis-fig svg { width:100%; height:auto; display:block; }
+.dis-info { display:flex; flex-direction:column; gap:6px; min-width:0; flex:1 1 auto; }
+.dis-nombre { font-size:.86rem; line-height:1.2; overflow-wrap:anywhere; }
+.dis-select { width:100%; padding:6px 8px; border:1.5px solid var(--border); border-radius:9px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.82rem; }
+.dis-edad { display:flex; gap:4px; }
+.dis-edad-btn { flex:1; border:1px solid var(--border); background:var(--bg-alt); color:var(--fg-muted); border-radius:8px; padding:4px 6px; font:inherit; font-size:.74rem; font-weight:600; cursor:pointer; }
+.dis-edad-btn[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong); }
+.dis-vacio { grid-column:1/-1; text-align:center; color:var(--fg-muted); padding:20px; }
+@media (max-width:600px){ .dis-lista { grid-template-columns:1fr; max-height:48vh; } }
 /* === BOMBA DE TIEMPO === */
 .bomba-modal { width:min(560px,96vw); text-align:center; }
 .bomba-modal:fullscreen { width:100vw; max-width:100vw; height:100vh; max-height:100vh; border-radius:0; display:flex; flex-direction:column; justify-content:center; }
@@ -2153,6 +2174,7 @@ tr.flash-m td { animation:flashM .9s ease-out; }
                 <button class="side-btn" onclick="openProjector()"><span class="sb-ico violet">📺</span><span id="projectorBtnText">Modo proyector</span></button>
                 <button class="side-btn" onclick="abrirJuegosVocabulario()"><span class="sb-ico rose">🧩</span><span id="vocBtnText">Juegos de vocabulario</span></button>
                 <button class="side-btn" onclick="abrirBomba()"><span class="sb-ico amber">💣</span><span id="bombaBtnText">Bomba de tiempo</span></button>
+                <button class="side-btn" onclick="abrirDisfraces()"><span class="sb-ico violet">🎭</span><span id="disfracesBtnText">Disfraces</span></button>
                 <button class="side-btn" id="exportPdfBtn"><span class="sb-ico slate">📄</span><span id="exportPdfBtnText">Export Full Report PDF</span></button>
             </div>
 
@@ -2780,6 +2802,31 @@ tr.flash-m td { animation:flashM .9s ease-out; }
     <div class="voc-acciones">
       <button type="button" class="btn-secondary" id="vocCerrarBtn" onclick="cerrarJuegosVocabulario()">Cerrar</button>
       <button type="button" class="btn-primary" id="vocPdfBtn" onclick="vocDescargarPdf()" disabled>📄 Descargar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Disfraces: el avatar de cada estudiante y su rol -->
+<div class="modal" id="disfracesModal" style="display:none;" aria-hidden="true">
+  <div class="modal-content disfraces-modal">
+    <button class="modal-close-btn" type="button" aria-label="Cerrar" onclick="cerrarDisfraces()">&times;</button>
+    <h3 id="disfracesTitulo">🎭 Disfraces del salón</h3>
+    <p class="dis-intro" id="disfracesIntro"></p>
+    <div class="dis-barra">
+      <input type="search" id="disfracesBuscar" oninput="filtrarDisfraces(this.value)" autocomplete="off">
+      <select id="disfracesReparto">
+        <option value="noticias">Proyecto de noticias</option>
+        <option value="comunidad">La comunidad</option>
+        <option value="ciencia">Ciencia y espacio</option>
+        <option value="todos">Todos los disfraces</option>
+      </select>
+      <button type="button" class="btn-secondary" id="disfracesRepartirBtn" onclick="repartirDisfraces()">🎬 Repartir roles</button>
+      <button type="button" class="btn-secondary" id="disfracesQuitarBtn" onclick="quitarDisfraces()">🧹 Quitar todos</button>
+      <span class="dis-cuenta" id="disfracesCuenta"></span>
+    </div>
+    <div class="dis-lista" id="disfracesLista"></div>
+    <div class="voc-acciones">
+      <button type="button" class="btn-primary" id="disfracesCerrarBtn" onclick="cerrarDisfraces()">Cerrar</button>
     </div>
   </div>
 </div>
@@ -5027,63 +5074,325 @@ const HW_CUELLO     = '<path d="M76 114 100 132 124 114l14 6q-16 20-38 22-22-2-3
 const HW_COLMILLOS  = '<path d="M93 94l3 8 3-8Z" fill="#fff"/><path d="M101 94l3 8 3-8Z" fill="#fff"/>';
 const HW_ARANA      = '<g><path d="M150 0v26" stroke="#64748b" stroke-width="2" fill="none"/><circle cx="150" cy="32" r="7" fill="#111827"/><path d="M143 28l-8-5M157 28l8-5M143 36l-8 5M157 36l8 5" stroke="#111827" stroke-width="2.5" stroke-linecap="round"/><circle cx="147.5" cy="30" r="1.6" fill="#fbbf24"/><circle cx="152.5" cy="30" r="1.6" fill="#fbbf24"/></g>';
 
-function celSvgNina(){
-    const hw=esHalloween();
+// ===================== AVATARES Y DISFRACES ================================
+// Cada estudiante tiene su muñequito: nina o nino segun el nombre, y pequeño o
+// joven segun el grado del salon (de 0 a 3 sale pequeño; de 4 en adelante,
+// joven). Encima se le puede poner un disfraz -reportero, bombero, chef...- que
+// aparece cuando llega a clase y se marca su asistencia.
+const PIEL='#f6cfae', PIEL_S='#e8b68d';
+
+// Grado del salon: se saca del nombre del aula o del perfil ("Grado 5A" -> 5).
+function gradoDelSalon(){
+    const textos=[ (document.getElementById('className')||{}).value,
+                   (classrooms[activeClassroomIndex]||{}).name,
+                   userProfile.grade ];
+    for(const t of textos){
+        const m=String(t||'').match(/(\d{1,2})/);
+        if(m){ const n=parseInt(m[1],10); if(n>=0 && n<=13) return n; }
+    }
+    return null;
+}
+// 'peque' o 'joven'. El docente puede corregirlo estudiante por estudiante.
+function edadDeAlumno(s){
+    if(s && (s.edad==='peque' || s.edad==='joven')) return s.edad;
+    const g=gradoDelSalon();
+    if(g===null) return 'peque';
+    return g>=4 ? 'joven' : 'peque';
+}
+
+// --- Catalogo de disfraces ---------------------------------------------------
+// Cada uno define el color de la ropa, lo que lleva en la cabeza, lo que sostiene
+// en cada mano y algun detalle en el pecho. Las manos van DENTRO del brazo, para
+// que los objetos se muevan con el.
+const DISFRACES = {
+  reportero: { emoji:'🎤', es:{f:'la reportera', m:'el reportero'}, en:'the reporter', color:'#1e3a8a', detalle:'#60a5fa',
+    pecho:'<rect x="112" y="134" width="20" height="14" rx="3" fill="#f8fafc"/><rect x="115" y="138" width="14" height="2.5" fill="#94a3b8"/><rect x="115" y="143" width="9" height="2.5" fill="#94a3b8"/>',
+    propD:'<rect x="-4" y="-78" width="8" height="26" rx="4" fill="#334155"/><circle cx="0" cy="-82" r="9" fill="#64748b"/><circle cx="-3" cy="-84" r="2.5" fill="#94a3b8"/>' },
+  camarografo: { emoji:'🎥', es:{f:'la camarógrafa', m:'el camarógrafo'}, en:'the camera operator', color:'#475569', detalle:'#94a3b8',
+    gorro:'<path d="M70 50q30-20 60 0l2 8H68Z" fill="#1e3a8a"/><path d="M68 56h26l-4 10q-18 0-22-10Z" fill="#1e40af"/>',
+    propD:'<rect x="-16" y="-86" width="34" height="24" rx="4" fill="#1f2937"/><circle cx="20" cy="-74" r="9" fill="#334155"/><circle cx="20" cy="-74" r="5" fill="#60a5fa"/><rect x="-12" y="-94" width="12" height="10" rx="3" fill="#374151"/><circle cx="-6" cy="-66" r="3" fill="#ef4467"/>' },
+  bombero: { emoji:'🚒', es:{f:'la bombera', m:'el bombero'}, en:'the firefighter', color:'#f59e0b', detalle:'#e2e8f0',
+    gorro:'<path d="M62 54q8-34 38-34t38 34q-16-12-38-12t-38 12Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="50" ry="10" fill="#b91c1c"/><path d="M92 28h16l4 22H88Z" fill="#fbbf24"/>',
+    propD:'<rect x="-3" y="-80" width="6" height="30" rx="3" fill="#92400e"/><path d="M-14 -86h20l6 8-6 8h-20Z" fill="#cbd5e1"/>' },
+  policia: { emoji:'👮', es:{f:'la policía', m:'el policía'}, en:'the police officer', color:'#1e40af', detalle:'#fbbf24',
+    gorro:'<path d="M66 50q34-24 68 0l2 8H64Z" fill="#1e3a8a"/><rect x="62" y="54" width="76" height="9" rx="4" fill="#111827"/><path d="M62 63h50q-8 10-26 10t-24-10Z" fill="#1f2937"/><circle cx="100" cy="42" r="6" fill="#fbbf24"/>',
+    pecho:'<path d="m118 134 4 4 6 1-4 5 1 6-5-3-5 3 1-6-4-5 6-1z" fill="#fbbf24"/>' },
+  doctor: { emoji:'🩺', es:{f:'la doctora', m:'el doctor'}, en:'the doctor', color:'#f8fafc', detalle:'#38bdf8',
+    pecho:'<path d="M88 122q-6 26 12 28t12-28" stroke="#334155" stroke-width="3.5" fill="none"/><circle cx="112" cy="152" r="6" fill="#64748b"/>',
+    propD:'<rect x="-11" y="-84" width="22" height="28" rx="3" fill="#e2e8f0"/><rect x="-7" y="-78" width="14" height="2.6" fill="#94a3b8"/><rect x="-7" y="-72" width="14" height="2.6" fill="#94a3b8"/><rect x="-7" y="-66" width="9" height="2.6" fill="#94a3b8"/>' },
+  chef: { emoji:'👨‍🍳', es:{f:'la chef', m:'el chef'}, en:'the chef', color:'#f8fafc', detalle:'#ef4467',
+    gorro:'<path d="M74 44h52v14H74Z" fill="#f1f5f9"/><circle cx="78" cy="34" r="15" fill="#f8fafc"/><circle cx="100" cy="26" r="18" fill="#f8fafc"/><circle cx="122" cy="34" r="15" fill="#f8fafc"/>',
+    pecho:'<path d="M84 128h32l6 46H78Z" fill="#fef3c7"/>',
+    propD:'<rect x="-3" y="-78" width="6" height="28" rx="3" fill="#b45309"/><ellipse cx="0" cy="-82" rx="11" ry="9" fill="#d97706"/>' },
+  astronauta: { emoji:'🚀', es:{f:'la astronauta', m:'el astronauta'}, en:'the astronaut', color:'#e2e8f0', detalle:'#38bdf8',
+    pecho:'<rect x="86" y="130" width="28" height="18" rx="4" fill="#cbd5e1"/><circle cx="94" cy="139" r="3" fill="#22c55e"/><circle cx="104" cy="139" r="3" fill="#ef4467"/>',
+    casco:'<circle cx="100" cy="72" r="43" fill="#bae6fd" opacity=".45"/><circle cx="100" cy="72" r="43" fill="none" stroke="#e2e8f0" stroke-width="7"/><path d="M74 48q16-12 34-8" stroke="#f8fafc" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>',
+    propD:'<rect x="-2" y="-84" width="5" height="34" rx="2" fill="#94a3b8"/><path d="M3 -84h26l-6 9 6 9H3Z" fill="#38bdf8"/>' },
+  cientifico: { emoji:'🔬', es:{f:'la científica', m:'el científico'}, en:'the scientist', color:'#f8fafc', detalle:'#a855f7',
+    gafas:'<circle cx="88" cy="76" r="11" fill="none" stroke="#334155" stroke-width="3.5"/><circle cx="112" cy="76" r="11" fill="none" stroke="#334155" stroke-width="3.5"/><path d="M99 76h2" stroke="#334155" stroke-width="3.5"/>',
+    propD:'<path d="M-7 -84h14v10l9 22a4 4 0 0 1-4 6h-24a4 4 0 0 1-4-6l9-22Z" fill="#c4b5fd" opacity=".85"/><path d="M-12 -58h24l-5-12h-14Z" fill="#22c55e"/><circle cx="-2" cy="-64" r="2.5" fill="#86efac"/>' },
+  futbolista: { emoji:'⚽', es:{f:'la futbolista', m:'el futbolista'}, en:'the footballer', color:'#16a34a', detalle:'#f8fafc',
+    pecho:'<path d="M90 120h8v56h-8ZM110 120h8v56h-8Z" fill="#f8fafc" opacity=".85"/>',
+    suelo:'<circle cx="150" cy="232" r="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><path d="m150 220 7 5-3 9h-8l-3-9z" fill="#1f2937"/><path d="m137 228 5 8M163 228l-5 8" stroke="#1f2937" stroke-width="3"/>' },
+  artista: { emoji:'🎨', es:{f:'la artista', m:'el artista'}, en:'the artist', color:'#0ea5e9', detalle:'#fbbf24',
+    gorro:'<ellipse cx="100" cy="44" rx="38" ry="14" fill="#ef4467"/><circle cx="100" cy="30" r="6" fill="#be123c"/>',
+    pecho:'<circle cx="86" cy="150" r="5" fill="#fbbf24"/><circle cx="104" cy="160" r="4" fill="#22c55e"/><circle cx="116" cy="144" r="4" fill="#ef4467"/>',
+    propI:'<ellipse cx="0" cy="-74" rx="18" ry="14" fill="#d9a066"/><circle cx="-6" cy="-80" r="3.5" fill="#ef4467"/><circle cx="2" cy="-82" r="3.5" fill="#38bdf8"/><circle cx="8" cy="-74" r="3.5" fill="#fbbf24"/><circle cx="-2" cy="-68" r="3.5" fill="#22c55e"/>',
+    propD:'<rect x="-2" y="-82" width="5" height="26" rx="2" fill="#b45309"/><path d="M-4 -86h9l-2-8h-5Z" fill="#334155"/>' },
+  superheroe: { emoji:'🦸', es:{f:'la superheroína', m:'el superhéroe'}, en:'the superhero', color:'#2563eb', detalle:'#fbbf24',
+    capa:'<path d="M66 120q-20 64-12 112h92q8-48-12-112l-16-4q-18 16-36 0Z" fill="#dc2626"/><path d="M72 120q-14 58-10 102h12q-6-52 8-98Z" fill="#ef4444" opacity=".8"/>',
+    pecho:'<path d="m104 126-14 24h10l-6 20 18-26h-10l8-18z" fill="#fbbf24"/>',
+    antifaz:'<path d="M70 70h60l-4 16q-14 6-26 0-12 6-26 0Z" fill="#1d4ed8"/><path d="M82 76q6-6 12 0M106 76q6-6 12 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/>' },
+  explorador: { emoji:'🧭', es:{f:'la exploradora', m:'el explorador'}, en:'the explorer', color:'#65a30d', detalle:'#a16207',
+    gorro:'<ellipse cx="100" cy="52" rx="52" ry="12" fill="#a16207"/><path d="M72 50q6-26 28-26t28 26q-14-8-28-8t-28 8Z" fill="#ca8a04"/><path d="M50 50h100v5H50Z" fill="#854d0e"/>',
+    pecho:'<rect x="84" y="134" width="18" height="14" rx="3" fill="#ca8a04"/><rect x="110" y="134" width="18" height="14" rx="3" fill="#ca8a04"/>',
+    propD:'<rect x="-13" y="-80" width="26" height="16" rx="4" fill="#1f2937"/><circle cx="-7" cy="-72" r="7" fill="#334155"/><circle cx="7" cy="-72" r="7" fill="#334155"/><circle cx="-7" cy="-72" r="3" fill="#60a5fa"/><circle cx="7" cy="-72" r="3" fill="#60a5fa"/>' },
+  mago: { emoji:'🪄', es:{f:'la maga', m:'el mago'}, en:'the magician', color:'#6d28d9', detalle:'#fbbf24',
+    gorro:'<ellipse cx="100" cy="46" rx="50" ry="11" fill="#2e1065"/><path d="M100 0 74 46h52Z" fill="#4c1d95"/><path d="M84 36h32l2 8H82Z" fill="#fbbf24"/>',
+    pecho:'<path d="m100 130 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fbbf24"/>',
+    propD:'<rect x="-2" y="-86" width="5" height="32" rx="2" fill="#1f2937"/><path d="m0 -94 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fde68a"/>' },
+  cantante: { emoji:'🎙️', es:{f:'la cantante', m:'el cantante'}, en:'the singer', color:'#db2777', detalle:'#fbbf24',
+    pecho:'<path d="M88 126q12 10 24 0l4 10q-16 12-32 0Z" fill="#fbbf24"/>',
+    propD:'<rect x="-3" y="-76" width="7" height="24" rx="3.5" fill="#1f2937"/><ellipse cx="0" cy="-82" rx="10" ry="12" fill="#475569"/><ellipse cx="0" cy="-84" rx="6" ry="7" fill="#94a3b8"/>' },
+  jardinero: { emoji:'🌻', es:{f:'la jardinera', m:'el jardinero'}, en:'the gardener', color:'#15803d', detalle:'#a3e635',
+    gorro:'<ellipse cx="100" cy="50" rx="48" ry="13" fill="#fcd34d"/><path d="M76 48q4-24 24-24t24 24q-12-8-24-8t-24 8Z" fill="#fbbf24"/>',
+    propD:'<rect x="-2" y="-80" width="5" height="30" rx="2" fill="#16a34a"/><circle cx="0" cy="-86" r="8" fill="#fbbf24"/><circle cx="0" cy="-86" r="3.5" fill="#92400e"/><path d="M-10 -62q10-6 18 0" stroke="#16a34a" stroke-width="3" fill="none"/>' }
+};
+const DISFRACES_ORDEN = ['reportero','camarografo','policia','bombero','doctor','chef','cientifico','astronauta','futbolista','artista','superheroe','explorador','mago','cantante','jardinero'];
+function disfrazDe(s){
+    const id=s && s.disfraz;
+    return (id && DISFRACES[id]) ? Object.assign({id:id}, DISFRACES[id]) : null;
+}
+function nombreDeDisfraz(rol, g, es){
+    if(!rol) return '';
+    return es ? (rol.es[g==='f'?'f':'m']) : rol.en;
+}
+
+// --- El muñequito ------------------------------------------------------------
+function celPelo(g, edad){
+    if(g==='f'){
+        return edad==='joven'
+            // Joven: melena larga recogida en una coleta.
+            ? `<path d="M62 70q0-40 38-40t38 40q4 50-10 66h-16q10-26 2-50-14 10-28 10t-24-8q-6 26 2 48H48q10-28 14-66Z" fill="#5b3a21"/>
+               <path d="M138 86q22 10 20 40t-16 34q6-32-10-54Z" fill="#6b4226"/>
+               <circle cx="100" cy="74" r="31" fill="${PIEL}"/>
+               <path d="M70 60q8-26 30-26t30 26q-12-12-30-12t-30 12Z" fill="#5b3a21"/>`
+            // Pequeña: dos moños y flequillo.
+            : `<circle cx="58" cy="60" r="16" fill="#6b4226"/><circle cx="142" cy="60" r="16" fill="#6b4226"/>
+               <circle cx="100" cy="70" r="37" fill="#6b4226"/>
+               <circle cx="100" cy="74" r="31" fill="${PIEL}"/>
+               <path d="M69 62q7-28 31-28t31 28q-11-11-31-11t-31 11Z" fill="#6b4226"/>`;
+    }
+    return edad==='joven'
+        // Joven: pelo mas corto, con raya a un lado.
+        ? `<circle cx="100" cy="74" r="30" fill="${PIEL}"/>
+           <path d="M70 68q0-32 30-32t30 32q-4-14-18-16-16 10-32 6-6 4-10 10Z" fill="#3f2a1d"/>`
+        // Pequeño: casquete y mechon.
+        : `<circle cx="100" cy="74" r="32" fill="${PIEL}"/>
+           <path d="M68 70q2-36 32-36t32 36q-6-18-32-18T68 70Z" fill="#3f2a1d"/>
+           <path d="M126 40q10-6 13 4-7-1-13-4Z" fill="#3f2a1d"/>`;
+}
+function celPiernas(edad, zapato, pantalon){
+    const y = edad==='joven' ? 184 : 186;
+    const h = edad==='joven' ? 54 : 46;
+    const zy = y+h-2;
+    const color = pantalon || PIEL;
+    return `<g class="cel-pierna-l"><rect x="82" y="${y}" width="15" height="${h}" rx="7.5" fill="${color}"/><path d="M75 ${zy}h22a7 7 0 0 1 7 7v5H75z" fill="${zapato}"/></g>
+    <g class="cel-pierna-r"><rect x="103" y="${y}" width="15" height="${h}" rx="7.5" fill="${color}"/><path d="M96 ${zy}h22a7 7 0 0 1 7 7v5H96z" fill="${zapato}"/></g>`;
+}
+function celBrazo(lado, propio){
+    const x = lado==='l' ? 71 : 129, giro = lado==='l' ? -36 : 36;
+    return `<g class="cel-brazo-${lado}"><g transform="translate(${x},130) rotate(${giro})">
+      <rect x="-8" y="-62" width="16" height="68" rx="8" fill="${PIEL}"/><circle cx="0" cy="-64" r="11.5" fill="${PIEL}"/>
+      ${propio||''}
+    </g></g>`;
+}
+// Arma el muñequito completo: genero, edad y disfraz.
+function celSvgPersona(s, opciones){
+    const o=opciones||{};
+    const g = o.genero || (typeof generoDeAlumno==='function' ? generoDeAlumno(s) : 'f');
+    const edad = o.edad || edadDeAlumno(s);
+    const rol = o.rol!==undefined ? (o.rol?Object.assign({id:o.rol},DISFRACES[o.rol]||{}):null) : disfrazDe(s);
+    const hw = (!rol) && esHalloween();          // el disfraz elegido manda sobre Halloween
+    const vestido = g==='f' && edad==='peque' && !rol;
+    const colorRopa = rol ? rol.color : (hw ? (g==='f'?'#6d28d9':'#1f2937') : (g==='f'?'#ec4899':'#2563eb'));
+    const zapato = rol ? '#334155' : (hw ? '#111827' : (g==='f'?'#ef4467':'#334155'));
+    const pantalon = (edad==='joven' && !vestido) ? (rol?'#1e293b':'#1e40af') : null;
+    const torso = vestido
+        ? `<path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="${colorRopa}"/>
+           <path d="M66 172h68l3 12H63Z" fill="${hw?'#f59e0b':'#f9a8d4'}"/>`
+        : `<path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="${colorRopa}"/>`;
+    const cadera = (!vestido)
+        ? `<path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="${pantalon||(hw?'#111827':(rol?'#1e293b':'#1e3a8a'))}"/>`
+        : '';
+    const pecho = rol ? (rol.pecho||'') : (hw ? (g==='f'?'':HW_CUELLO)
+        : (g==='f' ? '<circle cx="100" cy="132" r="6" fill="#fbbf24"/>'
+                   : '<path d="m100 130 4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3-9.3-4.9-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#fbbf24"/>'));
+    const capaAtras = rol ? (rol.capa||'') : (hw ? (g==='f'?HW_CAPA_NINA:HW_CAPA_NINO) : '');
+    const cara = (rol && rol.antifaz) ? rol.antifaz
+        : `<path d="M82 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
+           <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    const cachetes = edad==='peque'
+        ? `<circle cx="78" cy="88" r="6.5" fill="${g==='f'?'#f9a8d4':'#fca5a5'}" opacity=".78"/><circle cx="122" cy="88" r="6.5" fill="${g==='f'?'#f9a8d4':'#fca5a5'}" opacity=".78"/>`
+        : '';
+    const bocaExtra = (hw && g==='m') ? HW_COLMILLOS : '<path d="M94 95q6 6 12 0Z" fill="#f9788f"/>';
+    const sombreroBase = hw ? (g==='f'?HW_SOMBRERO:'') : (g==='f' && edad==='peque'
+        ? '<g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>' : '');
+    const cabezaEscala = edad==='joven'
+        ? '<g transform="translate(100,80) scale(.9) translate(-100,-80)">' : '<g>';
     return `<svg viewBox="0 0 200 270" aria-hidden="true">
   <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
   <g class="cel-cuerpo">
-    ${hw?HW_CAPA_NINA:''}
-    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="${hw?'#111827':'#ef4467'}"/></g>
-    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="${hw?'#111827':'#ef4467'}"/></g>
-    <path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="${hw?'#6d28d9':'#ec4899'}"/>
-    <path d="M66 172h68l3 12H63Z" fill="${hw?'#f59e0b':'#f9a8d4'}"/>
-    <circle cx="100" cy="132" r="6" fill="#fbbf24"/>
-    <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
-    <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
-    <rect x="92" y="96" width="16" height="24" rx="8" fill="#e8b68d"/>
-    <g class="cel-cabeza">
-      <circle cx="58" cy="60" r="16" fill="#6b4226"/><circle cx="142" cy="60" r="16" fill="#6b4226"/>
-      <circle cx="100" cy="70" r="37" fill="#6b4226"/>
-      <circle cx="100" cy="74" r="31" fill="#f6cfae"/>
-      <path d="M69 62q7-28 31-28t31 28q-11-11-31-11t-31 11Z" fill="#6b4226"/>
-      <path d="M82 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <circle cx="78" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/><circle cx="122" cy="88" r="6.5" fill="#f9a8d4" opacity=".8"/>
+    ${capaAtras}
+    ${celPiernas(edad, zapato, pantalon)}
+    ${cadera}
+    ${torso}
+    ${pecho}
+    ${celBrazo('l', rol?rol.propI:'')}
+    ${celBrazo('r', rol?rol.propD:'')}
+    <rect x="92" y="96" width="16" height="24" rx="8" fill="${PIEL_S}"/>
+    <g class="cel-cabeza">${cabezaEscala}
+      ${celPelo(g, edad)}
+      ${cara}
+      ${cachetes}
       <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
-      <path d="M94 95q6 6 12 0Z" fill="#f9788f"/>
-      ${hw ? HW_SOMBRERO : '<g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>'}
-    </g>
+      ${bocaExtra}
+      ${(rol && rol.gafas) ? rol.gafas : ''}
+      ${(rol && rol.gorro) ? rol.gorro : sombreroBase}
+      ${(rol && rol.casco) ? rol.casco : ''}
+      ${(hw && g==='m' && !rol) ? HW_ARANA : ''}
+    </g></g>
+    ${(rol && rol.suelo) ? rol.suelo : ''}
   </g>
 </svg>`;
 }
-function celSvgNino(){
-    const hw=esHalloween();
-    return `<svg viewBox="0 0 200 270" aria-hidden="true">
-  <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
-  <g class="cel-cuerpo">
-    ${hw?HW_CAPA_NINO:''}
-    <g class="cel-pierna-l"><rect x="82" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M75 230h22a7 7 0 0 1 7 7v5H75z" fill="#334155"/></g>
-    <g class="cel-pierna-r"><rect x="103" y="186" width="15" height="46" rx="7.5" fill="#f6cfae"/><path d="M96 230h22a7 7 0 0 1 7 7v5H96z" fill="#334155"/></g>
-    <path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="${hw?'#111827':'#1e3a8a'}"/>
-    <path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="${hw?'#1f2937':'#2563eb'}"/>
-    ${hw ? HW_CUELLO : '<path d="m100 130 4.6 9.4 10.4 1.5-7.5 7.3 1.8 10.3-9.3-4.9-9.3 4.9 1.8-10.3-7.5-7.3 10.4-1.5z" fill="#fbbf24"/>'}
-    <g class="cel-brazo-l"><g transform="translate(71,130) rotate(-36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
-    <g class="cel-brazo-r"><g transform="translate(129,130) rotate(36)"><rect x="-8" y="-62" width="16" height="68" rx="8" fill="#f6cfae"/><circle cx="0" cy="-64" r="11.5" fill="#f6cfae"/></g></g>
-    <rect x="92" y="96" width="16" height="24" rx="8" fill="#e8b68d"/>
-    <g class="cel-cabeza">
-      <circle cx="100" cy="74" r="32" fill="#f6cfae"/>
-      <path d="M68 70q2-36 32-36t32 36q-6-18-32-18T68 70Z" fill="#3f2a1d"/>
-      <path d="M126 40q10-6 13 4-7-1-13-4Z" fill="#3f2a1d"/>
-      <path d="M82 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <circle cx="78" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/><circle cx="122" cy="88" r="6.5" fill="#fca5a5" opacity=".75"/>
-      <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
-      ${hw ? HW_COLMILLOS : '<path d="M94 95q6 6 12 0Z" fill="#f9788f"/>'}
-      ${hw ? HW_ARANA : ''}
-    </g>
-  </g>
-</svg>`;
+// Se conservan los nombres viejos: el resto de la plataforma los sigue usando.
+function celSvgNina(s){ return celSvgPersona(s||null,{genero:'f'}); }
+function celSvgNino(s){ return celSvgPersona(s||null,{genero:'m'}); }
+
+// --- Apartado "Disfraces" ----------------------------------------------------
+let _disfracesFiltro='';
+window.abrirDisfraces=function(){
+    const es=currentLanguage==='es';
+    if(!(currentStudents||[]).length){ showNotification(es?'Este salón no tiene estudiantes':'This classroom has no students','info'); return; }
+    textosDisfraces();
+    pintarDisfraces();
+    showModal('disfracesModal');
+};
+window.cerrarDisfraces=function(){ hideModal('disfracesModal'); };
+window.filtrarDisfraces=function(v){ _disfracesFiltro=String(v||'').toLowerCase(); pintarDisfraces(); };
+window.setDisfraz=function(sid,id){
+    const s=currentStudents.find(x=>x.id===sid); if(!s) return;
+    s.disfraz = (id && DISFRACES[id]) ? id : '';
+    saveData();
+    pintarUnDisfraz(s);
+};
+window.setEdadAlumno=function(sid,edad){
+    const s=currentStudents.find(x=>x.id===sid); if(!s) return;
+    s.edad = (edad==='peque'||edad==='joven') ? edad : '';
+    saveData();
+    pintarUnDisfraz(s);
+};
+window.quitarDisfraces=function(){
+    const es=currentLanguage==='es';
+    const con=(currentStudents||[]).filter(s=>s.disfraz).length;
+    if(!con){ showNotification(es?'Nadie tiene disfraz todavía':'Nobody has a costume yet','info'); return; }
+    if(!confirm(es?`¿Quitar el disfraz a ${con} estudiante(s)?`:`Remove the costume from ${con} student(s)?`)) return;
+    const copia=(currentStudents||[]).map(s=>({id:s.id, disfraz:s.disfraz||''}));
+    currentStudents.forEach(s=>{ s.disfraz=''; });
+    saveData(); pintarDisfraces();
+    showNotification(es?'Disfraces quitados':'Costumes removed','success',{ texto: es?'Deshacer':'Undo', onClick(){
+        copia.forEach(r=>{ const s=currentStudents.find(x=>x.id===r.id); if(s) s.disfraz=r.disfraz; });
+        saveData(); pintarDisfraces();
+    }});
+};
+// Reparte los disfraces de la lista entre todos, en orden: util para un proyecto.
+window.repartirDisfraces=function(){
+    const es=currentLanguage==='es';
+    const sel=document.getElementById('disfracesReparto');
+    const grupo=(sel&&sel.value)||'noticias';
+    const paquetes={
+        noticias:['reportero','camarografo','cantante','artista'],
+        comunidad:['policia','bombero','doctor','chef','jardinero'],
+        ciencia:['cientifico','astronauta','doctor','explorador'],
+        todos:DISFRACES_ORDEN
+    };
+    const lista=paquetes[grupo]||paquetes.todos;
+    const copia=(currentStudents||[]).map(s=>({id:s.id, disfraz:s.disfraz||''}));
+    (currentStudents||[]).forEach((s,i)=>{ s.disfraz=lista[i%lista.length]; });
+    saveData(); pintarDisfraces();
+    showNotification(es?`🎭 Disfraces repartidos entre ${currentStudents.length} estudiantes`:`🎭 Costumes handed out to ${currentStudents.length} students`,'success',
+        { texto: es?'Deshacer':'Undo', onClick(){ copia.forEach(r=>{ const s=currentStudents.find(x=>x.id===r.id); if(s) s.disfraz=r.disfraz; }); saveData(); pintarDisfraces(); } });
+};
+function opcionesDeDisfraz(s){
+    const es=currentLanguage==='es';
+    const g=generoDeAlumno(s);
+    const actual=s.disfraz||'';
+    return `<option value="">${es?'— Sin disfraz —':'— No costume —'}</option>`
+        + DISFRACES_ORDEN.map(id=>{
+            const r=DISFRACES[id];
+            const nombre=es ? r.es[g==='f'?'f':'m'].replace(/^(la|el)\s+/,'') : r.en.replace(/^the\s+/,'');
+            return `<option value="${id}"${id===actual?' selected':''}>${r.emoji} ${escapeHtml(nombre)}</option>`;
+        }).join('');
 }
+function tarjetaDisfraz(s){
+    const es=currentLanguage==='es';
+    const edad=edadDeAlumno(s);
+    return `<div class="dis-card" data-dis-id="${Number(s.id)}">
+        <div class="dis-fig">${celSvgPersona(s)}</div>
+        <div class="dis-info">
+            <b class="dis-nombre">${escapeHtml(s.name||'')}</b>
+            <select class="dis-select" aria-label="${es?'Disfraz de ':'Costume for '}${escapeHtml(s.name||'')}" onchange="setDisfraz(${Number(s.id)},this.value)">${opcionesDeDisfraz(s)}</select>
+            <div class="dis-edad" role="group">
+                <button type="button" class="dis-edad-btn" aria-pressed="${edad==='peque'}" onclick="setEdadAlumno(${Number(s.id)},'peque')">${es?'Peque':'Child'}</button>
+                <button type="button" class="dis-edad-btn" aria-pressed="${edad==='joven'}" onclick="setEdadAlumno(${Number(s.id)},'joven')">${es?'Joven':'Teen'}</button>
+            </div>
+        </div>
+    </div>`;
+}
+function pintarUnDisfraz(s){
+    const card=document.querySelector(`#disfracesLista .dis-card[data-dis-id="${Number(s.id)}"]`);
+    if(!card){ pintarDisfraces(); return; }
+    const fig=card.querySelector('.dis-fig'); if(fig) fig.innerHTML=celSvgPersona(s);
+    const sel=card.querySelector('.dis-select'); if(sel) sel.value=s.disfraz||'';
+    actualizarCuentaDisfraces();
+    const edad=edadDeAlumno(s);
+    card.querySelectorAll('.dis-edad-btn').forEach((b,i)=>b.setAttribute('aria-pressed', (i===0)===(edad==='peque')?'true':'false'));
+}
+function pintarDisfraces(){
+    const es=currentLanguage==='es';
+    const caja=document.getElementById('disfracesLista'); if(!caja) return;
+    const lista=(currentStudents||[]).filter(s=>!_disfracesFiltro || String(s.name||'').toLowerCase().includes(_disfracesFiltro));
+    caja.innerHTML = lista.length
+        ? lista.map(tarjetaDisfraz).join('')
+        : `<p class="dis-vacio">${es?'Ningún nombre coincide con la búsqueda.':'No name matches the search.'}</p>`;
+    actualizarCuentaDisfraces();
+}
+function actualizarCuentaDisfraces(){
+    const es=currentLanguage==='es';
+    const n=(currentStudents||[]).filter(s=>s.disfraz).length;
+    const cuenta=document.getElementById('disfracesCuenta');
+    if(cuenta) cuenta.textContent = n ? (es?`${n} con disfraz`:`${n} in costume`) : (es?'Nadie tiene disfraz todavía':'Nobody is in costume yet');
+}
+function textosDisfraces(){
+    const es=currentLanguage==='es';
+    const t=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    t('disfracesBtnText', es?'Disfraces':'Costumes');
+    t('disfracesTitulo', es?'🎭 Disfraces del salón':'🎭 Classroom costumes');
+    t('disfracesIntro', es?'Cada estudiante tiene su muñequito, y puedes ponerle un disfraz. Aparece cuando llega a clase y marcas su asistencia.'
+                         :'Every student has their own character, and you can put a costume on them. It shows up when you mark them present.');
+    t('disfracesRepartirBtn', es?'🎬 Repartir roles':'🎬 Hand out roles');
+    t('disfracesQuitarBtn', es?'🧹 Quitar todos':'🧹 Remove all');
+    t('disfracesCerrarBtn', es?'Cerrar':'Close');
+    const b=document.getElementById('disfracesBuscar'); if(b) b.placeholder=es?'🔎 Buscar estudiante…':'🔎 Search student…';
+    const sel=document.getElementById('disfracesReparto');
+    if(sel){
+        const vals=es?['Proyecto de noticias','La comunidad','Ciencia y espacio','Todos los disfraces']
+                     :['News project','Community helpers','Science and space','Every costume'];
+        [...sel.options].forEach((o,i)=>{ if(vals[i]) o.textContent=vals[i]; });
+    }
+}
+
 // Pupitre vacio para la ausencia: nada de burla, solo la silla sola.
 const CEL_PUPITRE = `<svg viewBox="0 0 220 200" aria-hidden="true">
   <ellipse cx="110" cy="182" rx="76" ry="10" fill="rgba(31,35,64,.14)"/>
@@ -5321,7 +5630,9 @@ function celebrarLlegada(ancla,s){
     cerrarCelebracion();
     const { capa, escena } = celCapa(g);
     const rayos=document.createElement('div'); rayos.className='cel-rayos'; escena.appendChild(rayos);
-    if(Math.random()<0.42){
+    const rolLlegada=(typeof disfrazDe==='function') ? disfrazDe(s) : null;
+    // Con disfraz siempre sale el muñequito: para eso se lo pusieron.
+    if(!rolLlegada && Math.random()<0.42){
         // Escena sin personaje: cohete, globos, estrella, trofeo, arcoiris, YUJU...
         const id=celElegir('celFig', celFigurasDisponibles());
         const fig=document.createElement('div');
@@ -5332,10 +5643,14 @@ function celebrarLlegada(ancla,s){
         const mov=celElegir('celMov', CEL_MOVS);
         const kid=document.createElement('div');
         kid.className='cel-kid mov-'+mov;
-        kid.innerHTML = g==='f' ? celSvgNina() : celSvgNino();
+        kid.innerHTML = celSvgPersona(s);
         escena.appendChild(kid);
     }
-    celTexto(escena, celElegir('celSaludo'+(es?g:'en'), CEL_SALUDOS[es?g:'en']), celNombreDe(s));
+    const saludo = rolLlegada
+        ? (es ? `¡Llegó ${rolLlegada.es[g==='f'?'f':'m']}!`
+              : rolLlegada.en.charAt(0).toUpperCase()+rolLlegada.en.slice(1)+' has arrived!')
+        : celElegir('celSaludo'+(es?g:'en'), CEL_SALUDOS[es?g:'en']);
+    celTexto(escena, saludo, (rolLlegada?rolLlegada.emoji+' ':'')+celNombreDe(s));
     celConfeti(capa, esHalloween()?'hw':g, 34, true);
     celMostrar(capa, 1950);
     return g;
@@ -6759,6 +7074,7 @@ function updateNewFeaturesText(){
     const ws=document.getElementById('weeklySummaryBtnText'); if(ws)ws.textContent=es?'Resumen semanal (IA)':'Weekly summary (AI)';
     if(typeof textosJuegosVocabulario==='function') textosJuegosVocabulario();
     if(typeof textosBomba==='function') textosBomba();
+    if(typeof textosDisfraces==='function') textosDisfraces();
     if(typeof textosComentariosBoletin==='function') textosComentariosBoletin();
     const sc=document.getElementById('suggestCommentBtn'); if(sc && !sc.disabled) sc.innerHTML='✨ '+(es?'Sugerir con IA':'Suggest with AI');
     if(typeof updateCloudStatusPill==='function') updateCloudStatusPill();
