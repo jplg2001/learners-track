@@ -2822,6 +2822,7 @@ tr.flash-m td { animation:flashM .9s ease-out; }
         <option value="comida">Comida y servicio</option>
         <option value="deportes">Deportes</option>
         <option value="fantasia">Fantasía</option>
+        <option value="halloween">🎃 Halloween</option>
         <option value="todos">Todos los disfraces</option>
       </select>
       <button type="button" class="btn-secondary" id="disfracesRepartirBtn" onclick="repartirDisfraces()">🎬 Repartir roles</button>
@@ -5202,7 +5203,8 @@ const DIS_CATS = {
   ciencia:   { es:'Ciencia y tecnología', en:'Science and technology' },
   arte:      { es:'Arte, letras y escenario', en:'Arts, words and stage' },
   deportes:  { es:'Deportes', en:'Sports' },
-  fantasia:  { es:'Fantasía', en:'Fantasy' }
+  fantasia:  { es:'Fantasía', en:'Fantasy' },
+  halloween: { es:'Halloween', en:'Halloween' }
 };
 const DISFRACES = {
   // ---------------- Comunidad y salud ----------------
@@ -5386,6 +5388,103 @@ const DISFRACES = {
   vaquero:     { cat:'fantasia', emoji:'🤠', es:{f:'la vaquera', m:'el vaquero'}, en:'the cowboy', color:'#b45309',
                  gorro:PZ.sombrero('#92400e','#b45309'),
                  pecho:'<path d="M92 120h16l-8 16Z" fill="#dc2626"/><path d="m118 134 4 4 6 1-4 5 1 6-5-3-5 3 1-6-4-5 6-1z" fill="#fbbf24"/>' },
+  // ---------------- Halloween ----------------
+  // Disfraces de octubre. Algunos cambian la cabeza entera (calabaza, esqueleto,
+  // fantasma) y otros solo el color de la piel (zombi, duende, Frankenstein).
+  bruja:       { cat:'halloween', emoji:'🧙', es:{f:'la bruja', m:'el brujo'}, en:'the witch', color:'#4c1d95',
+                 gorro:PZ.pico('#2e1065','#fbbf24'),
+                 capa:'<path d="M64 120q-18 62-10 112h92q8-50-10-112l-14-4q-18 16-44 0Z" fill="#1e1b4b"/><path d="M70 120q-12 56-8 100h12q-6-52 6-98Z" fill="#4c1d95" opacity=".8"/>',
+                 pecho:'<path d="m100 130 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#a3e635"/>', propD:PZ.escoba() },
+  vampiro:     { cat:'halloween', emoji:'🧛', es:{f:'la vampiresa', m:'el vampiro'}, en:'the vampire', color:'#1f2937',
+                 capa:'<path d="M62 118q-20 66-12 116h100q8-50-12-116l-16-4q-20 18-44 0Z" fill="#111827"/><path d="M70 118q-14 60-10 104h14q-8-54 8-100Z" fill="#991b1b" opacity=".9"/>',
+                 pecho:'<path d="M76 114 100 132l24-18 14 6q-16 22-38 24-22-2-38-24Z" fill="#7f1d1d"/>',
+                 boca:'<path d="M90 88q10 14 20 0Z" fill="#7f1d1d"/><path d="M93 94l3 9 3-9ZM101 94l3 9 3-9Z" fill="#fff"/>' },
+  fantasma:    { cat:'halloween', emoji:'👻', es:{f:'el fantasma', m:'el fantasma'}, en:'the ghost', color:'#f8fafc',
+                 cuerpo:'<path d="M100 102c-32 0-50 24-50 58v78l16-14 16 14 18-16 18 16 16-14 16 14v-78c0-34-18-58-50-58Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/>',
+                 cabeza:'<circle cx="100" cy="74" r="34" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><ellipse cx="86" cy="72" rx="8" ry="11" fill="#1f2937"/><ellipse cx="114" cy="72" rx="8" ry="11" fill="#1f2937"/><ellipse cx="100" cy="94" rx="10" ry="8" fill="#1f2937"/>' },
+  esqueleto:   { cat:'halloween', emoji:'💀', es:{f:'el esqueleto', m:'el esqueleto'}, en:'the skeleton', color:'#111827',
+                 cabeza:'<circle cx="100" cy="74" r="32" fill="#f1f5f9"/><ellipse cx="87" cy="72" rx="9" ry="11" fill="#1f2937"/><ellipse cx="113" cy="72" rx="9" ry="11" fill="#1f2937"/><path d="M100 84l-5 9h10Z" fill="#1f2937"/><path d="M84 98h32v4H84Zm4 4h4v6h-4Zm8 0h4v6h-4Zm8 0h4v6h-4Zm8 0h4v6h-4Z" fill="#1f2937"/>',
+                 pecho:'<path d="M94 120h12v54H94Z" fill="#e2e8f0"/><path d="M76 132h48v7H76Zm2 14h44v7H78Zm3 14h38v7H81Z" fill="#e2e8f0"/>',
+                 encima:'<path d="M84 190h10v44H84Zm22 0h10v44h-10Z" fill="#e2e8f0" opacity=".9"/>' },
+  momia:       { cat:'halloween', emoji:'🧻', es:{f:'la momia', m:'la momia'}, en:'the mummy', color:'#e7e5e4',
+                 cabeza:'<circle cx="100" cy="74" r="32" fill="#e7e5e4"/><path d="M68 62h64v9H68Zm2 18h60v9H70Zm0 18h58v9H70Z" fill="#f5f5f4"/><path d="M70 50q30-16 60 0l-4 10H74Z" fill="#fafaf9"/><ellipse cx="112" cy="76" rx="8" ry="6" fill="#1f2937"/>',
+                 pecho:'<path d="M72 124h56v8H72Zm0 16h56v8H72Zm0 16h56v8H72Z" fill="#f5f5f4"/>',
+                 encima:'<path d="M60 128l-14 10 6 8 14-10Z" fill="#f5f5f4"/>' },
+  zombi:       { cat:'halloween', emoji:'🧟', es:{f:'la zombi', m:'el zombi'}, en:'the zombie', color:'#4b5563',
+                 piel:'#86efac',
+                 cara:'<circle cx="88" cy="76" r="7" fill="#f8fafc"/><circle cx="88" cy="77" r="3.5" fill="#1f2937"/><circle cx="112" cy="76" r="5" fill="#f8fafc"/><circle cx="112" cy="77" r="2.5" fill="#1f2937"/><path d="M118 60l10 6" stroke="#15803d" stroke-width="3"/>',
+                 boca:'<path d="M88 92h24l-4 8H92Z" fill="#334155"/><path d="M92 92v8M100 92v8M108 92v8" stroke="#86efac" stroke-width="2"/>',
+                 pecho:'<path d="M78 150l12 10-12 6Zm44 8l-10 10 12 4Z" fill="#1f2937" opacity=".5"/>' },
+  calabaza:    { cat:'halloween', emoji:'🎃', es:{f:'la calabaza', m:'la calabaza'}, en:'the pumpkin', color:'#f97316',
+                 cuerpo:'<ellipse cx="100" cy="158" rx="54" ry="48" fill="#f97316"/><ellipse cx="78" cy="158" rx="17" ry="46" fill="#fb923c" opacity=".55"/><ellipse cx="122" cy="158" rx="17" ry="46" fill="#fb923c" opacity=".55"/>',
+                 cabeza:'<circle cx="100" cy="74" r="34" fill="#f97316"/><ellipse cx="78" cy="74" rx="11" ry="32" fill="#fb923c" opacity=".5"/><ellipse cx="122" cy="74" rx="11" ry="32" fill="#fb923c" opacity=".5"/><path d="M80 64l16 8-16 8Zm40 0-16 8 16 8Z" fill="#7c2d12"/><path d="M80 92h40l-6 12-8-6-8 8-8-6Z" fill="#7c2d12"/>',
+                 gorro:'<path d="M94 44h12v-10c0-7 6-13 13-13-6 6-7 9-7 15v8Z" fill="#16a34a"/><path d="M106 34c8-8 18-6 21-2-8-1-13 2-16 6Z" fill="#22c55e"/>' },
+  gatonegro:   { cat:'halloween', emoji:'🐈‍⬛', es:{f:'la gata negra', m:'el gato negro'}, en:'the black cat', color:'#111827',
+                 gorro:'<path d="M66 54 62 18l30 20Zm68 0 4-36-30 20Z" fill="#111827"/><path d="M72 46 70 28l15 11Zm56 0 2-18-15 11Z" fill="#f472b6"/>',
+                 cara:'<path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#1f2937" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M96 88h8l-4 5Z" fill="#f472b6"/><path d="M72 86h14M72 94h14M114 86h14M114 94h14" stroke="#1f2937" stroke-width="2.5"/>',
+                 capa:'<path d="M140 180q34 6 30-34-2-18-16-16 10 6 8 20-2 18-24 14Z" fill="#111827"/>' },
+  murcielago:  { cat:'halloween', emoji:'🦇', es:{f:'el murciélago', m:'el murciélago'}, en:'the bat', color:'#1f2937',
+                 gorro:'<path d="M70 52 64 24l26 18Zm60 0 6-28-26 18Z" fill="#1f2937"/>',
+                 capa:'<path d="M66 122Q20 106 8 140q22-6 30 8 8-18 30-12Zm68 0q46-16 58 18-22-6-30 8-8-18-30-12Z" fill="#4c1d95"/>',
+                 boca:'<path d="M90 88q10 14 20 0Z" fill="#7f1d1d"/><path d="M93 94l3 9 3-9ZM101 94l3 9 3-9Z" fill="#fff"/>' },
+  hombrelobo:  { cat:'halloween', emoji:'🐺', es:{f:'la mujer lobo', m:'el hombre lobo'}, en:'the werewolf', color:'#78350f',
+                 cabeza:'<path d="M64 52 60 16l30 22Zm72 0 4-36-30 22Z" fill="#78350f"/><circle cx="100" cy="76" r="33" fill="#92400e"/><path d="M70 60q30-18 60 0-16-8-30-8t-30 8Z" fill="#78350f"/><ellipse cx="100" cy="92" rx="18" ry="14" fill="#d6d3d1"/><ellipse cx="100" cy="84" rx="7" ry="5" fill="#1f2937"/><path d="M90 96q10 10 20 0Z" fill="#1f2937"/><path d="M92 98l3 8 3-8Zm10 0 3 8 3-8Z" fill="#fff"/><path d="M84 72q6-7 12 0M104 72q6-7 12 0" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>',
+                 pecho:'<path d="M80 150l10 12-12 8Zm40 4-8 12 12 6Z" fill="#451a03" opacity=".6"/>' },
+  frankenstein:{ cat:'halloween', emoji:'🧟‍♂️', es:{f:'la monstruita', m:'el monstruito'}, en:'the friendly monster', color:'#1f2937',
+                 piel:'#86efac',
+                 cabeza:'<rect x="68" y="44" width="64" height="66" rx="10" fill="#86efac"/><path d="M68 56h64v12H68Z" fill="#1f2937"/><rect x="58" y="86" width="10" height="16" rx="4" fill="#94a3b8"/><rect x="132" y="86" width="10" height="16" rx="4" fill="#94a3b8"/><circle cx="86" cy="80" r="5" fill="#1f2937"/><circle cx="114" cy="80" r="5" fill="#1f2937"/><path d="M86 96h28" stroke="#15803d" stroke-width="3"/><path d="M92 96v6M104 96v6" stroke="#15803d" stroke-width="2.5"/>',
+                 pecho:'<path d="M84 126h32v10H84Z" fill="#0f172a"/>' },
+  diablito:    { cat:'halloween', emoji:'😈', es:{f:'la diablita', m:'el diablito'}, en:'the little devil', color:'#dc2626',
+                 gorro:'<path d="M74 50q-10-20 2-30 2 14 14 20Zm52 0q10-20-2-30-2 14-14 20Z" fill="#991b1b"/>',
+                 capa:'<path d="M142 186q30-8 24-44-4-16-16-12 10 8 6 22-4 16-20 20Z" fill="#991b1b"/>',
+                 propD:'<rect x="-3" y="-84" width="6" height="32" rx="3" fill="#991b1b"/><path d="M-14 -96v12h28v-12l-6 8-8-10-8 10Z" fill="#fbbf24"/>' },
+  catrina:     { cat:'halloween', emoji:'💐', es:{f:'la catrina', m:'el catrín'}, en:'the catrina', color:'#7e22ce',
+                 cabeza:'<circle cx="100" cy="74" r="32" fill="#faf5ff"/><circle cx="87" cy="74" r="10" fill="#7e22ce"/><circle cx="113" cy="74" r="10" fill="#7e22ce"/><path d="M87 60v-6M113 60v-6M79 70l-6-3M121 70l6-3" stroke="#a855f7" stroke-width="3"/><path d="M100 84l-5 8h10Z" fill="#7e22ce"/><path d="M80 98h40M86 98v8M94 98v8M106 98v8M114 98v8" stroke="#7e22ce" stroke-width="3"/>',
+                 gorro:'<circle cx="74" cy="50" r="11" fill="#ef4467"/><circle cx="100" cy="42" r="12" fill="#fbbf24"/><circle cx="126" cy="50" r="11" fill="#f472b6"/><circle cx="74" cy="50" r="4" fill="#fde68a"/><circle cx="100" cy="42" r="4" fill="#b45309"/><circle cx="126" cy="50" r="4" fill="#fde68a"/>' },
+  espantapajaros:{cat:'halloween', emoji:'🌾', es:{f:'la espantapájaros', m:'el espantapájaros'}, en:'the scarecrow', color:'#a16207',
+                 gorro:'<path d="M58 54q42-8 84 0l-6 8H64Z" fill="#ca8a04"/><path d="M74 52q6-28 26-28t26 28q-13-10-26-10t-26 10Z" fill="#eab308"/><path d="M74 46h52l2 6H72Z" fill="#b45309"/>',
+                 cara:'<path d="M84 70l12 12M96 70l-12 12M104 70l12 12M116 70l-12 12" stroke="#1f2937" stroke-width="3.5"/>',
+                 boca:'<path d="M84 92h32" stroke="#1f2937" stroke-width="3.5"/><path d="M90 86v12M100 86v12M110 86v12" stroke="#1f2937" stroke-width="3"/>',
+                 pecho:'<rect x="84" y="134" width="16" height="14" rx="2" fill="#dc2626" opacity=".8"/><rect x="106" y="150" width="14" height="12" rx="2" fill="#16a34a" opacity=".8"/>' },
+  dinosaurio:  { cat:'halloween', emoji:'🦖', es:{f:'el dinosaurio', m:'el dinosaurio'}, en:'the dinosaur', color:'#16a34a',
+                 gorro:'<path d="M66 60q0-40 34-40t34 40q-16-12-34-12t-34 12Z" fill="#16a34a"/><path d="M100 14l8 14h-16Zm-20 8 7 13-14 2Zm40 0-7 13 14 2Z" fill="#a3e635"/>',
+                 capa:'<path d="M138 180q40 4 38-40-2-22-18-20 12 8 10 24-2 22-30 22Z" fill="#16a34a"/><path d="M160 150l10-8 2 12Zm12 18 12-4-4 12Z" fill="#a3e635"/>',
+                 pecho:'<ellipse cx="100" cy="152" rx="24" ry="28" fill="#bbf7d0"/>' },
+  dragon:      { cat:'halloween', emoji:'🐉', es:{f:'la dragona', m:'el dragón'}, en:'the dragon', color:'#b91c1c',
+                 gorro:'<path d="M66 58q0-38 34-38t34 38q-16-12-34-12t-34 12Z" fill="#b91c1c"/><path d="M78 30l-8-16 18 8Zm44 0 8-16-18 8Z" fill="#fbbf24"/>',
+                 capa:'<path d="M64 120Q18 104 6 142q24-8 32 8 8-20 30-14Zm72 0q46-16 58 22-24-8-32 8-8-20-30-14Z" fill="#dc2626"/><path d="M60 126q-30-6-40 16 16-4 22 6 4-14 20-10Z" fill="#fca5a5" opacity=".7"/>',
+                 boca:'<path d="M90 88q10 14 20 0Z" fill="#7f1d1d"/><path d="M93 94l3 9 3-9ZM101 94l3 9 3-9Z" fill="#fff"/>' },
+  unicornio:   { cat:'halloween', emoji:'🦄', es:{f:'el unicornio', m:'el unicornio'}, en:'the unicorn', color:'#f0abfc',
+                 gorro:'<path d="M100 10 112 48H88Z" fill="#fbbf24"/><path d="M94 44h12M92 34h16M96 24h8" stroke="#f8fafc" stroke-width="3"/><path d="M62 56q10-16 22-10-8 10-6 18Zm76 0q-10-16-22-10 8 10 6 18Z" fill="#c4b5fd"/>',
+                 capa:'<path d="M66 70q-22 8-24 34 14-12 26-6Z" fill="#f472b6"/><path d="M62 84q-20 10-20 32 12-12 24-8Z" fill="#60a5fa"/><path d="M60 100q-18 12-16 32 12-14 22-10Z" fill="#a3e635"/>',
+                 pecho:'<path d="m100 130 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fde68a"/>' },
+  sirena:      { cat:'halloween', emoji:'🧜', es:{f:'la sirena', m:'el tritón'}, en:'the merfolk', color:'#0ea5e9',
+                 gorro:'<path d="M70 50q30-20 60 0l-4 8H74Z" fill="#06b6d4"/><path d="M88 40q6-12 12 0 6-12 12 0-6 6-12 2-6 4-12-2Z" fill="#f472b6"/>',
+                 pecho:'<path d="M84 136q8-10 16 0 8-10 16 0-8 8-16 3-8 5-16-3Z" fill="#a855f7"/>',
+                 encima:'<path d="M76 176h48q10 34-4 56-20 10-40 0-14-22-4-56Z" fill="#06b6d4"/><path d="M80 228q20 12 40 0 14 18 8 26-28 8-56 0-6-8 8-26Z" fill="#22d3ee"/><path d="M88 190h24M86 206h28" stroke="#0e7490" stroke-width="3"/>' },
+  duende:      { cat:'halloween', emoji:'🧝', es:{f:'la duende', m:'el duende'}, en:'the elf', color:'#15803d',
+                 piel:'#bbf7d0',
+                 gorro:PZ.pico('#166534','#fbbf24'),
+                 cara:'<path d="M70 66 58 56l14-6Zm60 0 12-10-14-6Z" fill="#bbf7d0"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#14532d" stroke-width="4" fill="none" stroke-linecap="round"/>' },
+  aranita:     { cat:'halloween', emoji:'🕷️', es:{f:'la arañita', m:'la arañita'}, en:'the spider', color:'#111827',
+                 gorro:'<circle cx="78" cy="40" r="7" fill="#111827"/><circle cx="122" cy="40" r="7" fill="#111827"/><path d="M78 48v8M122 48v8" stroke="#111827" stroke-width="3"/><circle cx="78" cy="38" r="2.5" fill="#fbbf24"/><circle cx="122" cy="38" r="2.5" fill="#fbbf24"/>',
+                 capa:'<path d="M66 128 26 106l-6 12 44 24Zm0 22-44 8 2 14 44-10Zm68-22 40-22 6 12-44 24Zm0 22 44 8-2 14-44-10Z" fill="#111827"/>',
+                 pecho:'<circle cx="100" cy="146" r="18" fill="#7f1d1d"/><path d="m100 134 5 12-5 12-5-12z" fill="#fbbf24"/>' },
+  cazafantasmas:{cat:'halloween', emoji:'🔫', es:{f:'la cazafantasmas', m:'el cazafantasmas'}, en:'the ghost hunter', color:'#d6d3d1',
+                 capa:'<rect x="68" y="118" width="26" height="46" rx="6" fill="#64748b"/><circle cx="81" cy="132" r="7" fill="#f87171"/><path d="M94 140h10" stroke="#334155" stroke-width="5"/>',
+                 pecho:'<circle cx="104" cy="140" r="13" fill="#ef4467"/><path d="M104 132c6 0 9 4 9 9h-4q0-5-5-5Z" fill="#f8fafc"/>',
+                 propD:'<rect x="-4" y="-80" width="9" height="26" rx="3" fill="#475569"/><path d="M-6 -86h14l10-10-4 16 4 16-10-10h-14Z" fill="#94a3b8"/><circle cx="12" cy="-86" r="5" fill="#38bdf8"/>' },
+  cientificoloco:{cat:'halloween', emoji:'⚗️', es:{f:'la científica loca', m:'el científico loco'}, en:'the mad scientist', color:'#f8fafc',
+                 cabeza:'<path d="M58 60q4-26 20-18-2-16 12-14-4-14 10-14 14 0 10 14 14-2 12 14 16-8 20 18-18-10-40-10t-40 10Z" fill="#e2e8f0"/><circle cx="100" cy="76" r="30" fill="#f6cfae"/><path d="M62 62q16-12 38-12t38 12q-10-16-38-16t-38 16Z" fill="#f1f5f9"/>',
+                 gafas:PZ.gafas('#334155'),
+                 propD:'<path d="M-7 -84h14v10l9 22a4 4 0 0 1-4 6h-24a4 4 0 0 1-4-6l9-22Z" fill="#bbf7d0" opacity=".9"/><path d="M-12 -58h24l-5-12h-14Z" fill="#22c55e"/><circle cx="-2" cy="-66" r="3" fill="#86efac"/><circle cx="5" cy="-74" r="2.5" fill="#86efac"/><circle cx="-6" cy="-80" r="2" fill="#86efac"/>' },
+  calavera:    { cat:'halloween', emoji:'☠️', es:{f:'la calaverita', m:'el calaverito'}, en:'the sugar skull', color:'#0f172a',
+                 cabeza:'<circle cx="100" cy="74" r="32" fill="#f8fafc"/><circle cx="87" cy="74" r="9" fill="#0f172a"/><circle cx="113" cy="74" r="9" fill="#0f172a"/><circle cx="87" cy="74" r="4" fill="#f97316"/><circle cx="113" cy="74" r="4" fill="#f97316"/><path d="M100 84l-5 9h10Z" fill="#0f172a"/><path d="M82 98h36M88 98v9M96 98v9M104 98v9M112 98v9" stroke="#0f172a" stroke-width="3"/><path d="M100 46v8M94 50h12" stroke="#f97316" stroke-width="3"/>',
+                 pecho:'<path d="M94 128h12v10h10v12h-10v10H94v-10H84v-12h10z" fill="#f97316"/>' },
+  brujito:     { cat:'halloween', emoji:'🔮', es:{f:'la hechicera', m:'el hechicero'}, en:'the sorcerer', color:'#312e81',
+                 gorro:PZ.pico('#1e1b4b','#38bdf8'),
+                 pecho:'<circle cx="100" cy="142" r="12" fill="#a5b4fc" opacity=".9"/><circle cx="96" cy="138" r="4" fill="#e0e7ff"/>',
+                 propD:'<circle cx="0" cy="-76" r="14" fill="#a78bfa" opacity=".85"/><circle cx="-4" cy="-80" r="4" fill="#ede9fe"/><path d="M-10 -62h20l-4 8h-12Z" fill="#fbbf24"/>' },
   rey:         { cat:'fantasia', emoji:'👑', es:{f:'la reina', m:'el rey'}, en:'the royal', color:'#7e22ce',
                  gorro:PZ.corona(), capa:'<path d="M64 122q-16 66-8 110h88q8-44-8-110l-16-4q-20 16-40 0Z" fill="#b91c1c"/><path d="M70 122q-12 60-8 102h12q-6-54 8-98Z" fill="#f8fafc" opacity=".6"/>',
                  pecho:'<circle cx="100" cy="138" r="7" fill="#fbbf24"/>' }
@@ -5402,7 +5501,8 @@ function nombreDeDisfraz(rol, g, es){
 }
 
 // --- El muñequito ------------------------------------------------------------
-function celPelo(g, edad){
+function celPelo(g, edad, piel){
+    const PIEL=piel||'#f6cfae';
     if(g==='f'){
         return edad==='joven'
             // Joven: melena larga recogida en una coleta.
@@ -5425,18 +5525,19 @@ function celPelo(g, edad){
            <path d="M68 70q2-36 32-36t32 36q-6-18-32-18T68 70Z" fill="#3f2a1d"/>
            <path d="M126 40q10-6 13 4-7-1-13-4Z" fill="#3f2a1d"/>`;
 }
-function celPiernas(edad, zapato, pantalon){
+function celPiernas(edad, zapato, pantalon, piel){
     const y = edad==='joven' ? 184 : 186;
     const h = edad==='joven' ? 54 : 46;
     const zy = y+h-2;
-    const color = pantalon || PIEL;
+    const color = pantalon || piel || PIEL;
     return `<g class="cel-pierna-l"><rect x="82" y="${y}" width="15" height="${h}" rx="7.5" fill="${color}"/><path d="M75 ${zy}h22a7 7 0 0 1 7 7v5H75z" fill="${zapato}"/></g>
     <g class="cel-pierna-r"><rect x="103" y="${y}" width="15" height="${h}" rx="7.5" fill="${color}"/><path d="M96 ${zy}h22a7 7 0 0 1 7 7v5H96z" fill="${zapato}"/></g>`;
 }
-function celBrazo(lado, propio){
+function celBrazo(lado, propio, piel){
     const x = lado==='l' ? 71 : 129, giro = lado==='l' ? -36 : 36;
+    const p = piel||PIEL;
     return `<g class="cel-brazo-${lado}"><g transform="translate(${x},130) rotate(${giro})">
-      <rect x="-8" y="-62" width="16" height="68" rx="8" fill="${PIEL}"/><circle cx="0" cy="-64" r="11.5" fill="${PIEL}"/>
+      <rect x="-8" y="-62" width="16" height="68" rx="8" fill="${p}"/><circle cx="0" cy="-64" r="11.5" fill="${p}"/>
       ${propio||''}
     </g></g>`;
 }
@@ -5448,14 +5549,15 @@ function celSvgPersona(s, opciones){
     const rol = o.rol!==undefined ? (o.rol?Object.assign({id:o.rol},DISFRACES[o.rol]||{}):null) : disfrazDe(s);
     const hw = (!rol) && esHalloween();          // el disfraz elegido manda sobre Halloween
     const vestido = g==='f' && edad==='peque' && !rol;
+    const piel = (rol && rol.piel) || PIEL;
     const colorRopa = rol ? rol.color : (hw ? (g==='f'?'#6d28d9':'#1f2937') : (g==='f'?'#ec4899':'#2563eb'));
     const zapato = rol ? '#334155' : (hw ? '#111827' : (g==='f'?'#ef4467':'#334155'));
     const pantalon = (edad==='joven' && !vestido) ? (rol?'#1e293b':'#1e40af') : null;
-    const torso = vestido
+    const torso = (rol && rol.cuerpo) ? rol.cuerpo : (vestido
         ? `<path d="M100 116c-24 0-31 8-35 25l-11 47c-2 8 3 12 10 12h72c7 0 12-4 10-12l-11-47c-4-17-11-25-35-25Z" fill="${colorRopa}"/>
            <path d="M66 172h68l3 12H63Z" fill="${hw?'#f59e0b':'#f9a8d4'}"/>`
-        : `<path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="${colorRopa}"/>`;
-    const cadera = (!vestido)
+        : `<path d="M100 116c-23 0-30 7-33 21l-8 38c-1 6 3 10 9 10h64c6 0 10-4 9-10l-8-38c-3-14-10-21-33-21Z" fill="${colorRopa}"/>`);
+    const cadera = (rol && rol.cuerpo) ? '' : (!vestido)
         ? `<path d="M67 168h66l4 22c1 5-2 8-7 8h-18l-8-16-8 16H70c-5 0-8-3-7-8Z" fill="${pantalon||(hw?'#111827':(rol?'#1e293b':'#1e3a8a'))}"/>`
         : '';
     const pecho = rol ? (rol.pecho||'') : (hw ? (g==='f'?'':HW_CUELLO)
@@ -5477,25 +5579,27 @@ function celSvgPersona(s, opciones){
   <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
   <g class="cel-cuerpo">
     ${capaAtras}
-    ${celPiernas(edad, zapato, pantalon)}
+    ${celPiernas(edad, zapato, pantalon, piel)}
     ${cadera}
     ${torso}
     ${pecho}
-    ${celBrazo('l', rol?rol.propI:'')}
-    ${celBrazo('r', rol?rol.propD:'')}
-    <rect x="92" y="96" width="16" height="24" rx="8" fill="${PIEL_S}"/>
+    ${celBrazo('l', rol?rol.propI:'', piel)}
+    ${celBrazo('r', rol?rol.propD:'', piel)}
+    <rect x="92" y="96" width="16" height="24" rx="8" fill="${(rol&&rol.piel)?rol.piel:PIEL_S}"/>
     <g class="cel-cabeza">${cabezaEscala}
-      ${celPelo(g, edad)}
+      ${(rol && rol.cabeza) ? rol.cabeza : `
+      ${celPelo(g, edad, piel)}
       ${cara}
       ${cachetes}
-      <path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>
-      ${bocaExtra}
+      ${(rol && rol.boca) ? rol.boca : '<path d="M90 88q10 14 20 0Z" fill="#8d3b4a"/>'}
+      ${(rol && rol.boca) ? '' : bocaExtra}`}
       ${(rol && rol.cara) ? rol.cara : ''}
       ${(rol && (rol.gafas||rol.gafasSol)) ? (rol.gafas||PZ.gafasSol()) : ''}
       ${(rol && rol.gorro) ? rol.gorro : sombreroBase}
       ${(rol && rol.casco) ? rol.casco : ''}
       ${(hw && g==='m' && !rol) ? HW_ARANA : ''}
     </g></g>
+    ${(rol && rol.encima) ? rol.encima : ''}
     ${(rol && rol.suelo) ? rol.suelo : ''}
   </g>
 </svg>`;
@@ -5553,6 +5657,7 @@ window.repartirDisfraces=function(){
         comida:['chef','panadero','heladero','mesero','barista','cajero','florista','peluquero'],
         deportes:['futbolista','basquetbolista','nadador','ciclista','tenista','arbitro','karateka'],
         fantasia:['superheroe','mago','pirata','caballero','hada','ninja','robot','vaquero','rey'],
+        halloween:['bruja','vampiro','fantasma','esqueleto','momia','zombi','calabaza','gatonegro','murcielago','hombrelobo','frankenstein','diablito','catrina','espantapajaros','dinosaurio','dragon','unicornio','sirena','duende','aranita','cazafantasmas','cientificoloco','calavera','brujito'],
         todos:DISFRACES_ORDEN
     };
     const lista=paquetes[grupo]||paquetes.todos;
@@ -5567,7 +5672,9 @@ function opcionesDeDisfraz(s){
     const g=generoDeAlumno(s);
     const actual=s.disfraz||'';
     let html=`<option value="">${es?'— Sin disfraz —':'— No costume —'}</option>`;
-    Object.keys(DIS_CATS).forEach(cat=>{
+    let cats=Object.keys(DIS_CATS);
+    if(esHalloween()) cats=['halloween'].concat(cats.filter(c=>c!=='halloween'));
+    cats.forEach(cat=>{
         const ids=DISFRACES_ORDEN.filter(id=>DISFRACES[id].cat===cat);
         if(!ids.length) return;
         html+=`<optgroup label="${escapeHtml(DIS_CATS[cat][es?'es':'en'])}">`
@@ -5632,8 +5739,8 @@ function textosDisfraces(){
     const b=document.getElementById('disfracesBuscar'); if(b) b.placeholder=es?'🔎 Buscar estudiante…':'🔎 Search student…';
     const sel=document.getElementById('disfracesReparto');
     if(sel){
-        const vals=es?['Proyecto de noticias','La comunidad','Ciencia y espacio','Oficios y construcción','Comida y servicio','Deportes','Fantasía','Todos los disfraces']
-                     :['News project','Community helpers','Science and space','Trades and building','Food and service','Sports','Fantasy','Every costume'];
+        const vals=es?['Proyecto de noticias','La comunidad','Ciencia y espacio','Oficios y construcción','Comida y servicio','Deportes','Fantasía','🎃 Halloween','Todos los disfraces']
+                     :['News project','Community helpers','Science and space','Trades and building','Food and service','Sports','Fantasy','🎃 Halloween','Every costume'];
         [...sel.options].forEach((o,i)=>{ if(vals[i]) o.textContent=vals[i]; });
     }
 }
