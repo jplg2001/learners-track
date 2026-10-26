@@ -404,8 +404,8 @@ html,body { min-height:100vh; background:var(--bg-gradient); color:var(--fg); fo
 .att-pop-no { color:var(--danger); }
 @keyframes attSube { 0%{opacity:0; transform:translate(-50%,4px) scale(.6);} 25%{opacity:1; transform:translate(-50%,-6px) scale(1.15);} 100%{opacity:0; transform:translate(-50%,-26px) scale(1);} }
 /* Marca permanente en la casilla del nombre, para ver la lista de un vistazo. */
-.student-name-cell.celda-presente { box-shadow:inset 3px 0 0 var(--success); }
-.student-name-cell.celda-ausente { box-shadow:inset 3px 0 0 var(--danger); }
+.student-name-cell.celda-presente { box-shadow:inset 3px 0 0 var(--success); background:rgba(34,197,94,.10); }
+.student-name-cell.celda-ausente { box-shadow:inset 3px 0 0 var(--danger); background:rgba(239,68,103,.16); }
 .student-name-cell.celda-ausente .student-name-text { opacity:.62; text-decoration:line-through; text-decoration-thickness:1px; }
 /* Destello de la fila entera al pasar lista. */
 tr.flash-si td { animation:flashSi .8s ease-out; }
@@ -1456,6 +1456,18 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .dis-edad-btn[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong); }
 .dis-vacio { grid-column:1/-1; text-align:center; color:var(--fg-muted); padding:20px; }
 @media (max-width:600px){ .dis-lista { grid-template-columns:1fr; max-height:48vh; } }
+/* === FECHAS DE LA SEMANA === */
+.week-rango { display:inline-flex; align-items:center; gap:4px; font-size:.78rem; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
+.week-rango input[type="date"] { padding:2px 5px; border:1px solid var(--border); border-radius:7px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.76rem; }
+.week-rango:hover { border-color:var(--accent); }
+.week-dias { display:flex; flex-wrap:wrap; gap:5px; margin:0 0 8px 2px; }
+.week-dia { border:1px solid var(--border); background:var(--bg-alt); color:var(--fg-muted); border-radius:999px; padding:3px 11px; font:inherit; font-size:.76rem; font-weight:600; cursor:pointer; transition:border-color .18s var(--ease-out), background-color .18s var(--ease-out), color .18s var(--ease-out); }
+.week-dia b { font-weight:800; color:var(--fg); }
+.week-dia:hover { border-color:var(--accent); }
+.week-dia.es-hoy { border-style:dashed; border-color:var(--accent); }
+.week-dia.hoy { background:var(--accent-strong); border-color:var(--accent-strong); color:#fff; }
+.week-dia.hoy b { color:#fff; }
+
 /* === BOMBA DE TIEMPO === */
 .bomba-modal { width:min(560px,96vw); text-align:center; }
 .bomba-modal:fullscreen { width:100vw; max-width:100vw; height:100vh; max-height:100vh; border-radius:0; display:flex; flex-direction:column; justify-content:center; }
@@ -6103,6 +6115,8 @@ function actualizarResumenAsistencia(){
 }
 window.cambiarFechaAsistencia=function(valor){
     attendanceDate = valor || fechaISO();
+    const inp=document.getElementById('attendanceDateInput');
+    if(inp && inp.value!==attendanceDate) inp.value=attendanceDate;
     renderCurrentView();
     actualizarResumenAsistencia();
 };
@@ -6191,10 +6205,103 @@ window.alternarSemana=function(w){
     });
 };
 // Cabecera de cada semana: el titulo editable y la escoba que la vacia.
+// === FECHAS DE CADA SEMANA ==================================================
+// Cada semana del tablero tiene su rango de fechas (lunes a viernes), editable
+// por el docente. De ahi sale el dia al que se le pasa lista: antes la
+// asistencia era una sola para todo el tablero, asi que marcar en una semana se
+// veia igual en todas las demas. Ahora cada semana tiene sus propios dias.
+function fechaMas(iso, dias){
+    const p=String(iso||'').split('-').map(Number);
+    const d=new Date(p[0], (p[1]||1)-1, p[2]||1);
+    d.setDate(d.getDate()+dias);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function lunesDe(iso){
+    const p=String(iso||'').split('-').map(Number);
+    const d=new Date(p[0], (p[1]||1)-1, p[2]||1);
+    const dia=d.getDay();                     // 0 domingo … 6 sabado
+    const resta=(dia===0?6:dia-1);            // se retrocede hasta el lunes
+    d.setDate(d.getDate()-resta);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+// La ultima semana del tablero es la que se esta cursando: de ahi se cuenta
+// hacia atras. Se guarda una sola vez para que no se mueva con el tiempo.
+function baseDeSemanas(){
+    const c=classrooms[activeClassroomIndex];
+    if(!c) return lunesDe(fechaISO());
+    if(!c.semanaBase){
+        c.semanaBase = fechaMas(lunesDe(fechaISO()), -(Math.max(1,gridWeeks)-1)*7);
+        try{ saveData(); }catch(e){}
+    }
+    return c.semanaBase;
+}
+function rangoSemana(w){
+    const c=classrooms[activeClassroomIndex]||{};
+    const guardado = c.semanas && c.semanas[w];
+    if(guardado && guardado.ini) return { ini:guardado.ini, fin:guardado.fin||fechaMas(guardado.ini, Math.max(0,weekDays.length-1)) };
+    const ini=fechaMas(baseDeSemanas(), (w-1)*7);
+    return { ini:ini, fin:fechaMas(ini, Math.max(0,weekDays.length-1)) };
+}
+window.setRangoSemana=function(w, campo, valor){
+    const c=classrooms[activeClassroomIndex]; if(!c || !valor) return;
+    if(!c.semanas || typeof c.semanas!=='object') c.semanas={};
+    const actual=rangoSemana(w);
+    const nuevo={ ini:actual.ini, fin:actual.fin };
+    nuevo[campo]=valor;
+    // Si el final queda antes del inicio, se corre solo.
+    if(nuevo.fin < nuevo.ini) nuevo.fin = fechaMas(nuevo.ini, Math.max(0,weekDays.length-1));
+    c.semanas[w]=nuevo;
+    saveData();
+    renderCurrentView();
+    actualizarResumenAsistencia();
+};
+// Los dias de columna de esa semana, uno por cada dia del encabezado.
+function fechasDeSemana(w){
+    const r=rangoSemana(w);
+    return weekDays.map((_,i)=>fechaMas(r.ini, i));
+}
+function semanaDeFecha(iso){
+    for(let w=1;w<=gridWeeks;w++){
+        const r=rangoSemana(w);
+        if(iso>=r.ini && iso<=r.fin) return w;
+    }
+    return null;
+}
+// Semana a la que se le esta pasando lista. Si la fecha elegida no cae en
+// ninguna, manda la ultima: siempre tiene que haber una donde marcar.
+function semanaActiva(){
+    return semanaDeFecha(attendanceDate) || Math.max(1,gridWeeks);
+}
+function fechaCorta(iso){
+    const es=currentLanguage==='es';
+    const p=String(iso||'').split('-').map(Number);
+    if(p.length<3) return '';
+    const d=new Date(p[0], p[1]-1, p[2]);
+    const mes=(es?['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+                 :['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])[d.getMonth()];
+    return d.getDate()+' '+mes;
+}
+// Los dias de la semana, para elegir a cual se le pasa lista.
+function diasDeSemanaHtml(w){
+    const es=currentLanguage==='es';
+    const fechas=fechasDeSemana(w);
+    const hoy=fechaISO();
+    return `<div class="week-dias" role="group" aria-label="${es?'Día para pasar lista':'Day for attendance'}">`
+        + fechas.map((f,i)=>{
+            const dia=(weekDays[i]||'').slice(0,3);
+            const n=Number(String(f).split('-')[2]);
+            return `<button type="button" class="week-dia${f===attendanceDate?' hoy':''}${f===hoy?' es-hoy':''}"`
+                + ` aria-pressed="${f===attendanceDate}" title="${es?'Pasar lista de este día':'Take attendance for this day'}"`
+                + ` onclick="cambiarFechaAsistencia('${f}')">${escapeHtml(dia)} <b>${n}</b></button>`;
+        }).join('')
+        + `</div>`;
+}
+
 function weekHeaderHtml(w){
     const es=currentLanguage==='es';
     const title=weekTitles[w-1]||((es?"Semana ":"Week ")+w);
     const plegada=semanaPlegada(w);
+    const rango=rangoSemana(w);
     // El titulo ES el interruptor: un toque recoge la semana entera, otro la
     // saca. El doble clic sigue sirviendo para cambiarle el nombre.
     return `<div class="week-head">`
@@ -6204,8 +6311,14 @@ function weekHeaderHtml(w){
         + ` aria-label="${es?'Título de la semana':'Week title'}"`
         + ` onmousedown="if(this.readOnly)event.preventDefault();"`
         + ` onclick="clicEnSemana(${w},this)" ondblclick="editarTituloSemana(${w-1},this)" onblur="setWeekTitle(${w-1},this)"/>`
+        + `<label class="week-rango" title="${es?'Fechas de esta semana':'Dates for this week'}">📅`
+        +   `<input type="date" value="${rango.ini}" aria-label="${es?'Inicio de la semana':'Week start'}" onchange="setRangoSemana(${w},'ini',this.value)">`
+        +   `<span>→</span>`
+        +   `<input type="date" value="${rango.fin}" aria-label="${es?'Fin de la semana':'Week end'}" onchange="setRangoSemana(${w},'fin',this.value)">`
+        + `</label>`
         + `<button class="clear-week-btn" type="button" title="${es?'Quitar todas las insignias de esta semana':'Remove every badge from this week'}" onclick="limpiarInsignias(${w})">🧹 ${es?'Limpiar casillas':'Clear cells'}</button>`
-        + `</div>`;
+        + `</div>`
+        + diasDeSemanaHtml(w);
 }
 // Vacia las casillas de insignias. Con un numero de semana limpia solo esa;
 // sin argumento, todas. Las notas y los nombres no se tocan.
@@ -6275,11 +6388,14 @@ function renderCellBadges(student,ci) {
 function studentNameCellHtml(s,opts){
     const es=currentLanguage==='es';
     const safeName=escapeHtml(s.name||'');
+    // La asistencia pertenece a un dia, y cada dia esta en una sola semana.
+    const semanaDeLaTabla = opts && opts.semana;
+    const esSemanaDeLista = !semanaDeLaTabla || semanaDeLaTabla===semanaActiva();
     const certBtn = (opts&&opts.cert===false) ? '' :
         `<button class="cert-btn-inline" type="button" title="${es?'Certificado':'Certificate'}" aria-label="${es?'Certificado de ':'Certificate for '}${safeName}" onclick="openCertificateModalFromTable(${s.id},event)">📜</button>`;
     // La asistencia solo tiene sentido en las parrillas de insignias, no en notas.
-    const asistencia = (opts&&opts.att===false) ? '' : attendanceButtonsHtml(s);
-    const est=(s.attendance||{})[attendanceDate]||'';
+    const asistencia = ((opts&&opts.att===false) || !esSemanaDeLista) ? '' : attendanceButtonsHtml(s);
+    const est=esSemanaDeLista ? ((s.attendance||{})[attendanceDate]||'') : '';
     // El nombre va en un bloque editable, no en una casilla de una sola linea:
     // asi se lee entero aunque sean tres apellidos, y se sigue pudiendo corregir.
     return `<td class="student-name-cell${est==='p'?' celda-presente':(est==='a'?' celda-ausente':'')}" data-name-for="${s.id}">`
@@ -6328,7 +6444,7 @@ function renderClassroomGrid() {
         const tbody=document.createElement('tbody');
         currentStudents.forEach(s=>{
             const tr=document.createElement('tr');
-            tr.innerHTML=studentNameCellHtml(s);
+            tr.innerHTML=studentNameCellHtml(s,{semana:w});
             for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${s.id}" data-cell-idx="${ci}">${renderCellBadges(s,ci)}</td>`;}
             tbody.appendChild(tr);
         });
@@ -6351,7 +6467,7 @@ function renderClassroomRows() {
             for(let s=f*groupSize;s<Math.min((f+1)*groupSize,currentStudents.length);s++){
                 const st=currentStudents[s];
                 const tr=document.createElement('tr');
-                tr.innerHTML=studentNameCellHtml(st);
+                tr.innerHTML=studentNameCellHtml(st,{semana:w});
                 for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${st.id}" data-cell-idx="${ci}" data-row="${f}">${renderCellBadges(st,ci)}</td>`;}
                 tbody.appendChild(tr);
             }
