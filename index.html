@@ -1456,6 +1456,15 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .dis-edad-btn[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong); }
 .dis-vacio { grid-column:1/-1; text-align:center; color:var(--fg-muted); padding:20px; }
 @media (max-width:600px){ .dis-lista { grid-template-columns:1fr; max-height:48vh; } }
+/* La franja entera del estudiante, para ver de un golpe quien vino y quien no. */
+.student-grid-table tr.fila-presente td { background:rgba(34,197,94,.13); }
+.student-grid-table tr.fila-ausente td { background:rgba(239,68,103,.15); }
+.student-grid-table tr.fila-ausente .student-name-text { opacity:.72; }
+.week-resumen { margin-left:6px; align-self:center; font-size:.76rem; font-weight:700; color:var(--accent-strong); }
+.week-dia.con-lista { border-color:var(--success); }
+.week-dia.con-lista::after { content:'·'; margin-left:3px; color:var(--success); font-weight:900; }
+.week-dia.hoy.con-lista::after { color:#fff; }
+
 /* === FECHAS DE LA SEMANA === */
 .week-rango { display:inline-flex; align-items:center; gap:4px; font-size:.78rem; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
 .week-rango input[type="date"] { padding:2px 5px; border:1px solid var(--border); border-radius:7px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.76rem; }
@@ -4994,38 +5003,64 @@ function renderCurrentView() {
 // === ASISTENCIA ===
 // El chulito y la equis viven al lado del nombre. Un segundo toque en el mismo
 // boton desmarca, por si el docente se equivoca al pasar lista.
-function attendanceButtonsHtml(s){
+function attendanceButtonsHtml(s, w){
     const es=currentLanguage==='es';
-    const est=(s.attendance||{})[attendanceDate]||'';
+    const fecha=(typeof w==='number' && typeof diaDeSemana==='function') ? diaDeSemana(w) : attendanceDate;
+    const est=(s.attendance||{})[fecha]||'';
     const nom=escapeHtml(s.name||'');
-    return `<div class="att-group" data-student-id="${s.id}" role="group" aria-label="${es?'Asistencia':'Attendance'}">`
-        + `<button class="att-btn att-yes${est==='p'?' on':''}" type="button" aria-pressed="${est==='p'}" title="${es?'Presente':'Present'}" aria-label="${es?'Presente: ':'Present: '}${nom}" onclick="marcarAsistencia(${s.id},'p',this)">&#10003;</button>`
-        + `<button class="att-btn att-no${est==='a'?' on':''}" type="button" aria-pressed="${est==='a'}" title="${es?'Ausente':'Absent'}" aria-label="${es?'Ausente: ':'Absent: '}${nom}" onclick="marcarAsistencia(${s.id},'a',this)">&#10007;</button>`
+    return `<div class="att-group" data-student-id="${s.id}" data-fecha="${fecha}" role="group" aria-label="${es?'Asistencia':'Attendance'}">`
+        + `<button class="att-btn att-yes${est==='p'?' on':''}" type="button" aria-pressed="${est==='p'}" title="${es?'Presente':'Present'}" aria-label="${es?'Presente: ':'Present: '}${nom}" onclick="marcarAsistencia(${s.id},'p',this,'${fecha}')">&#10003;</button>`
+        + `<button class="att-btn att-no${est==='a'?' on':''}" type="button" aria-pressed="${est==='a'}" title="${es?'Ausente':'Absent'}" aria-label="${es?'Ausente: ':'Absent: '}${nom}" onclick="marcarAsistencia(${s.id},'a',this,'${fecha}')">&#10007;</button>`
         + `</div>`;
 }
-window.marcarAsistencia=function(sid,estado,btn){
+window.marcarAsistencia=function(sid,estado,btn,fecha){
     const s=currentStudents.find(x=>x.id===sid); if(!s) return;
     if(!s.attendance||typeof s.attendance!=='object') s.attendance={};
-    const actual=s.attendance[attendanceDate]||'';
-    if(actual===estado) delete s.attendance[attendanceDate];
-    else s.attendance[attendanceDate]=estado;
+    const dia=fecha||attendanceDate;
+    const actual=s.attendance[dia]||'';
+    if(actual===estado) delete s.attendance[dia];
+    else s.attendance[dia]=estado;
+    attendanceDate=dia;
     saveData();
     // Se retocan solo los botones de ese alumno: volver a dibujar la parrilla
     // entera en cada nombre de la lista se notaria, y cortaria la animacion.
     sincronizarAsistencia(s);
-    if(s.attendance[attendanceDate]) animarAsistencia(btn,estado,s);
+    if(s.attendance[dia]) animarAsistencia(btn,estado,s);
     actualizarResumenAsistencia();
+    pintarResumenesDeSemana();
 };
 // El mismo alumno sale en la vista de grupos y en la individual: se ponen al dia
 // las dos, esten a la vista o no.
 function sincronizarAsistencia(s){
-    const est=(s.attendance||{})[attendanceDate]||'';
+    // Cada grupo de botones lleva su fecha: la de la semana donde esta dibujado.
     document.querySelectorAll(`.att-group[data-student-id="${s.id}"]`).forEach(g=>{
+        const fecha=g.dataset.fecha||attendanceDate;
+        const est=(s.attendance||{})[fecha]||'';
         const si=g.querySelector('.att-yes'), no=g.querySelector('.att-no');
         if(si){ si.classList.toggle('on',est==='p'); si.setAttribute('aria-pressed',est==='p'); }
         if(no){ no.classList.toggle('on',est==='a'); no.setAttribute('aria-pressed',est==='a'); }
         const celda=g.closest('td');
         if(celda){ celda.classList.toggle('celda-presente',est==='p'); celda.classList.toggle('celda-ausente',est==='a'); }
+        const fila=g.closest('tr');
+        if(fila){ fila.classList.toggle('fila-presente',est==='p'); fila.classList.toggle('fila-ausente',est==='a'); }
+    });
+}
+// Vuelve a escribir el "✓ 3 · ✗ 1" de cada semana sin redibujar las tablas.
+function pintarResumenesDeSemana(){
+    document.querySelectorAll('.week-dias').forEach(caja=>{
+        const w=Number(caja.dataset.semana||0);
+        if(!w) return;
+        const es=currentLanguage==='es';
+        const res=resumenDeSemana(w);
+        const txt=caja.querySelector('.week-resumen');
+        if(txt) txt.textContent = (res.presentes||res.ausentes)
+            ? `✓ ${res.presentes} · ✗ ${res.ausentes}` + (res.faltan>0?` · ${res.faltan} ${es?'por llamar':'to call'}`:'')
+            : (es?'Sin lista de este día':'No attendance for this day');
+        caja.querySelectorAll('.week-dia').forEach((b,i)=>{
+            const f=fechasDeSemana(w)[i];
+            const marcados=(currentStudents||[]).filter(s=>(s.attendance||{})[f]).length;
+            b.classList.toggle('con-lista', marcados>0);
+        });
     });
 }
 // === BIENVENIDA AL PASAR LISTA ===
@@ -6117,6 +6152,14 @@ window.cambiarFechaAsistencia=function(valor){
     attendanceDate = valor || fechaISO();
     const inp=document.getElementById('attendanceDateInput');
     if(inp && inp.value!==attendanceDate) inp.value=attendanceDate;
+    // Si esa fecha cae en una semana del tablero, esa semana pasa a mostrarla.
+    const w=(typeof semanaDeFecha==='function') ? semanaDeFecha(attendanceDate) : null;
+    const c=classrooms[activeClassroomIndex];
+    if(w && c){
+        if(!c.diaSemana || typeof c.diaSemana!=='object') c.diaSemana={};
+        c.diaSemana[w]=attendanceDate;
+        saveData();
+    }
     renderCurrentView();
     actualizarResumenAsistencia();
 };
@@ -6281,19 +6324,53 @@ function fechaCorta(iso){
                  :['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])[d.getMonth()];
     return d.getDate()+' '+mes;
 }
+// Dia de esa semana al que se le esta pasando lista. Cada semana recuerda el
+// suyo: al volver a la semana 1 se ve lo que se marco en la semana 1.
+function diaDeSemana(w){
+    const c=classrooms[activeClassroomIndex]||{};
+    const r=rangoSemana(w);
+    const guardado=(c.diaSemana||{})[w];
+    if(guardado && guardado>=r.ini && guardado<=r.fin) return guardado;
+    const hoy=fechaISO();
+    if(hoy>=r.ini && hoy<=r.fin) return hoy;
+    return r.ini;
+}
+window.setDiaDeSemana=function(w, fecha){
+    const c=classrooms[activeClassroomIndex]; if(!c||!fecha) return;
+    if(!c.diaSemana || typeof c.diaSemana!=='object') c.diaSemana={};
+    c.diaSemana[w]=fecha;
+    attendanceDate=fecha;
+    saveData();
+    renderCurrentView();
+    actualizarResumenAsistencia();
+};
+// Resumen de ese dia en esa semana: cuantos vinieron y cuantos faltaron.
+function resumenDeSemana(w){
+    const f=diaDeSemana(w);
+    let p=0,a=0;
+    (currentStudents||[]).forEach(s=>{ const e=(s.attendance||{})[f]; if(e==='p')p++; else if(e==='a')a++; });
+    return { fecha:f, presentes:p, ausentes:a, faltan:(currentStudents||[]).length-p-a };
+}
 // Los dias de la semana, para elegir a cual se le pasa lista.
 function diasDeSemanaHtml(w){
     const es=currentLanguage==='es';
     const fechas=fechasDeSemana(w);
     const hoy=fechaISO();
-    return `<div class="week-dias" role="group" aria-label="${es?'Día para pasar lista':'Day for attendance'}">`
+    const elegido=diaDeSemana(w);
+    const res=resumenDeSemana(w);
+    // Cada dia muestra si ya tiene lista pasada, para no repetirla ni olvidarla.
+    return `<div class="week-dias" data-semana="${w}" role="group" aria-label="${es?'Día para pasar lista':'Day for attendance'}">`
         + fechas.map((f,i)=>{
             const dia=(weekDays[i]||'').slice(0,3);
             const n=Number(String(f).split('-')[2]);
-            return `<button type="button" class="week-dia${f===attendanceDate?' hoy':''}${f===hoy?' es-hoy':''}"`
-                + ` aria-pressed="${f===attendanceDate}" title="${es?'Pasar lista de este día':'Take attendance for this day'}"`
-                + ` onclick="cambiarFechaAsistencia('${f}')">${escapeHtml(dia)} <b>${n}</b></button>`;
+            const marcados=(currentStudents||[]).filter(s=>(s.attendance||{})[f]).length;
+            return `<button type="button" class="week-dia${f===elegido?' hoy':''}${f===hoy?' es-hoy':''}${marcados?' con-lista':''}"`
+                + ` aria-pressed="${f===elegido}" title="${es?(marcados?`Lista pasada: ${marcados} estudiante(s)`:'Pasar lista de este día'):(marcados?`Attendance taken: ${marcados} student(s)`:'Take attendance for this day')}"`
+                + ` onclick="setDiaDeSemana(${w},'${f}')">${escapeHtml(dia)} <b>${n}</b></button>`;
         }).join('')
+        + `<span class="week-resumen">${res.presentes||res.ausentes
+              ? `✓ ${res.presentes} · ✗ ${res.ausentes}` + (res.faltan>0?` · ${res.faltan} ${es?'por llamar':'to call'}`:'')
+              : (es?'Sin lista de este día':'No attendance for this day')}</span>`
         + `</div>`;
 }
 
@@ -6388,14 +6465,14 @@ function renderCellBadges(student,ci) {
 function studentNameCellHtml(s,opts){
     const es=currentLanguage==='es';
     const safeName=escapeHtml(s.name||'');
-    // La asistencia pertenece a un dia, y cada dia esta en una sola semana.
-    const semanaDeLaTabla = opts && opts.semana;
-    const esSemanaDeLista = !semanaDeLaTabla || semanaDeLaTabla===semanaActiva();
+    // Cada semana muestra la lista de SU dia, no la de la semana activa.
+    const semanaDeLaTabla = (opts && opts.semana) || null;
+    const diaDeLaTabla = semanaDeLaTabla ? diaDeSemana(semanaDeLaTabla) : attendanceDate;
     const certBtn = (opts&&opts.cert===false) ? '' :
         `<button class="cert-btn-inline" type="button" title="${es?'Certificado':'Certificate'}" aria-label="${es?'Certificado de ':'Certificate for '}${safeName}" onclick="openCertificateModalFromTable(${s.id},event)">📜</button>`;
     // La asistencia solo tiene sentido en las parrillas de insignias, no en notas.
-    const asistencia = ((opts&&opts.att===false) || !esSemanaDeLista) ? '' : attendanceButtonsHtml(s);
-    const est=esSemanaDeLista ? ((s.attendance||{})[attendanceDate]||'') : '';
+    const asistencia = (opts&&opts.att===false) ? '' : attendanceButtonsHtml(s, semanaDeLaTabla||undefined);
+    const est=(s.attendance||{})[diaDeLaTabla]||'';
     // El nombre va en un bloque editable, no en una casilla de una sola linea:
     // asi se lee entero aunque sean tres apellidos, y se sigue pudiendo corregir.
     return `<td class="student-name-cell${est==='p'?' celda-presente':(est==='a'?' celda-ausente':'')}" data-name-for="${s.id}">`
@@ -6445,6 +6522,9 @@ function renderClassroomGrid() {
         currentStudents.forEach(s=>{
             const tr=document.createElement('tr');
             tr.innerHTML=studentNameCellHtml(s,{semana:w});
+            const estSem=(s.attendance||{})[diaDeSemana(w)]||'';
+            if(estSem==='p') tr.classList.add('fila-presente');
+            else if(estSem==='a') tr.classList.add('fila-ausente');
             for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${s.id}" data-cell-idx="${ci}">${renderCellBadges(s,ci)}</td>`;}
             tbody.appendChild(tr);
         });
@@ -6468,6 +6548,9 @@ function renderClassroomRows() {
                 const st=currentStudents[s];
                 const tr=document.createElement('tr');
                 tr.innerHTML=studentNameCellHtml(st,{semana:w});
+                const estSem=(st.attendance||{})[diaDeSemana(w)]||'';
+                if(estSem==='p') tr.classList.add('fila-presente');
+                else if(estSem==='a') tr.classList.add('fila-ausente');
                 for(let d=0;d<weekDays.length;d++){const ci=(w-1)*weekDays.length+d;tr.innerHTML+=`<td data-student-id="${st.id}" data-cell-idx="${ci}" data-row="${f}">${renderCellBadges(st,ci)}</td>`;}
                 tbody.appendChild(tr);
             }
