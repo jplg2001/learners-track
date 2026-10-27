@@ -4474,7 +4474,23 @@ function setViewMode(m) {
 
 // === WEEK & NOTE CONTROLS ===
 function updateWeekButtons() { const a=document.getElementById('addWeekBtn'),r=document.getElementById('removeWeekBtn'); if(a)a.disabled=gridWeeks>=10; if(r)r.disabled=gridWeeks<=1; }
-window.addWeek=function(){ if(gridWeeks>=10)return; gridWeeks++; const wn=currentLanguage==='es'?"Semana ":"Week "; weekTitles.push(wn+gridWeeks); const h=getGridHeaders(); currentStudents.forEach(s=>{while(s.gridBadges.length<h.length)s.gridBadges.push([]);}); saveData(); renderCurrentView(); updateWeekButtons(); };
+window.addWeek=function(){
+    if(gridWeeks>=10)return;
+    const anterior = (typeof rangoSemana==='function' && gridWeeks>=1) ? rangoSemana(gridWeeks) : null;
+    gridWeeks++;
+    const wn=currentLanguage==='es'?"Semana ":"Week ";
+    weekTitles.push(wn+gridWeeks);
+    const h=getGridHeaders();
+    currentStudents.forEach(s=>{while(s.gridBadges.length<h.length)s.gridBadges.push([]);});
+    // La semana nueva va justo despues de la anterior, no en una fecha suelta.
+    const c=classrooms[activeClassroomIndex];
+    if(c && anterior && anterior.ini){
+        if(!c.semanas || typeof c.semanas!=='object') c.semanas={};
+        const ini=fechaMas(anterior.ini, 7);
+        c.semanas[gridWeeks]={ ini:ini, fin:fechaMas(ini, Math.max(0,weekDays.length-1)) };
+    }
+    saveData(); renderCurrentView(); updateWeekButtons();
+};
 window.removeWeek=function(){ if(gridWeeks<=1)return; gridWeeks--; weekTitles.pop(); const h=getGridHeaders(); currentStudents.forEach(s=>{s.gridBadges=s.gridBadges.slice(0,h.length);}); saveData(); renderCurrentView(); updateWeekButtons(); };
 window.editWeekTitle=function(i,el){el.readOnly=false;el.focus();el.select();};
 // Al salir del titulo no se redibuja si el nombre quedo igual: ahora se sale de
@@ -6283,6 +6299,39 @@ function baseDeSemanas(){
     }
     return c.semanaBase;
 }
+// Lunes de cada semana en la que hay lista pasada, de la mas vieja a la mas nueva.
+function lunesConLista(){
+    const set=new Set();
+    (currentStudents||[]).forEach(s=>{
+        const a=s.attendance||{};
+        Object.keys(a).forEach(f=>{ if(a[f]==='p'||a[f]==='a') set.add(lunesDe(f)); });
+    });
+    return Array.from(set).sort();
+}
+// Acomoda las semanas del tablero sobre las semanas reales de clase: la ultima
+// semana con lista es la ultima del tablero, y de ahi hacia atras. Solo rellena
+// las que no tengan fechas puestas a mano, y las guarda para que no se muevan.
+function asegurarRangosDeSemanas(){
+    const c=classrooms[activeClassroomIndex]; if(!c) return;
+    const lunes=lunesConLista();
+    if(!lunes.length) return;                      // sin lista aun: se deja el calculo normal
+    if(!c.semanas || typeof c.semanas!=='object') c.semanas={};
+    let faltan=false;
+    for(let w=1;w<=gridWeeks;w++) if(!c.semanas[w] || !c.semanas[w].ini) faltan=true;
+    if(!faltan) return;
+    // Las ultimas semanas del tablero reciben las ultimas semanas con lista.
+    const usados=lunes.slice(Math.max(0, lunes.length-gridWeeks));
+    const primeraOcupada=gridWeeks-usados.length+1;   // numero de semana donde empiezan
+    const dias=Math.max(0, weekDays.length-1);
+    for(let w=1;w<=gridWeeks;w++){
+        if(c.semanas[w] && c.semanas[w].ini) continue;
+        const ini = (w>=primeraOcupada)
+            ? usados[w-primeraOcupada]
+            : fechaMas(usados[0], -(primeraOcupada-w)*7);
+        c.semanas[w]={ ini:ini, fin:fechaMas(ini, dias) };
+    }
+    try{ saveData(); }catch(e){}
+}
 function rangoSemana(w){
     const c=classrooms[activeClassroomIndex]||{};
     const guardado = c.semanas && c.semanas[w];
@@ -6290,6 +6339,23 @@ function rangoSemana(w){
     const ini=fechaMas(baseDeSemanas(), (w-1)*7);
     return { ini:ini, fin:fechaMas(ini, Math.max(0,weekDays.length-1)) };
 }
+// Vuelve a repartir las semanas del tablero sobre las semanas en que hubo clase.
+window.recalcularFechasSemanas=function(){
+    const es=currentLanguage==='es';
+    const c=classrooms[activeClassroomIndex]; if(!c) return;
+    const lunes=lunesConLista();
+    if(!lunes.length){
+        showNotification(es?'Todavía no hay listas pasadas para calcular las fechas':'No attendance yet to work out the dates','info');
+        return;
+    }
+    const antes=JSON.parse(JSON.stringify(c.semanas||{}));
+    c.semanas={};
+    asegurarRangosDeSemanas();
+    renderCurrentView();
+    actualizarResumenAsistencia();
+    showNotification(es?'🗓️ Fechas ajustadas a los días en que pasaste lista':'🗓️ Dates set from the days you took attendance','success',
+        { texto: es?'Deshacer':'Undo', onClick(){ c.semanas=antes; saveData(); renderCurrentView(); } });
+};
 window.setRangoSemana=function(w, campo, valor){
     const c=classrooms[activeClassroomIndex]; if(!c || !valor) return;
     if(!c.semanas || typeof c.semanas!=='object') c.semanas={};
@@ -6420,6 +6486,7 @@ function weekHeaderHtml(w){
         +   `<span>→</span>`
         +   `<input type="date" value="${rango.fin}" aria-label="${es?'Fin de la semana':'Week end'}" onchange="setRangoSemana(${w},'fin',this.value)">`
         + `</label>`
+        + (w===1 ? `<button class="clear-week-btn" type="button" title="${es?'Poner las fechas de todas las semanas según los días en que pasaste lista':'Set every week’s dates from the days you took attendance'}" onclick="recalcularFechasSemanas()">🗓️ ${es?'Ajustar fechas':'Fix dates'}</button>` : '')
         + `<button class="clear-week-btn" type="button" title="${es?'Quitar todas las insignias de esta semana':'Remove every badge from this week'}" onclick="limpiarInsignias(${w})">🧹 ${es?'Limpiar casillas':'Clear cells'}</button>`
         + `</div>`
         + diasDeSemanaHtml(w);
@@ -6536,6 +6603,7 @@ function emptyClassroomHtml(){
 }
 function renderClassroomGrid() {
     const gc=document.getElementById("classroomGridView"); if(!gc)return; gc.innerHTML='';
+    if(typeof asegurarRangosDeSemanas==='function') asegurarRangosDeSemanas();
     if(currentStudents.length===0){gc.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const wb=document.createElement('div');
@@ -6561,6 +6629,7 @@ function renderClassroomGrid() {
 }
 function renderClassroomRows() {
     const g=document.getElementById('classroomRowsView'); if(!g)return; g.innerHTML='';
+    if(typeof asegurarRangosDeSemanas==='function') asegurarRangosDeSemanas();
     if(currentStudents.length===0){g.innerHTML=emptyClassroomHtml();return;}
     for(let w=1;w<=gridWeeks;w++){
         const sd=document.createElement('div');
