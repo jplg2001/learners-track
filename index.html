@@ -5053,9 +5053,13 @@ function pintarResumenesDeSemana(){
         const es=currentLanguage==='es';
         const res=resumenDeSemana(w);
         const txt=caja.querySelector('.week-resumen');
+        const otros=diasConListaDe(w).filter(f=>f!==res.fecha);
         if(txt) txt.textContent = (res.presentes||res.ausentes)
             ? `✓ ${res.presentes} · ✗ ${res.ausentes}` + (res.faltan>0?` · ${res.faltan} ${es?'por llamar':'to call'}`:'')
-            : (es?'Sin lista de este día':'No attendance for this day');
+            : (otros.length
+                ? (es?`Sin lista de este día · sí la hay el ${otros.map(f=>Number(String(f).split('-')[2])).join(', ')}`
+                     :`No attendance for this day · there is on ${otros.map(f=>Number(String(f).split('-')[2])).join(', ')}`)
+                : (es?'Sin lista de este día':'No attendance for this day'));
         caja.querySelectorAll('.week-dia').forEach((b,i)=>{
             const f=fechasDeSemana(w)[i];
             const marcados=(currentStudents||[]).filter(s=>(s.attendance||{})[f]).length;
@@ -6156,6 +6160,7 @@ window.cambiarFechaAsistencia=function(valor){
     const w=(typeof semanaDeFecha==='function') ? semanaDeFecha(attendanceDate) : null;
     const c=classrooms[activeClassroomIndex];
     if(w && c){
+        if(typeof _diaTocado==='object') _diaTocado[claveDia(w)]=attendanceDate;
         if(!c.diaSemana || typeof c.diaSemana!=='object') c.diaSemana={};
         c.diaSemana[w]=attendanceDate;
         saveData();
@@ -6326,17 +6331,35 @@ function fechaCorta(iso){
 }
 // Dia de esa semana al que se le esta pasando lista. Cada semana recuerda el
 // suyo: al volver a la semana 1 se ve lo que se marco en la semana 1.
+function hayListaEn(fecha){
+    return (currentStudents||[]).some(s=>(s.attendance||{})[fecha]);
+}
+function diasConListaDe(w){
+    return fechasDeSemana(w).filter(hayListaEn);
+}
+// Dia que el docente toco en esta visita: manda siempre, aunque este vacio
+// (si acaba de abrir un dia nuevo para pasar lista, no se le puede mover).
+let _diaTocado={};
+function claveDia(w){ return activeClassroomIndex+':'+w; }
 function diaDeSemana(w){
     const c=classrooms[activeClassroomIndex]||{};
     const r=rangoSemana(w);
+    const dentro=f=>!!f && f>=r.ini && f<=r.fin;
+    const tocado=_diaTocado[claveDia(w)];
+    if(dentro(tocado)) return tocado;
+    const conLista=diasConListaDe(w);
     const guardado=(c.diaSemana||{})[w];
-    if(guardado && guardado>=r.ini && guardado<=r.fin) return guardado;
+    // Un dia guardado se respeta, salvo que este vacio habiendo otro con lista:
+    // ahi se muestra el que tiene los datos, que es lo que el docente busca.
+    if(dentro(guardado) && (hayListaEn(guardado) || !conLista.length)) return guardado;
     const hoy=fechaISO();
-    if(hoy>=r.ini && hoy<=r.fin) return hoy;
-    return r.ini;
+    if(dentro(hoy) && (hayListaEn(hoy) || !conLista.length)) return hoy;
+    if(conLista.length) return conLista[conLista.length-1];
+    return dentro(guardado) ? guardado : (dentro(hoy) ? hoy : r.ini);
 }
 window.setDiaDeSemana=function(w, fecha){
     const c=classrooms[activeClassroomIndex]; if(!c||!fecha) return;
+    _diaTocado[claveDia(w)]=fecha;
     if(!c.diaSemana || typeof c.diaSemana!=='object') c.diaSemana={};
     c.diaSemana[w]=fecha;
     attendanceDate=fecha;
@@ -6358,6 +6381,7 @@ function diasDeSemanaHtml(w){
     const hoy=fechaISO();
     const elegido=diaDeSemana(w);
     const res=resumenDeSemana(w);
+    const otros=diasConListaDe(w).filter(f=>f!==elegido);
     // Cada dia muestra si ya tiene lista pasada, para no repetirla ni olvidarla.
     return `<div class="week-dias" data-semana="${w}" role="group" aria-label="${es?'Día para pasar lista':'Day for attendance'}">`
         + fechas.map((f,i)=>{
@@ -6370,7 +6394,10 @@ function diasDeSemanaHtml(w){
         }).join('')
         + `<span class="week-resumen">${res.presentes||res.ausentes
               ? `✓ ${res.presentes} · ✗ ${res.ausentes}` + (res.faltan>0?` · ${res.faltan} ${es?'por llamar':'to call'}`:'')
-              : (es?'Sin lista de este día':'No attendance for this day')}</span>`
+              : (otros.length
+                  ? (es?`Sin lista de este día · sí la hay el ${otros.map(f=>Number(String(f).split('-')[2])).join(', ')}`
+                       :`No attendance for this day · there is on ${otros.map(f=>Number(String(f).split('-')[2])).join(', ')}`)
+                  : (es?'Sin lista de este día':'No attendance for this day'))}</span>`
         + `</div>`;
 }
 
