@@ -1075,6 +1075,115 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .juyu-mascot.act-ball .juyu-paw { animation:juyuPaw .58s ease-in-out infinite; }
 .juyu-mascot.act-ball .juyu-tail { animation:juyuTail .4s ease-in-out infinite; }
 
+/* ---- Mas trucos de YUJU ---- */
+/* Estirarse al despertar: baja el pecho y levanta la cola. */
+.juyu-mascot.act-estirar .juyu-btn { animation: juyuEstirar 2.2s var(--ease-in-out) 2; }
+@keyframes juyuEstirar { 0%,100%{ transform:scaleY(1) translateY(0); } 40%{ transform:scaleY(.82) scaleX(1.12) translateY(6px); } 70%{ transform:scaleY(1.06) translateY(-3px); } }
+.juyu-mascot.act-estirar .juyu-head { animation: juyuEstirarCabeza 2.2s var(--ease-in-out) 2; }
+@keyframes juyuEstirarCabeza { 0%,100%{ transform:rotate(0deg) translateY(0); } 40%{ transform:rotate(0deg) translateY(10px); } 70%{ transform:rotate(-12deg) translateY(-4px); } }
+.juyu-mascot.act-estirar .juyu-tail { animation: juyuColaArriba 2.2s var(--ease-in-out) 2; }
+@keyframes juyuColaArriba { 0%,100%{ transform:rotate(0deg); } 40%{ transform:rotate(-38deg); } }
+.juyu-mascot.act-estirar .juyu-mouth { animation: juyuBostezo 2.2s var(--ease-in-out) 2; }
+@keyframes juyuBostezo { 0%,100%{ transform:scaleY(0); } 55%{ transform:scaleY(1.3); } }
+
+/* Sacudirse, como cuando sale del agua. */
+.juyu-mascot.act-sacudir .juyu-btn { animation: juyuSacudir .14s ease-in-out infinite; }
+@keyframes juyuSacudir { 0%,100%{ transform:rotate(-4deg) translateX(-2px); } 50%{ transform:rotate(4deg) translateX(2px); } }
+.juyu-mascot.act-sacudir .juyu-ear-l,.juyu-mascot.act-sacudir .juyu-ear-r { animation: juyuOrejasLocas .14s ease-in-out infinite; }
+@keyframes juyuOrejasLocas { 0%,100%{ transform:rotate(-22deg); } 50%{ transform:rotate(22deg); } }
+.juyu-mascot.act-sacudir .juyu-tail { animation: juyuTail .13s ease-in-out infinite; }
+
+/* Cavar: las patas delanteras rascan el suelo. */
+.juyu-mascot.act-cavar .juyu-btn { animation: juyuCavarCuerpo .3s ease-in-out infinite; }
+@keyframes juyuCavarCuerpo { 0%,100%{ transform:rotate(-6deg) translateY(2px); } 50%{ transform:rotate(-9deg) translateY(5px); } }
+.juyu-mascot.act-cavar .juyu-paw { animation: juyuCavarPata .18s ease-in-out infinite; }
+@keyframes juyuCavarPata { 0%,100%{ transform:rotate(-30deg) translateY(0); } 50%{ transform:rotate(10deg) translateY(8px); } }
+.juyu-mascot.act-cavar .juyu-leg-l { animation: juyuCavarPata .18s ease-in-out infinite reverse; }
+.juyu-mascot.act-cavar .juyu-head { animation: juyuCavarCabeza .36s ease-in-out infinite; }
+@keyframes juyuCavarCabeza { 0%,100%{ transform:rotate(10deg) translateY(6px); } 50%{ transform:rotate(14deg) translateY(10px); } }
+
+/* Aullar: cuello estirado hacia arriba. */
+.juyu-mascot.act-aullar .juyu-head { animation: juyuAullar 2.4s var(--ease-in-out) 2; transform-origin:60px 80px; }
+@keyframes juyuAullar { 0%,100%{ transform:rotate(0deg) translateY(0); } 25%{ transform:rotate(-26deg) translateY(-8px); } 75%{ transform:rotate(-30deg) translateY(-10px); } }
+.juyu-mascot.act-aullar .juyu-mouth { animation: juyuAullarBoca 2.4s var(--ease-in-out) 2; }
+@keyframes juyuAullarBoca { 0%,100%{ transform:scaleY(0); } 20%,80%{ transform:scaleY(1.1) scaleX(.8); } }
+.juyu-mascot.act-aullar .juyu-btn { animation: juyuAullarCuerpo 2.4s var(--ease-in-out) 2; }
+@keyframes juyuAullarCuerpo { 0%,100%{ transform:translateY(0) scaleY(1); } 30%{ transform:translateY(-4px) scaleY(1.05); } }
+
+/* Voltereta hacia atras. */
+.juyu-mascot.act-voltereta .juyu-btn { animation: juyuVoltereta 1.3s var(--ease-in-out) 2; }
+@keyframes juyuVoltereta {
+  0%   { transform:translateY(0) rotate(0deg) scale(1,1); }
+  12%  { transform:translateY(5px) rotate(0deg) scale(1.12,.86); }
+  45%  { transform:translateY(-48px) rotate(180deg) scale(.95,1.05); }
+  78%  { transform:translateY(0) rotate(360deg) scale(1,1); }
+  88%  { transform:translateY(4px) rotate(360deg) scale(1.1,.88); }
+  100% { transform:translateY(0) rotate(360deg) scale(1,1); }
+}
+.juyu-mascot.act-voltereta .juyu-tail { animation: juyuTail .2s ease-in-out infinite; }
+
+/* Rodar en el piso con las patas arriba. */
+.juyu-mascot.act-rodar .juyu-btn { animation: juyuRodar 2.6s var(--ease-in-out) 1; }
+@keyframes juyuRodar {
+  0%,100% { transform:rotate(0deg) translateY(0); }
+  20%     { transform:rotate(-82deg) translateY(10px); }
+  50%     { transform:rotate(-96deg) translateY(12px); }
+  80%     { transform:rotate(-82deg) translateY(10px); }
+}
+.juyu-mascot.act-rodar .juyu-paw { animation: juyuPataFeliz .4s ease-in-out infinite; }
+@keyframes juyuPataFeliz { 0%,100%{ transform:rotate(-18deg); } 50%{ transform:rotate(16deg); } }
+.juyu-mascot.act-rodar .juyu-leg-l,.juyu-mascot.act-rodar .juyu-leg-r { animation: juyuPataFeliz .34s ease-in-out infinite alternate; }
+
+/* Roer un hueso. */
+.juyu-mascot.act-hueso .juyu-head { animation: juyuRoer .22s ease-in-out infinite; }
+@keyframes juyuRoer { 0%,100%{ transform:rotate(6deg) translateY(4px); } 50%{ transform:rotate(10deg) translateY(8px); } }
+.juyu-mascot.act-hueso .juyu-mouth { animation: juyuRoerBoca .22s ease-in-out infinite; }
+@keyframes juyuRoerBoca { 0%,100%{ transform:scaleY(.2); } 50%{ transform:scaleY(.9); } }
+.juyu-mascot.act-hueso .juyu-tail { animation: juyuTail .3s ease-in-out infinite; }
+.juyu-mascot.act-hueso .juyu-btn { animation: juyuRoerCuerpo .44s ease-in-out infinite; }
+@keyframes juyuRoerCuerpo { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(2px); } }
+
+/* Perseguir una mariposa con la mirada y un saltito. */
+.juyu-mascot.act-mariposa .juyu-head { animation: juyuMirar 1.6s var(--ease-in-out) infinite; }
+@keyframes juyuMirar { 0%,100%{ transform:rotate(-14deg) translateY(-4px); } 50%{ transform:rotate(14deg) translateY(-6px); } }
+.juyu-mascot.act-mariposa .juyu-btn { animation: juyuBrinquito .8s var(--ease-in-out) infinite; }
+@keyframes juyuBrinquito { 0%,60%,100%{ transform:translateY(0); } 30%{ transform:translateY(-12px); } }
+.juyu-mascot.act-mariposa .juyu-tail { animation: juyuTail .26s ease-in-out infinite; }
+
+/* Sentarse y dar la patita. */
+.juyu-mascot.act-patita .juyu-btn { animation: juyuSentado 1.6s var(--ease-in-out) 3; }
+@keyframes juyuSentado { 0%,100%{ transform:translateY(0) scaleY(1); } 30%,70%{ transform:translateY(4px) scaleY(.94); } }
+.juyu-mascot.act-patita .juyu-paw { animation: juyuDarPatita .8s var(--ease-out-back) 6; }
+@keyframes juyuDarPatita { 0%,100%{ transform:rotate(0deg) translateY(0); } 45%{ transform:rotate(-54deg) translateY(-12px); } }
+.juyu-mascot.act-patita .juyu-head { animation: juyuLadear 1.6s var(--ease-in-out) 3; }
+@keyframes juyuLadear { 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(-16deg); } }
+.juyu-mascot.act-patita .juyu-tail { animation: juyuTail .34s ease-in-out infinite; }
+
+/* Estornudo: toma aire y suelta. */
+.juyu-mascot.act-estornudar .juyu-head { animation: juyuEstornudo 1.5s var(--ease-out) 2; }
+@keyframes juyuEstornudo {
+  0%,100% { transform:rotate(0deg) translateY(0); }
+  35%     { transform:rotate(-22deg) translateY(-6px); }
+  45%     { transform:rotate(18deg) translateY(8px); }
+  55%     { transform:rotate(-4deg) translateY(0); }
+}
+.juyu-mascot.act-estornudar .juyu-btn { animation: juyuEstornudoCuerpo 1.5s var(--ease-out) 2; }
+@keyframes juyuEstornudoCuerpo { 0%,100%{ transform:scale(1); } 35%{ transform:scale(1.06,1.02); } 45%{ transform:scale(.94,.98) translateY(3px); } }
+.juyu-mascot.act-estornudar .juyu-ear-l,.juyu-mascot.act-estornudar .juyu-ear-r { animation: juyuOrejasLocas .16s ease-in-out 6; animation-delay:.5s; }
+
+/* Beber agua: cabeza abajo y lengua trabajando. */
+.juyu-mascot.act-beber .juyu-head { animation: juyuBeber 1.2s var(--ease-in-out) 3; }
+@keyframes juyuBeber { 0%,100%{ transform:rotate(0deg) translateY(0); } 40%,70%{ transform:rotate(16deg) translateY(14px); } }
+.juyu-mascot.act-beber .juyu-tongue { animation: juyuLengua .22s ease-in-out infinite; }
+@keyframes juyuLengua { 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(1.9) translateY(2px); } }
+.juyu-mascot.act-beber .juyu-btn { animation: juyuBeberCuerpo 1.2s var(--ease-in-out) 3; }
+@keyframes juyuBeberCuerpo { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(3px) scaleY(.97); } }
+
+@media (prefers-reduced-motion:reduce){
+  .juyu-mascot[class*="act-"] .juyu-mouth,.juyu-mascot[class*="act-"] .juyu-tongue,
+  .juyu-mascot[class*="act-"] .juyu-hind { animation:none; }
+}
+
 @media (prefers-reduced-motion:reduce){
   .juyu-mascot { transition:none; }
   .juyu-mascot.act-run .juyu-btn,.juyu-mascot.act-run .juyu-leg-l,.juyu-mascot.act-run .juyu-leg-r,
@@ -1892,6 +2001,24 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .cel-aus { --cel-1:#64748b; --cel-2:#94a3b8; --cel-3:#cbd5e1; --cel-4:#475569; }
 .cel-racha { --cel-1:#f59e0b; --cel-2:#fbbf24; --cel-3:#f97316; --cel-4:#fcd34d; }
 .cel-hw.cel-f, .cel-hw.cel-m { --cel-1:#f97316; --cel-2:#a855f7; --cel-3:#fbbf24; --cel-4:#22c55e; }
+/* Cada escena de la inasistencia tiene su propio movimiento, siempre calmado. */
+.cel-equis { animation: celSelloCae .5s .4s var(--ease-out-back) both; transform-origin: 130px 122px; }
+@keyframes celSelloCae { 0%{ opacity:0; transform:scale(2.6) rotate(-18deg); } 70%{ opacity:1; transform:scale(.92) rotate(-6deg); } 100%{ opacity:1; transform:scale(1) rotate(-6deg); } }
+.cel-nube-triste { animation: celNubeFlota 3s var(--ease-in-out) infinite alternate; }
+@keyframes celNubeFlota { from { transform: translateX(-6px); } to { transform: translateX(8px); } }
+.cel-gotas path { animation: celGota 1.3s var(--ease-out) infinite; opacity:0; }
+.cel-gotas .g2 { animation-delay:.35s; } .cel-gotas .g3 { animation-delay:.7s; }
+@keyframes celGota { 0%{ opacity:0; transform:translateY(0); } 15%{ opacity:.9; } 100%{ opacity:0; transform:translateY(46px); } }
+.cel-globo { animation: celGloboSube 2.6s var(--ease-in-out) both; }
+@keyframes celGloboSube { 0%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-26px) rotate(5deg); } 100%{ transform:translateY(-54px) rotate(-3deg); } }
+.cel-cartel { animation: celCartelMece 2.4s var(--ease-in-out) infinite alternate; transform-origin: 100px 106px; }
+@keyframes celCartelMece { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+.cel-avion { animation: celAvionPasa 2.8s var(--ease-in-out) both; }
+@keyframes celAvionPasa { 0%{ transform:translate(-40px,30px) rotate(-8deg); opacity:0; } 15%{ opacity:1; } 100%{ transform:translate(150px,-18px) rotate(10deg); opacity:0; } }
+@media (prefers-reduced-motion:reduce){
+  .cel-equis,.cel-nube-triste,.cel-gotas path,.cel-globo,.cel-cartel,.cel-avion { animation:none; opacity:1; }
+}
+
 /* Ausencia: el pupitre vacio entra despacio y el sello cae encima */
 .cel-pupitre svg { height:min(30vh,230px); width:auto; display:block; animation:celPupitre .6s var(--ease-out) both; filter:drop-shadow(0 14px 24px rgba(31,35,64,.22)); }
 @keyframes celPupitre { from { opacity:0; transform:translateY(26px) scale(.92); } to { opacity:1; transform:none; } }
@@ -3910,13 +4037,24 @@ const JUYU_CICLO_MS = 30000;  // una acción cada 30 s
 const JUYU_PRIMERA_MS = 6000; // la primera pronto, para que se vea que está vivo
 // Se recorren en orden en vez de al azar: así se ven todas sí o sí. Correr va
 // repartido entre las demás para que no se pase el rato quieto en una esquina.
-const JUYU_ORDEN = ['run','bark','jump','scratch','dance','run','ball','sleep','spin','run','love','sniff'];
-const JUYU_ACCIONES = ['run','bark','scratch','ball','jump','dance','sleep','spin','love','sniff'];
+const JUYU_ORDEN = ['run','bark','estirar','jump','cavar','scratch','dance','patita','run','ball','sacudir',
+                    'sleep','mariposa','spin','hueso','run','love','aullar','sniff','voltereta','beber',
+                    'estornudar','run','rodar'];
+const JUYU_ACCIONES = ['run','bark','scratch','ball','jump','dance','sleep','spin','love','sniff',
+                       'estirar','sacudir','cavar','aullar','voltereta','rodar','hueso','mariposa',
+                       'patita','estornudar','beber'];
 // Cuanto dura cada una. Largas a proposito: si dura un parpadeo, no se ve.
 // Las de animacion con fin (saltar, dormir, girar) coinciden con su CSS.
-const JUYU_DURACION = { bark:3000, scratch:3800, ball:5200, jump:3000, dance:4800, sleep:7000, spin:3800, love:4600, sniff:4800 };
+const JUYU_DURACION = { bark:3000, scratch:3800, ball:5200, jump:3000, dance:4800, sleep:7000, spin:3800,
+                        love:4600, sniff:4800, estirar:4400, sacudir:2600, cavar:4200, aullar:4800,
+                        voltereta:2600, rodar:2600, hueso:4600, mariposa:5000, patita:4800,
+                        estornudar:3000, beber:3600 };
 // Lo que flota sobre YUJU en algunas acciones.
-const JUYU_ADORNOS = { dance:['♪','♫','♪'], love:['❤','❤','❤'], sleep:['z','z','Z'] };
+const JUYU_ADORNOS = { dance:['♪','♫','♪'], love:['❤','❤','❤'], sleep:['z','z','Z'],
+                       sacudir:['💧','💦','💧'], cavar:['🐾','🐾','🐾'], aullar:['🌙','♪','🎵'],
+                       hueso:['🦴','🦴','🦴'], mariposa:['🦋','🦋','✨'], estornudar:['💨','💨','✨'],
+                       beber:['💧','💧','💦'], estirar:['☀️','z','✨'], patita:['🐾','❤','🐾'],
+                       voltereta:['✨','⭐','✨'], rodar:['😄','✨','😄'] };
 let _juyuVidaTimer=null, _juyuAccionTimer=null, _juyuPos=0, _juyuAccionIdx=0, _juyuArrancado=false;
 
 function juyuSpots(){
@@ -6292,20 +6430,104 @@ function celebrarLlegada(ancla,s){
     celMostrar(capa, 1950);
     return g;
 }
-// Ausencia: el pupitre vacio y el sello. Sin fiesta y sin burla.
+// Escenas de la inasistencia. Son varias para que no sea siempre la misma, y
+// todas tranquilas: el puesto vacio, la lista marcada, la puerta cerrada. Nada
+// que se burle del que falto.
+const CEL_AUSENCIAS = {
+  pupitre: { sello:true, es:'No vino hoy', en:'Not here today', svg:CEL_PUPITRE },
+  lista: { sello:false, es:'Marcado como ausente', en:'Marked absent',
+    svg:`<svg viewBox="0 0 200 230" aria-hidden="true">
+      <rect x="34" y="22" width="132" height="190" rx="12" fill="#cbd5e1"/>
+      <rect x="46" y="38" width="108" height="160" rx="7" fill="#f8fafc"/>
+      <rect x="76" y="12" width="48" height="24" rx="7" fill="#94a3b8"/>
+      <g stroke="#cbd5e1" stroke-width="4" stroke-linecap="round">
+        <path d="M58 64h56M58 92h56M58 148h56M58 176h56"/>
+      </g>
+      <g stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round">
+        <path d="M126 60l5 6 9-11M126 88l5 6 9-11M126 144l5 6 9-11M126 172l5 6 9-11"/>
+      </g>
+      <rect x="50" y="108" width="100" height="26" rx="6" fill="rgba(239,68,103,.16)"/>
+      <path d="M58 120h48" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+      <g class="cel-equis"><path d="M120 110l22 22M142 110l-22 22" stroke="#9f1239" stroke-width="7" stroke-linecap="round"/></g>
+    </svg>` },
+  lluvia: { sello:false, es:'Hoy faltó', en:'Absent today',
+    svg:`<svg viewBox="0 0 220 220" aria-hidden="true">
+      <ellipse cx="110" cy="200" rx="66" ry="9" fill="rgba(31,35,64,.13)"/>
+      <rect x="78" y="132" width="64" height="11" rx="5" fill="#64748b"/>
+      <rect x="128" y="86" width="11" height="52" rx="5" fill="#64748b"/>
+      <rect x="82" y="143" width="9" height="50" rx="4" fill="#475569"/>
+      <rect x="130" y="143" width="9" height="50" rx="4" fill="#475569"/>
+      <g class="cel-nube-triste">
+        <ellipse cx="104" cy="52" rx="34" ry="22" fill="#cbd5e1"/>
+        <ellipse cx="78" cy="60" rx="22" ry="15" fill="#cbd5e1"/>
+        <ellipse cx="132" cy="60" rx="24" ry="16" fill="#cbd5e1"/>
+      </g>
+      <g class="cel-gotas" fill="#60a5fa">
+        <path class="g1" d="M84 82c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12Z"/>
+        <path class="g2" d="M110 82c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12Z"/>
+        <path class="g3" d="M136 82c4 6 6 9 6 12a6 6 0 0 1-12 0c0-3 2-6 6-12Z"/>
+      </g>
+    </svg>` },
+  globo: { sello:false, es:'Te esperamos mañana', en:'See you tomorrow',
+    svg:`<svg viewBox="0 0 220 240" aria-hidden="true">
+      <ellipse cx="110" cy="222" rx="64" ry="9" fill="rgba(31,35,64,.13)"/>
+      <rect x="76" y="150" width="68" height="12" rx="5" fill="#94a3b8"/>
+      <rect x="130" y="100" width="12" height="54" rx="5" fill="#94a3b8"/>
+      <rect x="80" y="162" width="9" height="52" rx="4" fill="#64748b"/>
+      <rect x="132" y="162" width="9" height="52" rx="4" fill="#64748b"/>
+      <g class="cel-globo">
+        <path d="M70 60q0 38 20 46" stroke="#94a3b8" stroke-width="2.5" fill="none"/>
+        <ellipse cx="70" cy="36" rx="26" ry="31" fill="#f472b6"/>
+        <path d="M70 67l-6 7h12Z" fill="#f472b6"/>
+        <ellipse cx="60" cy="26" rx="6" ry="9" fill="rgba(255,255,255,.55)"/>
+      </g>
+    </svg>` },
+  puerta: { sello:false, es:'No llegó a clase', en:'Did not come to class',
+    svg:`<svg viewBox="0 0 200 240" aria-hidden="true">
+      <rect x="42" y="18" width="116" height="206" rx="10" fill="#b45309"/>
+      <rect x="54" y="30" width="92" height="182" rx="7" fill="#d97706"/>
+      <rect x="66" y="44" width="68" height="60" rx="5" fill="#93c5fd" opacity=".55"/>
+      <circle cx="136" cy="128" r="7" fill="#fbbf24"/>
+      <g class="cel-cartel">
+        <path d="M100 104v18" stroke="#64748b" stroke-width="3"/>
+        <rect x="64" y="122" width="72" height="34" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+        <path d="M76 134h48M76 144h32" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </svg>` },
+  avion: { sello:false, es:'Su puesto quedó vacío', en:'Their seat stayed empty',
+    svg:`<svg viewBox="0 0 220 200" aria-hidden="true">
+      <ellipse cx="110" cy="182" rx="76" ry="10" fill="rgba(31,35,64,.13)"/>
+      <rect x="34" y="96" width="112" height="13" rx="5" fill="#94a3b8"/>
+      <rect x="42" y="109" width="9" height="66" rx="4" fill="#64748b"/>
+      <rect x="129" y="109" width="9" height="66" rx="4" fill="#64748b"/>
+      <rect x="60" y="86" width="52" height="10" rx="3" fill="#cbd5e1"/>
+      <rect x="150" y="120" width="52" height="10" rx="4" fill="#64748b"/>
+      <rect x="192" y="74" width="10" height="50" rx="5" fill="#64748b"/>
+      <g class="cel-avion"><path d="M10 40l54 16-22 8-6 18-10-18-20-6Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
+    </svg>` }
+};
+const CEL_AUSENCIAS_ORDEN = Object.keys(CEL_AUSENCIAS);
+// Ausencia: el puesto vacio, sin fiesta y sin burla. Cambia de escena cada vez.
 function celebrarAusencia(ancla,s){
     const es=currentLanguage==='es';
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     cerrarCelebracion();
+    const id=celElegir('celAus', CEL_AUSENCIAS_ORDEN);
+    const esc=CEL_AUSENCIAS[id]||CEL_AUSENCIAS.pupitre;
     const { capa, escena } = celCapa('aus');
-    const dib=document.createElement('div'); dib.className='cel-pupitre'; dib.innerHTML=CEL_PUPITRE;
+    const dib=document.createElement('div');
+    dib.className='cel-pupitre esc-'+id;
+    dib.innerHTML=esc.svg;
     escena.appendChild(dib);
-    const sello=document.createElement('div'); sello.className='cel-sello';
-    sello.textContent = es?'AUSENTE':'ABSENT';
-    escena.appendChild(sello);
-    celTexto(escena, es?'No vino hoy':'Not here today', celNombreDe(s));
-    celMostrar(capa, 1500);
+    if(esc.sello){
+        const sello=document.createElement('div'); sello.className='cel-sello';
+        sello.textContent = es?'AUSENTE':'ABSENT';
+        escena.appendChild(sello);
+    }
+    celTexto(escena, es?esc.es:esc.en, celNombreDe(s));
+    celMostrar(capa, 1700);
 }
+
 // Racha: tres o mas insignias en la misma clase.
 function celebrarRacha(s, cuantas, compas){
     const es=currentLanguage==='es';
