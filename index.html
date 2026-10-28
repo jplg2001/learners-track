@@ -1465,6 +1465,154 @@ body.modo-familia > *:not(#familiaScreen):not(.notification) { display:none !imp
 .week-dia.con-lista::after { content:'·'; margin-left:3px; color:var(--success); font-weight:900; }
 .week-dia.hoy.con-lista::after { color:#fff; }
 
+/* ====== CAPA DE ANIMACIONES ======================================= */
+/* Movimiento en toda la plataforma. Tres reglas que se respetan aqui:
+   1. Lo que se hace muchas veces al dia (poner una insignia, pasar lista) se
+      mueve poquito y rapido; lo que se hace de vez en cuando (abrir una
+      ventana, cambiar de vista) puede permitirse mas.
+   2. Solo se animan transform y opacity, que no obligan al navegador a
+      recalcular la pagina.
+   3. Las entradas que se repetirian en cada redibujado van dentro de
+      .vista-entra, que solo se pone cuando el docente cambia de vista, de
+      salon o de periodo. */
+
+/* --- Respuesta al toque: todo lo que se pulsa cede un poco --- */
+.btn-primary, .btn-secondary, .btn-ai, .btn-danger, .side-btn, .add-student-btn, .add-badge-btn,
+.clear-badges-btn, .add-week-btn, .remove-week-btn, .add-note-col-btn, .remove-note-col-btn,
+.view-mode-btn, .week-dia, .clear-week-btn, .voc-tab, .bomba-preset, .bomba-chico, .bomba-play,
+.genero-btn, .dis-edad-btn, .auth-button, .export-dropdown-btn, .cert-btn-inline, .att-btn,
+.rul-controles button, .bia-otra, .juyu-free-btn, .modal-close-btn, .week-title-editable {
+    transition: transform .13s var(--ease-out), box-shadow .18s var(--ease-out),
+                background-color .18s var(--ease-out), border-color .18s var(--ease-out), color .18s var(--ease-out);
+}
+.btn-primary:active, .btn-secondary:active, .btn-ai:active, .btn-danger:active, .add-student-btn:active,
+.add-badge-btn:active, .clear-badges-btn:active, .add-week-btn:active, .remove-week-btn:active,
+.add-note-col-btn:active, .remove-note-col-btn:active, .view-mode-btn:active, .week-dia:active,
+.clear-week-btn:active, .voc-tab:active, .bomba-preset:active, .bomba-chico:active,
+.genero-btn:active, .dis-edad-btn:active, .auth-button:active, .export-dropdown-btn:active,
+.cert-btn-inline:active, .att-btn:active, .rul-controles button:active, .bia-otra:active,
+.juyu-free-btn:active, .side-btn:active { transform: scale(.96); }
+.modal-close-btn:hover { transform: rotate(90deg); }
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover, .btn-ai:hover, .add-student-btn:hover, .add-badge-btn:hover,
+    .auth-button:hover, .bomba-play:hover { transform: translateY(-2px); }
+    .view-mode-btn:hover, .clear-badges-btn:hover, .clear-week-btn:hover, .week-dia:hover,
+    .btn-secondary:hover, .bomba-preset:hover { transform: translateY(-1px); }
+    .side-btn:hover .sb-ico { transform: rotate(-9deg) scale(1.08); }
+    .sb-ico { transition: transform .2s var(--ease-out-back); }
+    .stat-tile { transition: transform .18s var(--ease-out), border-color .18s var(--ease-out); }
+    .stat-tile:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .student-grid-table td[data-cell-idx]:hover { box-shadow: inset 0 0 0 2px var(--accent-soft); }
+    .student-grid-table td[data-cell-idx] { transition: box-shadow .16s var(--ease-out); }
+    .badge:hover { transform: translateY(-3px) scale(1.03); box-shadow: var(--shadow); }
+    .grid-badge:hover { transform: translateX(2px); }
+    .week-rango:hover em, .week-title-editable:hover { transform: translateY(-1px); }
+}
+.badge:active { transform: scale(.97); cursor: grabbing; }
+
+/* --- Ventanas: entran y salen, no aparecen de golpe --- */
+.modal { animation: modalFondo .18s var(--ease-out); }
+@keyframes modalFondo { from { opacity: 0; } }
+.modal.cerrando { animation: modalFondoSale .17s var(--ease-out) forwards; }
+@keyframes modalFondoSale { to { opacity: 0; } }
+.modal.cerrando .modal-content { animation: modalSale .17s var(--ease-out) forwards; }
+@keyframes modalSale { to { opacity: 0; transform: translateY(8px) scale(.97); } }
+
+/* --- Paginas completas (estadisticas, planilla) --- */
+#statisticsPage.show, #attendancePage.show { animation: paginaEntra .26s var(--ease-out); }
+@keyframes paginaEntra { from { opacity: 0; transform: translateY(14px); } }
+
+/* --- Menu de exportar: sale de su boton --- */
+.export-dropdown-content.show { animation: menuEntra .16s var(--ease-out); transform-origin: top right; }
+@keyframes menuEntra { from { opacity: 0; transform: translateY(-6px) scale(.97); } }
+
+/* --- Cambio de vista: el contenido entra y las filas se escalonan --- */
+.vista-entra { animation: vistaEntra .24s var(--ease-out); }
+@keyframes vistaEntra { from { opacity: 0; transform: translateY(10px); } }
+.vista-entra .student-grid-table tbody tr { animation: filaEntra .26s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 22ms); }
+@keyframes filaEntra { from { opacity: 0; transform: translateY(8px); } }
+.vista-entra .week-head { animation: filaEntra .3s var(--ease-out) both; }
+.vista-entra .week-dia.hoy { animation: chipElegido .26s var(--ease-out-back); }
+@keyframes chipElegido { from { transform: scale(.82); } }
+.vista-entra .periodo-tab.activo { animation: chipElegido .26s var(--ease-out-back); }
+
+/* --- Insignias del panel: entran escalonadas --- */
+.badges-container .badge { animation: insigniaEntra .24s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 28ms); }
+@keyframes insigniaEntra { from { opacity: 0; transform: scale(.86); } }
+/* La insignia recien puesta en una celda da su saltito, las demas no. */
+.grid-badge.chip-nuevo { animation: chipEntra .24s var(--ease-out-back); }
+@keyframes chipEntra { from { opacity: 0; transform: scale(.55); } }
+
+/* --- Numeros de las estadisticas --- */
+.stat-num { display: inline-block; transition: color .3s var(--ease-out); }
+.stat-num.cambio { animation: numeroPop .42s var(--ease-out-back); }
+@keyframes numeroPop { 40% { transform: scale(1.22); color: var(--accent-strong); } }
+.att-summary { transition: transform .2s var(--ease-out-back); display: inline-block; }
+.att-summary.cambio { animation: numeroPop .36s var(--ease-out-back); }
+
+/* --- Escribir: el campo responde --- */
+.note-input, .form-group input, .form-group textarea, .form-group select,
+.controls input, .controls select { transition: box-shadow .18s var(--ease-out), border-color .18s var(--ease-out), transform .18s var(--ease-out); }
+.note-input:focus { transform: scale(1.05); }
+.note-input.nota-ok { animation: notaGuardada .65s var(--ease-out); }
+@keyframes notaGuardada {
+    0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+    100% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+}
+
+/* --- Salon vacio: el dibujo flota --- */
+.empty-illo { animation: flotarSuave 4.5s ease-in-out infinite alternate; }
+@keyframes flotarSuave { to { transform: translateY(-9px); } }
+.empty-state .btn-primary { animation: latidoSuave 2.6s var(--ease-in-out) infinite; }
+@keyframes latidoSuave { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* --- Buscador: lo que se filtra desaparece suave --- */
+.student-grid-table tbody tr { transition: opacity .18s var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+    .modal, .modal.cerrando, .modal.cerrando .modal-content, #statisticsPage.show, #attendancePage.show,
+    .export-dropdown-content.show, .vista-entra, .vista-entra .student-grid-table tbody tr,
+    .vista-entra .week-head, .vista-entra .week-dia.hoy, .vista-entra .periodo-tab.activo,
+    .badges-container .badge, .grid-badge.chip-nuevo, .stat-num.cambio, .att-summary.cambio,
+    .note-input.nota-ok, .empty-illo, .empty-state .btn-primary { animation: none; }
+    .btn-primary:active, .btn-secondary:active, .side-btn:active, .att-btn:active,
+    .view-mode-btn:active, .badge:active, .note-input:focus, .modal-close-btn:hover { transform: none; }
+}
+
+
+/* --- Segunda tanda: el armazon de la aplicacion --- */
+/* La insignia activa respira, para no perderla de vista mientras se reparte. */
+.badge.badge-armed { animation: insigniaLista 1.8s var(--ease-in-out) infinite; }
+@keyframes insigniaLista { 0%,100% { transform: translateY(-3px) scale(1); } 50% { transform: translateY(-5px) scale(1.04); } }
+.badge-armed-hint { animation: avisoSube .28s var(--ease-out-back); }
+@keyframes avisoSube { from { opacity: 0; transform: translate(-50%, 18px); } }
+
+/* Entrada del salon: barra lateral y controles, una sola vez al abrir. */
+.app-entra .side-section, .app-entra .badges-container, .app-entra .stats,
+.app-entra .week-controls, .app-entra .notes-controls { animation: panelEntra .3s var(--ease-out) both; }
+.app-entra .side-section:nth-of-type(2) { animation-delay: .05s; }
+.app-entra .side-section:nth-of-type(3) { animation-delay: .1s; }
+.app-entra .stats { animation-delay: .15s; }
+@keyframes panelEntra { from { opacity: 0; transform: translateY(12px); } }
+
+/* La tarjeta de entrada tambien aparece con calma. */
+.auth-shell { animation: panelEntra .34s var(--ease-out) both; }
+
+/* Los botoncitos de cada estudiante responden al pasar el mouse. */
+.student-name-cell .actions button { transition: transform .15s var(--ease-out-back), background-color .15s var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+    .student-name-cell .actions button:hover { transform: translateY(-2px) scale(1.12); }
+}
+.student-name-cell .actions button:active { transform: scale(.92); }
+
+@media (prefers-reduced-motion: reduce) {
+    .badge.badge-armed, .badge-armed-hint, .auth-shell,
+    .app-entra .side-section, .app-entra .badges-container, .app-entra .stats,
+    .app-entra .week-controls, .app-entra .notes-controls { animation: none; }
+    .student-name-cell .actions button:hover, .student-name-cell .actions button:active { transform: none; }
+}
+
 /* === FECHAS DE LA SEMANA === */
 .week-rango { display:inline-flex; align-items:center; gap:4px; font-size:.78rem; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
 .week-rango input[type="date"] { padding:2px 5px; border:1px solid var(--border); border-radius:7px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.76rem; }
@@ -4461,6 +4609,7 @@ if(vrBtn)vrBtn.addEventListener('click',()=>setViewMode('rows'));
 if(vgBtn)vgBtn.addEventListener('click',()=>setViewMode('grid'));
 if(vsBtn)vsBtn.addEventListener('click',()=>setViewMode('scores'));
 function setViewMode(m) {
+    if(viewMode!==m) marcarEntradaDeVista();
     viewMode=m;
     document.querySelectorAll('.view-mode-btn').forEach(b=>b.classList.remove('active'));
     const ab=document.getElementById(m==='rows'?'viewRowsBtn':m==='grid'?'viewGridBtn':'viewScoresBtn');
@@ -4476,6 +4625,7 @@ function setViewMode(m) {
 function updateWeekButtons() { const a=document.getElementById('addWeekBtn'),r=document.getElementById('removeWeekBtn'); if(a)a.disabled=gridWeeks>=10; if(r)r.disabled=gridWeeks<=1; }
 window.addWeek=function(){
     if(gridWeeks>=10)return;
+    marcarEntradaDeVista();
     const anterior = (typeof rangoSemana==='function' && gridWeeks>=1) ? rangoSemana(gridWeeks) : null;
     gridWeeks++;
     const wn=currentLanguage==='es'?"Semana ":"Week ";
@@ -4913,6 +5063,11 @@ window.updateStudentNote=function(sid,ci,val,inputEl){
     // El punto verde de la pestana del periodo tiene que reflejar lo escrito.
     if(typeof renderPeriodoTabs==="function") renderPeriodoTabs();
     if(inputEl) inputEl.classList.toggle('note-invalid', isInvalidNote(val));
+    // Destello verde: confirma que quedo guardada sin tener que mirar a otro lado.
+    if(inputEl && !isInvalidNote(val) && String(val||'').trim() && typeof animacionSuave==='function' && animacionSuave()){
+        inputEl.classList.remove('nota-ok'); void inputEl.offsetWidth; inputEl.classList.add('nota-ok');
+        setTimeout(()=>inputEl.classList.remove('nota-ok'), 700);
+    }
     // Con los puntos activos, cambiar una nota puede redistribuir la bonificacion
     // entre todas las notas de la fila, asi que hay que redibujar la tabla.
     if(badgePointsEnabled && viewMode==='scores'){
@@ -4969,9 +5124,10 @@ function showArmedHint(badge){
 function renderBadges() {
     const c=document.getElementById('badgesContainer'); if(!c)return; c.innerHTML='';
     const es=currentLanguage==='es';
-    currentBadges.forEach(b=>{
+    currentBadges.forEach((b,idx)=>{
         const el=document.createElement('div');
         el.className='badge'; el.draggable=true; el.dataset.badgeId=b.id;
+        el.style.setProperty('--i', Math.min(idx,10));
         el.tabIndex=0; el.setAttribute('role','button');
         el.setAttribute('aria-label',(es?'Insignia ':'Badge ')+b.name+(es?'. Actívala y toca una celda para otorgarla.':'. Activate it and tap a cell to award it.'));
         const safeName=escapeHtml(b.name);
@@ -5006,13 +5162,57 @@ document.addEventListener('DOMContentLoaded',()=>{
 function selectEmoji(em){const bi=document.getElementById('badgeIcon');if(bi)bi.value=em;badgeImageDataUrl='';}
 
 // === RENDER VIEWS ===
+// --- Ayudas de animacion -------------------------------------------------
+function animacionSuave(){
+    try{ return !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return true; }
+}
+// Los numeros de las estadisticas suben contando en vez de saltar de golpe.
+function animarNumero(el, destino, decimales){
+    if(!el) return;
+    const dec=decimales||0;
+    const texto=Number(destino).toFixed(dec);
+    const desde=parseFloat(String(el.textContent||'').replace(',','.'));
+    if(!animacionSuave() || !isFinite(desde) || desde===Number(destino)){ el.textContent=texto; return; }
+    el.classList.remove('cambio'); void el.offsetWidth; el.classList.add('cambio');
+    const t0=performance.now(), dur=420;
+    const paso=(ahora)=>{
+        const p=Math.min(1,(ahora-t0)/dur);
+        const e=1-Math.pow(1-p,3);
+        el.textContent=(desde+(Number(destino)-desde)*e).toFixed(dec);
+        if(p<1) requestAnimationFrame(paso); else el.textContent=texto;
+    };
+    requestAnimationFrame(paso);
+    setTimeout(()=>{ el.textContent=texto; }, dur+180);   // por si la pestaña estaba quieta
+}
+// Las entradas escalonadas solo se ven cuando el docente cambia de vista, de
+// salon o de periodo: en cada insignia que cae seria un parpadeo molesto.
+let _animarVista=true;
+function marcarEntradaDeVista(){ _animarVista=true; }
+function aplicarEntradaDeVista(caja){
+    if(!caja || !_animarVista){ _animarVista=false; return; }
+    _animarVista=false;
+    if(!animacionSuave()) return;
+    caja.classList.remove('vista-entra'); void caja.offsetWidth; caja.classList.add('vista-entra');
+    clearTimeout(caja.__entrada);
+    caja.__entrada=setTimeout(()=>caja.classList.remove('vista-entra'), 900);
+}
+// La insignia que acaba de caer da un saltito; las que ya estaban, no.
+function destacarUltimaInsignia(sid, ci){
+    if(!animacionSuave()) return;
+    document.querySelectorAll(`td[data-student-id="${sid}"][data-cell-idx="${ci}"]`).forEach(td=>{
+        const chips=td.querySelectorAll('.grid-badge');
+        const ultimo=chips[chips.length-1]; if(!ultimo) return;
+        ultimo.classList.add('chip-nuevo');
+        setTimeout(()=>ultimo.classList.remove('chip-nuevo'), 400);
+    });
+}
 function renderCurrentView() {
     const rv=document.getElementById('classroomRowsView'),gv=document.getElementById('classroomGridView'),sv=document.getElementById('classroomScoresView');
     if(!rv||!gv||!sv)return;
     rv.style.display='none';gv.style.display='none';sv.style.display='none';
-    if(viewMode==="rows"){rv.style.display='block';renderClassroomRows();}
-    else if(viewMode==="grid"){gv.style.display='block';renderClassroomGrid();}
-    else{sv.style.display='block';renderClassroomScores();}
+    if(viewMode==="rows"){rv.style.display='block';renderClassroomRows();aplicarEntradaDeVista(rv);}
+    else if(viewMode==="grid"){gv.style.display='block';renderClassroomGrid();aplicarEntradaDeVista(gv);}
+    else{sv.style.display='block';renderClassroomScores();aplicarEntradaDeVista(sv);}
     filterStudents();
     actualizarResumenAsistencia();
 }
@@ -6166,7 +6366,11 @@ function actualizarResumenAsistencia(){
     let p=0,a=0;
     (currentStudents||[]).forEach(s=>{ const e=(s.attendance||{})[attendanceDate]; if(e==='p')p++; else if(e==='a')a++; });
     const faltan=(currentStudents||[]).length-p-a;
-    el.textContent = `✓ ${p} · ✗ ${a}` + (faltan>0 ? ` · ${faltan} ${es?'por llamar':'to call'}` : '');
+    const texto = `✓ ${p} · ✗ ${a}` + (faltan>0 ? ` · ${faltan} ${es?'por llamar':'to call'}` : '');
+    if(el.textContent!==texto && typeof animacionSuave==='function' && animacionSuave()){
+        el.classList.remove('cambio'); void el.offsetWidth; el.classList.add('cambio');
+    }
+    el.textContent = texto;
 }
 window.cambiarFechaAsistencia=function(valor){
     attendanceDate = valor || fechaISO();
@@ -6614,8 +6818,9 @@ function renderClassroomGrid() {
         thead.innerHTML=`<tr><th>${currentLanguage==='es'?'Estudiante':'Student'}</th>${weekDays.map(d=>`<th>${escapeHtml(d)}</th>`).join('')}</tr>`;
         table.appendChild(thead);
         const tbody=document.createElement('tbody');
-        currentStudents.forEach(s=>{
+        currentStudents.forEach((s,idx)=>{
             const tr=document.createElement('tr');
+            tr.style.setProperty('--i', Math.min(idx,14));
             tr.innerHTML=studentNameCellHtml(s,{semana:w});
             const estSem=(s.attendance||{})[diaDeSemana(w)]||'';
             if(estSem==='p') tr.classList.add('fila-presente');
@@ -6643,6 +6848,7 @@ function renderClassroomRows() {
             for(let s=f*groupSize;s<Math.min((f+1)*groupSize,currentStudents.length);s++){
                 const st=currentStudents[s];
                 const tr=document.createElement('tr');
+                tr.style.setProperty('--i', Math.min(s-f*groupSize,14));
                 tr.innerHTML=studentNameCellHtml(st,{semana:w});
                 const estSem=(st.attendance||{})[diaDeSemana(w)]||'';
                 if(estSem==='p') tr.classList.add('fila-presente');
@@ -6748,6 +6954,9 @@ function applyBadgeToRow(ri,ci,badge){
     }
     if(cuantos){
         saveData();renderCurrentView();updateStats();
+        if(typeof destacarUltimaInsignia==='function'){
+            for(let i=si;i<ei;i++){ const s=currentStudents[i]; if(s) destacarUltimaInsignia(s.id, ci); }
+        }
         // Si varios del grupo llegaron al hito, se celebra con el primero y se
         // nombra a los demas: no tiene sentido encadenar seis celebraciones.
         if(enRacha.length && typeof celebrarRacha==='function'){
@@ -6791,14 +7000,29 @@ function addGridBadgeToCell(sid,ci,badge){
     }
     s.gridBadges[ci].push(badge);
     saveData(); renderCurrentView(); updateStats();
+    if(typeof destacarUltimaInsignia==='function') destacarUltimaInsignia(sid, ci);
     // Tres o mas insignias en la misma clase merecen su propia celebracion.
     if(typeof revisarRacha==='function') revisarRacha(s, s.gridBadges[ci].length, 0);
 }
 window.removeGridBadge=function(sid,ci,bi){const s=currentStudents.find(x=>x.id===sid);if(s&&s.gridBadges[ci]){s.gridBadges[ci].splice(bi,1);saveData();renderCurrentView();updateStats();}};
 
 // === MODALS ===
-function showModal(id){const m=document.getElementById(id);if(m){m.style.display="flex";m.setAttribute('aria-hidden','false');}}
-function hideModal(id){const m=document.getElementById(id);if(m){m.style.display="none";m.setAttribute('aria-hidden','true');}}
+function showModal(id){
+    const m=document.getElementById(id); if(!m) return;
+    clearTimeout(m.__cierre); m.classList.remove('cerrando');
+    m.style.display="flex"; m.setAttribute('aria-hidden','false');
+}
+function hideModal(id){
+    const m=document.getElementById(id); if(!m) return;
+    m.setAttribute('aria-hidden','true');
+    const abierta = m.style.display==='flex';
+    const suave = (typeof animacionSuave==='function') ? animacionSuave() : true;
+    if(!abierta || !suave){ m.style.display="none"; m.classList.remove('cerrando'); return; }
+    // Se va como llego: encogiendose un poco mientras se desvanece.
+    m.classList.add('cerrando');
+    clearTimeout(m.__cierre);
+    m.__cierre=setTimeout(()=>{ m.style.display="none"; m.classList.remove('cerrando'); }, 170);
+}
 
 // PROFILE MODAL
 function openProfileModal(){if(!currentUser){showNotification("Please log in first","error");return;}showModal('profileModal');}
@@ -7243,7 +7467,14 @@ function showProfileSetup(){
 }
 function hideProfileSetup(){
     document.getElementById('profileSetupContainer').style.display='none';
-    document.getElementById('mainContainer').style.display='flex';
+    const mc=document.getElementById('mainContainer');
+    mc.style.display='flex';
+    // Presentacion del salon: solo al entrar, no en cada redibujado.
+    if(typeof animacionSuave!=='function' || animacionSuave()){
+        mc.classList.remove('app-entra'); void mc.offsetWidth; mc.classList.add('app-entra');
+        clearTimeout(mc.__entrada);
+        mc.__entrada=setTimeout(()=>mc.classList.remove('app-entra'), 1200);
+    }
     limpiarBusquedaAlumno();
 }
 // El gestor de contraseñas rellena con retraso, después de mostrar la app, así que
@@ -7499,12 +7730,19 @@ function renderProgressCharts(){
 // === UPDATE STATS ===
 function updateStats(){
     const sc=document.getElementById('studentCount'),bc=document.getElementById('badgeCount'),ac=document.getElementById('avgBadgeCount'),cc=document.getElementById('commentsCount');
-    if(sc)sc.textContent=currentStudents.length;
     const bcount=currentStudents.reduce((a,s)=>a+(s.gridBadges||[]).reduce((x,y)=>x+(y||[]).length,0),0);
-    if(bc)bc.textContent=bcount;
-    if(ac)ac.textContent=(bcount/(currentStudents.length||1)).toFixed(2);
     const ccount=currentStudents.filter(s=>s.comment&&s.comment.trim().length>0).length;
-    if(cc)cc.textContent=ccount;
+    if(typeof animarNumero==='function'){
+        animarNumero(sc, currentStudents.length, 0);
+        animarNumero(bc, bcount, 0);
+        animarNumero(ac, bcount/(currentStudents.length||1), 2);
+        animarNumero(cc, ccount, 0);
+    } else {
+        if(sc)sc.textContent=currentStudents.length;
+        if(bc)bc.textContent=bcount;
+        if(ac)ac.textContent=(bcount/(currentStudents.length||1)).toFixed(2);
+        if(cc)cc.textContent=ccount;
+    }
 }
 
 // === EXPORT FUNCTIONS ===
