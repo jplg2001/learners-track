@@ -1759,6 +1759,136 @@ body.navidad .stats { background:linear-gradient(160deg, rgba(220,38,38,.07), rg
 }
 @media (max-width:600px){ .nieve i { font-size:9px !important; } }
 
+/* === NAVIDAD 2: los disfraces cobran vida ================================ */
+/* Cada pieza del disfraz se mueve sola -el pompon rebota, la nariz del reno se
+   prende, el angel aletea- y siempre con transform y opacity, que son las dos
+   cosas que el navegador mueve sin esfuerzo. */
+.na-pompon,.na-barba,.na-hebilla,.na-regalo,.na-cascabel,.na-oreja-l,.na-oreja-r,
+.na-boton,.na-cuernos,.na-nariz,.na-campana,.na-bufanda,.na-zanahoria,.na-sombrero,
+.na-luz,.na-estrella,.na-aureola,.na-ala-l,.na-ala-r,.na-cayado,.na-corona,
+.na-dientes,.na-destello,.na-sonrisa,.na-cachete,.na-glaseado,.na-ojo,.na-pico,
+.na-panza,.na-hocico,.na-caja,.na-lazo,.na-cola {
+    transform-box:fill-box; transform-origin:50% 50%;
+}
+@keyframes naPompon   { 0%,100% { transform:translateY(0) rotate(0); }      50% { transform:translateY(-4px) rotate(-10deg); } }
+@keyframes naBarba    { 0%,100% { transform:rotate(-1.6deg); }              50% { transform:rotate(1.6deg); } }
+@keyframes naBrilla   { 0%,100% { opacity:1; transform:scale(1); }          50% { opacity:.55; transform:scale(1.15); } }
+@keyframes naRegalo   { 0%,100% { transform:rotate(-7deg); }                50% { transform:rotate(7deg) translateY(-2px); } }
+@keyframes naCascabel { 0%,100% { transform:rotate(-14deg); }               50% { transform:rotate(14deg); } }
+@keyframes naOrejaL   { 0%,100% { transform:rotate(0); }                    50% { transform:rotate(-13deg); } }
+@keyframes naOrejaR   { 0%,100% { transform:rotate(0); }                    50% { transform:rotate(13deg); } }
+@keyframes naBoton    { 0%,72%,100% { transform:scale(1); }                 86% { transform:scale(1.32); } }
+@keyframes naCuernos  { 0%,100% { transform:rotate(-3deg); }                50% { transform:rotate(3deg); } }
+@keyframes naNariz    { 0%,100% { transform:scale(1); opacity:.9; }         50% { transform:scale(1.22); opacity:1; } }
+@keyframes naBufanda  { 0%,100% { transform:rotate(-2deg); }                50% { transform:rotate(2deg); } }
+@keyframes naPunta    { 0%,100% { transform:rotate(0); }                    50% { transform:rotate(-7deg); } }
+@keyframes naSombrero { 0%,100% { transform:rotate(-4deg); }                50% { transform:rotate(4deg) translateY(-2px); } }
+@keyframes naLuz      { 0%,100% { opacity:1; transform:scale(1); }          50% { opacity:.2; transform:scale(.75); } }
+@keyframes naEstrella { 0%,100% { transform:rotate(0) scale(1); }           50% { transform:rotate(11deg) scale(1.13); } }
+@keyframes naAureola  { 0%,100% { transform:translateY(0) scaleX(1); }      50% { transform:translateY(-3px) scaleX(1.07); } }
+@keyframes naAlaL     { 0%,100% { transform:rotate(0); }                    50% { transform:rotate(-15deg); } }
+@keyframes naAlaR     { 0%,100% { transform:rotate(0); }                    50% { transform:rotate(15deg); } }
+@keyframes naCayado   { 0%,100% { transform:rotate(-4deg); }                50% { transform:rotate(4deg); } }
+@keyframes naDientes  { 0%,78%,100% { transform:scaleY(1); }                90% { transform:scaleY(.45); } }
+@keyframes naOjo      { 0%,92%,100% { transform:scaleY(1); }                96% { transform:scaleY(.12); } }
+@keyframes naPanza    { 0%,100% { transform:scale(1,1); }                   50% { transform:scale(1.04,.97); } }
+@keyframes naCaja     { 0%,100% { transform:scale(1,1); }                   50% { transform:scale(1.03,.96); } }
+@keyframes naLazo     { 0%,100% { transform:translateY(0) scale(1); }       50% { transform:translateY(-4px) scale(1.09); } }
+@keyframes naCola     { 0%,100% { transform:rotate(-8deg); }                50% { transform:rotate(8deg); } }
+.na-pompon  { animation:naPompon 2.6s var(--ease-in-out) infinite; }
+.na-barba   { transform-origin:50% 0%; animation:naBarba 3.2s var(--ease-in-out) infinite; }
+.na-hebilla,.na-destello,.na-corona { animation:naBrilla 2.2s var(--ease-in-out) infinite; }
+.na-regalo  { animation:naRegalo 2.4s var(--ease-in-out) infinite; }
+.na-cascabel,.na-campana { transform-origin:50% 0%; animation:naCascabel 1.8s var(--ease-in-out) infinite; }
+.na-oreja-l { transform-origin:100% 100%; animation:naOrejaL 2.1s var(--ease-in-out) infinite; }
+.na-oreja-r { transform-origin:0% 100%;   animation:naOrejaR 2.1s var(--ease-in-out) infinite; }
+.na-boton,.na-cachete { animation:naBoton 2.8s var(--ease-out) infinite; }
+.na-cuernos { transform-origin:50% 100%; animation:naCuernos 3s var(--ease-in-out) infinite; }
+.na-nariz   { animation:naNariz 1.5s var(--ease-in-out) infinite; }
+.na-bufanda,.na-glaseado,.na-sonrisa { transform-origin:50% 0%; animation:naBufanda 2.9s var(--ease-in-out) infinite; }
+.na-zanahoria,.na-pico,.na-hocico { transform-origin:0% 50%; animation:naPunta 2.3s var(--ease-in-out) infinite; }
+.na-sombrero { transform-origin:50% 100%; animation:naSombrero 3.1s var(--ease-in-out) infinite; }
+.na-luz     { animation:naLuz 1.4s var(--ease-in-out) infinite; }
+.na-estrella { animation:naEstrella 2.6s var(--ease-in-out) infinite; }
+.na-aureola { animation:naAureola 2.8s var(--ease-in-out) infinite; }
+.na-ala-l   { transform-origin:100% 80%; animation:naAlaL 1.6s var(--ease-in-out) infinite; }
+.na-ala-r   { transform-origin:0% 80%;   animation:naAlaR 1.6s var(--ease-in-out) infinite; }
+.na-cayado  { transform-origin:50% 100%; animation:naCayado 3.4s var(--ease-in-out) infinite; }
+.na-dientes { transform-origin:50% 0%; animation:naDientes 2.4s var(--ease-in-out) infinite; }
+.na-ojo     { animation:naOjo 4.2s linear infinite; }
+.na-panza   { transform-origin:50% 100%; animation:naPanza 2.6s var(--ease-in-out) infinite; }
+.na-caja    { transform-origin:50% 100%; animation:naCaja 2.2s var(--ease-in-out) infinite; }
+.na-lazo    { transform-origin:50% 100%; animation:naLazo 2.2s var(--ease-in-out) infinite; }
+.na-cola    { transform-origin:50% 0%; animation:naCola 2.5s var(--ease-in-out) infinite; }
+/* Las piezas repetidas (botones, luces, destellos) entran una detras de otra. */
+.na-b2 { animation-delay:.35s; } .na-b3 { animation-delay:.7s; }
+.na-b4 { animation-delay:1.05s; } .na-b5 { animation-delay:1.4s; }
+
+/* === NAVIDAD 2: mas adorno por toda la pagina ============================ */
+/* Bolas que cuelgan de la guirnalda. */
+.guirnalda { position:relative; }
+.guirnalda .bola { position:absolute; top:13px; left:var(--x); width:13px; margin-left:-6.5px;
+    transform-origin:50% -13px; animation:bolaMece 3.6s var(--ease-in-out) infinite alternate; }
+.guirnalda .bola::before { content:''; display:block; width:2px; height:9px; margin:0 auto; background:#166534; }
+.guirnalda .bola.larga::before { height:19px; }
+.guirnalda .bola::after { content:''; display:block; width:13px; height:13px; border-radius:50%;
+    background:var(--c); box-shadow:inset -3px -3px 0 rgba(0,0,0,.18), 0 0 9px var(--c); }
+@keyframes bolaMece { from { transform:rotate(-10deg); } to { transform:rotate(10deg); } }
+/* Nieve acumulada encima de la guirnalda, como si cayera sobre la barra. */
+.guirnalda::after { content:''; position:absolute; left:0; right:0; top:-5px; height:7px;
+    background:radial-gradient(circle at 11px 0, rgba(255,255,255,.9) 0 9px, transparent 10px) repeat-x;
+    background-size:22px 7px; opacity:.8; }
+/* Chispas que titilan en la capa de la nieve. */
+.nieve b { position:absolute; top:var(--y); left:var(--x); color:#fde68a; font-size:11px; font-weight:400;
+    opacity:0; animation:chispaTitila 4s var(--ease-in-out) infinite; }
+@keyframes chispaTitila { 0%,100% { opacity:0; transform:scale(.55); } 50% { opacity:.95; transform:scale(1); } }
+/* El trineo cruza el cielo cada tanto y se va. */
+.trineo { position:fixed; top:3px; left:0; z-index:1499; pointer-events:none; font-size:23px; white-space:nowrap;
+    filter:drop-shadow(0 3px 6px rgba(15,23,42,.3)); animation:trineoCruza 34s linear infinite; }
+.trineo span { display:inline-block; animation:trineoSube 2.8s var(--ease-in-out) infinite alternate; }
+@keyframes trineoCruza { 0% { transform:translateX(-320px); } 38%,100% { transform:translateX(calc(100vw + 90px)); } }
+@keyframes trineoSube  { from { transform:translateY(4px); } to { transform:translateY(-12px); } }
+/* Detalles navideños en el salon: bastoncito en cada semana, copo en los
+   recuadros de numeros y una campanita en el titulo de cada ventana. */
+body.navidad .week-head { position:relative; border-left:0; padding-left:13px; }
+body.navidad .week-head::before { content:''; position:absolute; left:0; top:3px; bottom:3px; width:5px; border-radius:3px;
+    background:repeating-linear-gradient(45deg, #dc2626 0 5px, #f8fafc 5px 10px); animation:bastonGira 1.6s linear infinite; }
+@keyframes bastonGira { to { background-position:0 -14.14px; } }
+body.navidad .stat-tile { position:relative; overflow:hidden; }
+body.navidad .stat-tile::after { content:'❄'; position:absolute; right:5px; bottom:-4px; font-size:28px; line-height:1;
+    color:#38bdf8; opacity:.12; animation:copoGira 15s linear infinite; }
+@keyframes copoGira { to { transform:rotate(360deg); } }
+body.navidad .modal-content > h3::after { content:' 🔔'; display:inline-block; animation:campanita 2.6s var(--ease-in-out) infinite; }
+@keyframes campanita { 0%,70%,100% { transform:rotate(0); } 80% { transform:rotate(-16deg); } 90% { transform:rotate(16deg); } }
+@media (hover:hover) and (pointer:fine){
+    body.navidad .side-btn:hover { box-shadow:0 7px 18px rgba(22,163,74,.3); }
+    body.navidad .btn-primary:hover { box-shadow:0 7px 20px rgba(220,38,38,.35); }
+}
+/* Un poquito mas de vida en el resto de la plataforma. */
+.modal-content > h3 { animation:tituloEntra .34s var(--ease-out) both; }
+@keyframes tituloEntra { from { opacity:0; transform:translateY(-7px); } to { opacity:1; transform:none; } }
+@media (hover:hover) and (pointer:fine){
+    .stat-tile { transition:transform .18s var(--ease-out), box-shadow .18s var(--ease-out); }
+    .stat-tile:hover { transform:translateY(-2px) scale(1.015); box-shadow:var(--shadow); }
+    .stat-num { transition:transform .18s var(--ease-out); }
+    .stat-tile:hover .stat-num { transform:scale(1.07); }
+}
+@media (prefers-reduced-motion: reduce){
+    .na-pompon,.na-barba,.na-hebilla,.na-regalo,.na-cascabel,.na-oreja-l,.na-oreja-r,
+    .na-boton,.na-cuernos,.na-nariz,.na-campana,.na-bufanda,.na-zanahoria,.na-sombrero,
+    .na-luz,.na-estrella,.na-aureola,.na-ala-l,.na-ala-r,.na-cayado,.na-corona,
+    .na-dientes,.na-destello,.na-sonrisa,.na-cachete,.na-glaseado,.na-ojo,.na-pico,
+    .na-panza,.na-hocico,.na-caja,.na-lazo,.na-cola,
+    .guirnalda .bola, .nieve b, .trineo, .trineo span,
+    body.navidad .week-head::before, body.navidad .stat-tile::after,
+    body.navidad .modal-content > h3::after, .modal-content > h3 { animation:none; }
+}
+/* El titulo tiene letras de color recortado: el arbolito necesita su propio
+   color para no salir transparente. */
+body.navidad .app-title::after { -webkit-text-fill-color:initial; color:initial;
+    background:none; -webkit-background-clip:initial; background-clip:initial; }
+@media (max-width:600px){ .trineo { font-size:16px; top:2px; } .guirnalda .bola { display:none; } }
+
 /* === FECHAS DE LA SEMANA === */
 .week-rango { display:inline-flex; align-items:center; gap:4px; font-size:.78rem; color:var(--fg-muted); background:var(--bg-card); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
 .week-rango input[type="date"] { padding:2px 5px; border:1px solid var(--border); border-radius:7px; background:var(--bg-alt); color:var(--fg); font:inherit; font-size:.76rem; }
@@ -5548,6 +5678,29 @@ window.cambiarNavidad=function(v){
 };
 // Nieve y guirnalda. Se dibujan una sola vez y se quitan al apagar la Navidad.
 const NIEVE_COPOS = 26;
+const NIEVE_CHISPAS = 14;
+const NAV_BOLAS = ['#ef4444','#fbbf24','#22c55e','#38bdf8','#f472b6','#f97316'];
+// Bolas de colores colgando de la guirnalda.
+function adornarGuirnalda(luces){
+    if(!luces || luces.dataset.bolas) return;
+    luces.dataset.bolas='1';
+    for(let i=0;i<9;i++){
+        const b=document.createElement('i');
+        b.className = 'bola' + (i%2 ? ' larga' : '');
+        b.style.setProperty('--x', (5+i*11+Math.random()*3).toFixed(1)+'%');
+        b.style.setProperty('--c', NAV_BOLAS[i%NAV_BOLAS.length]);
+        b.style.animationDelay=(-Math.random()*3.6).toFixed(2)+'s';
+        luces.appendChild(b);
+    }
+}
+// El trineo de Papa Noel cruza el cielo cada medio minuto.
+function ponerTrineo(){
+    if(document.getElementById('trineoNavidad')) return;
+    const t=document.createElement('div');
+    t.id='trineoNavidad'; t.className='trineo'; t.setAttribute('aria-hidden','true');
+    t.innerHTML='<span>\u2728 \ud83e\udd8c \ud83e\udd8c \ud83d\udef7 \ud83c\udf85</span>';
+    document.body.appendChild(t);
+}
 function aplicarDecoracionNavidad(){
     const puesta=esNavidad();
     document.body.classList.toggle('navidad', puesta);
@@ -5559,9 +5712,12 @@ function aplicarDecoracionNavidad(){
         luces.id='guirnaldaNavidad'; luces.className='guirnalda'; luces.setAttribute('aria-hidden','true');
         barra.insertAdjacentElement('afterend', luces);
     } else if(!puesta && luces){ luces.remove(); }
+    if(puesta && luces) adornarGuirnalda(luces);
     let nieve=document.getElementById('nieveNavidad');
+    const trineo=document.getElementById('trineoNavidad');
     const suave=(typeof animacionSuave==='function') ? animacionSuave() : true;
-    if(!puesta || !suave){ if(nieve) nieve.remove(); return; }
+    if(!puesta || !suave){ if(nieve) nieve.remove(); if(trineo) trineo.remove(); return; }
+    ponerTrineo();
     if(nieve) return;
     nieve=document.createElement('div');
     nieve.id='nieveNavidad'; nieve.className='nieve'; nieve.setAttribute('aria-hidden','true');
@@ -5577,11 +5733,21 @@ function aplicarDecoracionNavidad(){
         c.style.animationDelay=(-Math.random()*16).toFixed(1)+'s';
         nieve.appendChild(c);
     }
+    // Chispitas doradas que se prenden y se apagan en el fondo.
+    for(let i=0;i<NIEVE_CHISPAS;i++){
+        const e=document.createElement('b');
+        e.textContent = i%3 ? '\u2726' : '\u2727';
+        e.style.setProperty('--x', (Math.random()*96).toFixed(2)+'vw');
+        e.style.setProperty('--y', (4+Math.random()*88).toFixed(2)+'vh');
+        e.style.animationDuration=(3+Math.random()*4).toFixed(1)+'s';
+        e.style.animationDelay=(-Math.random()*6).toFixed(1)+'s';
+        nieve.appendChild(e);
+    }
     document.body.appendChild(nieve);
 }
 // Gorro y bufanda para YUJU.
-const NAV_YUJU_GORRO = '<g class="juyu-gorro"><path d="M44 26q14-18 30-6-10 2-14 10Z" fill="#dc2626"/><ellipse cx="52" cy="30" rx="18" ry="6" fill="#f8fafc"/><circle cx="74" cy="20" r="6" fill="#f8fafc"/></g>';
-const NAV_YUJU_BUFANDA = '<g class="juyu-bufanda"><path d="M38 88q22 12 44 0l3 12q-25 14-50 0Z" fill="#16a34a"/><path d="M78 98l10 20-12 4-6-20Z" fill="#16a34a"/></g>';
+const NAV_YUJU_GORRO = '<g class="juyu-gorro"><path d="M44 26q14-18 30-6-10 2-14 10Z" fill="#dc2626"/><ellipse cx="52" cy="30" rx="18" ry="6" fill="#f8fafc"/><circle class="na-pompon" cx="74" cy="20" r="6" fill="#f8fafc"/></g>';
+const NAV_YUJU_BUFANDA = '<g class="juyu-bufanda"><path d="M38 88q22 12 44 0l3 12q-25 14-50 0Z" fill="#16a34a"/><path class="na-cola" d="M78 98l10 20-12 4-6-20Z" fill="#16a34a"/></g>';
 
 // Piezas de disfraz que se insertan dentro del dibujo de cada muñequito.
 const HW_CAPA_NINA  = '<path d="M64 120q-16 62-10 112h92q6-50-10-112l-14-4q-18 16-44 0Z" fill="#4c1d95"/><path d="M70 120q-12 56-8 100h12q-6-52 6-98Z" fill="#6d28d9" opacity=".7"/>';
@@ -5590,8 +5756,8 @@ const HW_SOMBRERO   = '<g><ellipse cx="100" cy="46" rx="50" ry="11" fill="#2e106
 const HW_CUELLO     = '<path d="M76 114 100 132 124 114l14 6q-16 20-38 22-22-2-38-22Z" fill="#7f1d1d"/>';
 const HW_COLMILLOS  = '<path d="M93 94l3 8 3-8Z" fill="#fff"/><path d="M101 94l3 8 3-8Z" fill="#fff"/>';
 // Gorro de Papa Noel y bufanda para el muñequito en temporada de Navidad.
-const NAV_GORRO = '<g><path d="M62 50q10-36 44-28-20 6-24 28Z" fill="#dc2626"/><path d="M60 48q22-16 50-4l4 12H58Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="48" ry="10" fill="#f8fafc"/><circle cx="112" cy="20" r="9" fill="#f8fafc"/></g>';
-const NAV_BUFANDA = '<g><path d="M70 112q30 16 60 0l4 14q-34 18-68 0Z" fill="#16a34a"/><path d="M124 124l12 30-14 5-8-30Z" fill="#16a34a"/><path d="M74 118h56" stroke="#f8fafc" stroke-width="3" opacity=".6"/></g>';
+const NAV_GORRO = '<g><path d="M62 50q10-36 44-28-20 6-24 28Z" fill="#dc2626"/><path d="M60 48q22-16 50-4l4 12H58Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="48" ry="10" fill="#f8fafc"/><circle class="na-pompon" cx="112" cy="20" r="9" fill="#f8fafc"/></g>';
+const NAV_BUFANDA = '<g><path d="M70 112q30 16 60 0l4 14q-34 18-68 0Z" fill="#16a34a"/><path class="na-cola" d="M124 124l12 30-14 5-8-30Z" fill="#16a34a"/><path d="M74 118h56" stroke="#f8fafc" stroke-width="3" opacity=".6"/></g>';
 const HW_ARANA      = '<g><path d="M150 0v26" stroke="#64748b" stroke-width="2" fill="none"/><circle cx="150" cy="32" r="7" fill="#111827"/><path d="M143 28l-8-5M157 28l8-5M143 36l-8 5M157 36l8 5" stroke="#111827" stroke-width="2.5" stroke-linecap="round"/><circle cx="147.5" cy="30" r="1.6" fill="#fbbf24"/><circle cx="152.5" cy="30" r="1.6" fill="#fbbf24"/></g>';
 
 // ===================== AVATARES Y DISFRACES ================================
@@ -6002,62 +6168,65 @@ const DISFRACES = {
                  pecho:'<circle cx="100" cy="142" r="12" fill="#a5b4fc" opacity=".9"/><circle cx="96" cy="138" r="4" fill="#e0e7ff"/>',
                  propD:'<circle cx="0" cy="-76" r="14" fill="#a78bfa" opacity=".85"/><circle cx="-4" cy="-80" r="4" fill="#ede9fe"/><path d="M-10 -62h20l-4 8h-12Z" fill="#fbbf24"/>' },
   // ---------------- Navidad ----------------
+  // Los disfraces navideños se mueven solos: el pompón del gorro rebota, la
+  // nariz del reno se prende, las luces del arbolito titilan, el ángel aletea.
+  // Todo con transform y opacity, y quieto si el equipo pide menos animación.
   papanoel:    { cat:'navidad', emoji:'🎅', es:{f:'la Mamá Noel', m:'el Papá Noel'}, en:'Santa', color:'#dc2626',
-                 gorro:'<path d="M60 48q12-34 44-26-18 6-22 26Z" fill="#dc2626"/><path d="M58 46q22-16 48-4l4 12H56Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="48" ry="10" fill="#f8fafc"/><circle cx="138" cy="24" r="10" fill="#f8fafc"/>',
-                 cara:'<path d="M70 84q10 26 30 26t30-26q6 26-30 34-36-8-30-34Z" fill="#f8fafc"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>',
-                 pecho:'<rect x="62" y="150" width="76" height="16" rx="4" fill="#1f2937"/><rect x="90" y="148" width="20" height="20" rx="4" fill="#fbbf24"/>',
-                 propD:'<rect x="-16" y="-80" width="32" height="26" rx="5" fill="#16a34a"/><rect x="-16" y="-70" width="32" height="6" fill="#fbbf24"/><rect x="-4" y="-80" width="8" height="26" fill="#fbbf24"/>' },
+                 gorro:'<path d="M60 48q12-34 44-26-18 6-22 26Z" fill="#dc2626"/><path d="M58 46q22-16 48-4l4 12H56Z" fill="#dc2626"/><ellipse cx="100" cy="56" rx="48" ry="10" fill="#f8fafc"/><circle class="na-pompon" cx="138" cy="24" r="10" fill="#f8fafc"/>',
+                 cara:'<path class="na-barba" d="M70 84q10 26 30 26t30-26q6 26-30 34-36-8-30-34Z" fill="#f8fafc"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>',
+                 pecho:'<rect x="62" y="150" width="76" height="16" rx="4" fill="#1f2937"/><rect class="na-hebilla" x="90" y="148" width="20" height="20" rx="4" fill="#fbbf24"/>',
+                 propD:'<g class="na-regalo"><rect x="-16" y="-80" width="32" height="26" rx="5" fill="#16a34a"/><rect x="-16" y="-70" width="32" height="6" fill="#fbbf24"/><rect x="-4" y="-80" width="8" height="26" fill="#fbbf24"/></g>' },
   elfonavideno:{ cat:'navidad', emoji:'🧝', es:{f:'la duende de Navidad', m:'el duende de Navidad'}, en:'the Christmas elf', color:'#16a34a',
-                 gorro:'<path d="M100 8 70 48h60Z" fill="#16a34a"/><ellipse cx="100" cy="50" rx="42" ry="9" fill="#dc2626"/><circle cx="100" cy="8" r="7" fill="#fbbf24"/>',
-                 cara:'<path d="M70 66 56 56l16-8Zm60 0 14-10-16-8Z" fill="#f6cfae"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>',
-                 pecho:'<rect x="66" y="148" width="68" height="14" rx="4" fill="#dc2626"/><circle cx="100" cy="132" r="6" fill="#fbbf24"/>',
-                 propD:'<rect x="-14" y="-78" width="28" height="22" rx="4" fill="#dc2626"/><rect x="-14" y="-70" width="28" height="5" fill="#fbbf24"/>' },
+                 gorro:'<path d="M100 8 70 48h60Z" fill="#16a34a"/><ellipse cx="100" cy="50" rx="42" ry="9" fill="#dc2626"/><circle class="na-cascabel" cx="100" cy="8" r="7" fill="#fbbf24"/>',
+                 cara:'<path class="na-oreja-l" d="M70 66 56 56l16-8Z" fill="#f6cfae"/><path class="na-oreja-r" d="M130 66l14-10-16-8Z" fill="#f6cfae"/><path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/>',
+                 pecho:'<rect x="66" y="148" width="68" height="14" rx="4" fill="#dc2626"/><circle class="na-boton" cx="100" cy="132" r="6" fill="#fbbf24"/>',
+                 propD:'<g class="na-regalo"><rect x="-14" y="-78" width="28" height="22" rx="4" fill="#dc2626"/><rect x="-14" y="-70" width="28" height="5" fill="#fbbf24"/></g>' },
   reno:        { cat:'navidad', emoji:'🦌', es:{f:'la renita', m:'el renito'}, en:'the reindeer', color:'#92400e',
-                 gorro:'<path d="M78 44q-10-26-30-28 4 10-2 14 14 2 18 18Zm44 0q10-26 30-28-4 10 2 14-14 2-18 18Z" fill="#78350f"/>',
-                 cara:'<path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="100" cy="92" r="11" fill="#ef4444"/><circle cx="96" cy="89" r="3.5" fill="#fca5a5"/>',
-                 pecho:'<rect x="66" y="146" width="68" height="12" rx="5" fill="#16a34a"/><circle cx="100" cy="164" r="9" fill="#fbbf24"/><path d="M96 160h8v8h-8Z" fill="#d97706"/>' },
+                 gorro:'<g class="na-cuernos"><path d="M78 44q-10-26-30-28 4 10-2 14 14 2 18 18Zm44 0q10-26 30-28-4 10 2 14-14 2-18 18Z" fill="#78350f"/></g>',
+                 cara:'<path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/><g class="na-nariz"><circle cx="100" cy="92" r="11" fill="#ef4444"/><circle cx="96" cy="89" r="3.5" fill="#fca5a5"/></g>',
+                 pecho:'<path class="na-bufanda" d="M66 146h68v12H66Z" fill="#16a34a"/><g class="na-campana"><circle cx="100" cy="164" r="9" fill="#fbbf24"/><path d="M96 160h8v8h-8Z" fill="#d97706"/></g>' },
   munecodenieve:{cat:'navidad', emoji:'⛄', es:{f:'la muñeca de nieve', m:'el muñeco de nieve'}, en:'the snowman', color:'#f8fafc',
-                 cuerpo:'<circle cx="100" cy="150" r="48" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><circle cx="100" cy="128" r="6" fill="#1f2937"/><circle cx="100" cy="152" r="6" fill="#1f2937"/><circle cx="100" cy="176" r="6" fill="#1f2937"/>',
-                 cabeza:'<circle cx="100" cy="74" r="33" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><circle cx="88" cy="70" r="5" fill="#1f2937"/><circle cx="112" cy="70" r="5" fill="#1f2937"/><path d="M100 80l22 8-22 8Z" fill="#f97316"/><path d="M86 94q7 7 14 0M110 92q4 4 8 1" stroke="#1f2937" stroke-width="3" fill="none" stroke-linecap="round"/>',
-                 gorro:'<rect x="70" y="36" width="60" height="12" rx="4" fill="#1f2937"/><rect x="78" y="8" width="44" height="30" rx="4" fill="#1f2937"/><rect x="78" y="28" width="44" height="8" fill="#dc2626"/>',
-                 pecho:'<path d="M66 112q34 16 68 0l3 12q-37 18-74 0Z" fill="#dc2626"/>' },
+                 cuerpo:'<circle cx="100" cy="150" r="48" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><circle class="na-boton" cx="100" cy="128" r="6" fill="#1f2937"/><circle class="na-boton na-b2" cx="100" cy="152" r="6" fill="#1f2937"/><circle class="na-boton na-b3" cx="100" cy="176" r="6" fill="#1f2937"/>',
+                 cabeza:'<circle cx="100" cy="74" r="33" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><circle cx="88" cy="70" r="5" fill="#1f2937"/><circle cx="112" cy="70" r="5" fill="#1f2937"/><path class="na-zanahoria" d="M100 80l22 8-22 8Z" fill="#f97316"/><path d="M86 94q7 7 14 0M110 92q4 4 8 1" stroke="#1f2937" stroke-width="3" fill="none" stroke-linecap="round"/>',
+                 gorro:'<g class="na-sombrero"><rect x="70" y="36" width="60" height="12" rx="4" fill="#1f2937"/><rect x="78" y="8" width="44" height="30" rx="4" fill="#1f2937"/><rect x="78" y="28" width="44" height="8" fill="#dc2626"/></g>',
+                 pecho:'<path class="na-bufanda" d="M66 112q34 16 68 0l3 12q-37 18-74 0Z" fill="#dc2626"/>' },
   arbolito:    { cat:'navidad', emoji:'🎄', es:{f:'el arbolito', m:'el arbolito'}, en:'the Christmas tree', color:'#15803d',
-                 cuerpo:'<path d="M100 104 66 152h68Zm0 30-44 60h88Z" fill="#15803d"/><path d="M100 104 78 136h44Z" fill="#16a34a"/><circle cx="84" cy="150" r="5" fill="#fbbf24"/><circle cx="116" cy="146" r="5" fill="#ef4444"/><circle cx="100" cy="172" r="5" fill="#38bdf8"/><circle cx="80" cy="182" r="5" fill="#ef4444"/><circle cx="122" cy="178" r="5" fill="#fbbf24"/>',
-                 gorro:'<path d="m100 14 6 14 15 2-11 10 3 15-13-7-13 7 3-15-11-10 15-2z" fill="#fbbf24"/>',
+                 cuerpo:'<path d="M100 104 66 152h68Zm0 30-44 60h88Z" fill="#15803d"/><path d="M100 104 78 136h44Z" fill="#16a34a"/><circle class="na-luz" cx="84" cy="150" r="5" fill="#fbbf24"/><circle class="na-luz na-b2" cx="116" cy="146" r="5" fill="#ef4444"/><circle class="na-luz na-b3" cx="100" cy="172" r="5" fill="#38bdf8"/><circle class="na-luz na-b4" cx="80" cy="182" r="5" fill="#ef4444"/><circle class="na-luz na-b5" cx="122" cy="178" r="5" fill="#fbbf24"/>',
+                 gorro:'<path class="na-estrella" d="m100 14 6 14 15 2-11 10 3 15-13-7-13 7 3-15-11-10 15-2z" fill="#fbbf24"/>',
                  pecho:'' },
   angel:       { cat:'navidad', emoji:'👼', es:{f:'el ángel', m:'el ángel'}, en:'the angel', color:'#f8fafc',
-                 gorro:'<ellipse cx="100" cy="26" rx="26" ry="8" fill="none" stroke="#fbbf24" stroke-width="6"/>',
-                 capa:'<path d="M70 132q-40-30-48 4 26-4 34 14 6-14 14-18Zm60 0q40-30 48 4-26-4-34 14-6-14-14-18Z" fill="#f8fafc" stroke="#e2e8f0" stroke-width="3"/>',
-                 pecho:'<path d="m100 128 5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#fbbf24"/>' },
+                 gorro:'<ellipse class="na-aureola" cx="100" cy="26" rx="26" ry="8" fill="none" stroke="#fbbf24" stroke-width="6"/>',
+                 capa:'<path class="na-ala-l" d="M70 132q-40-30-48 4 26-4 34 14 6-14 14-18Z" fill="#f8fafc" stroke="#e2e8f0" stroke-width="3"/><path class="na-ala-r" d="M130 132q40-30 48 4-26-4-34 14-6-14-14-18Z" fill="#f8fafc" stroke="#e2e8f0" stroke-width="3"/>',
+                 pecho:'<path class="na-estrella" d="m100 128 5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#fbbf24"/>' },
   pastor:      { cat:'navidad', emoji:'🐑', es:{f:'la pastorcita', m:'el pastorcito'}, en:'the shepherd', color:'#a16207',
-                 gorro:'<path d="M64 52q36-22 72 0l-4 10H68Z" fill="#f8fafc"/><path d="M60 56h80v7H60Z" fill="#dc2626"/>',
-                 propD:'<rect x="-3" y="-96" width="7" height="46" rx="3" fill="#92400e"/><path d="M4 -96q16-6 16 8t-14 10" stroke="#92400e" stroke-width="7" fill="none" stroke-linecap="round"/>',
-                 pecho:'<path d="M74 128q26 14 52 0l4 14q-30 16-60 0Z" fill="#fef3c7"/>' },
+                 gorro:'<g class="na-sombrero"><path d="M64 52q36-22 72 0l-4 10H68Z" fill="#f8fafc"/><path d="M60 56h80v7H60Z" fill="#dc2626"/></g>',
+                 propD:'<g class="na-cayado"><rect x="-3" y="-96" width="7" height="46" rx="3" fill="#92400e"/><path d="M4 -96q16-6 16 8t-14 10" stroke="#92400e" stroke-width="7" fill="none" stroke-linecap="round"/></g>',
+                 pecho:'<path class="na-bufanda" d="M74 128q26 14 52 0l4 14q-30 16-60 0Z" fill="#fef3c7"/>' },
   reymago:     { cat:'navidad', emoji:'👑', es:{f:'la Reina Maga', m:'el Rey Mago'}, en:'the Wise King', color:'#7e22ce',
-                 gorro:'<path d="M70 50 64 20l18 12 18-18 18 18 18-12-6 30z" fill="#fbbf24"/><circle cx="100" cy="36" r="4" fill="#ef4467"/>',
+                 gorro:'<g class="na-corona"><path d="M70 50 64 20l18 12 18-18 18 18 18-12-6 30z" fill="#fbbf24"/><circle cx="100" cy="36" r="4" fill="#ef4467"/></g>',
                  capa:'<path d="M64 122q-16 66-8 110h88q8-44-8-110l-16-4q-20 16-40 0Z" fill="#b91c1c"/><path d="M70 122q-12 60-8 102h12q-6-54 8-98Z" fill="#fbbf24" opacity=".45"/>',
-                 propD:'<rect x="-13" y="-78" width="26" height="24" rx="4" fill="#fbbf24"/><path d="M-13 -78h26l-13 10Z" fill="#f59e0b"/><circle cx="0" cy="-84" r="5" fill="#f8fafc"/>' },
+                 propD:'<g class="na-regalo"><rect x="-13" y="-78" width="26" height="24" rx="4" fill="#fbbf24"/><path d="M-13 -78h26l-13 10Z" fill="#f59e0b"/><circle class="na-destello" cx="0" cy="-84" r="5" fill="#f8fafc"/></g>' },
   cascanueces: { cat:'navidad', emoji:'🥁', es:{f:'la soldadita', m:'el soldadito'}, en:'the nutcracker', color:'#b91c1c',
-                 gorro:'<rect x="72" y="4" width="56" height="44" rx="5" fill="#1f2937"/><rect x="72" y="42" width="56" height="10" fill="#fbbf24"/><circle cx="100" cy="20" r="8" fill="#fbbf24"/><path d="M100 0v8" stroke="#fbbf24" stroke-width="5"/>',
-                 cara:'<path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M78 96h44v10H78Z" fill="#f8fafc"/><path d="M86 96v10M100 96v10M114 96v10" stroke="#cbd5e1" stroke-width="2"/>',
-                 pecho:'<rect x="94" y="118" width="12" height="60" fill="#fbbf24"/><circle cx="100" cy="132" r="5" fill="#f8fafc"/><circle cx="100" cy="152" r="5" fill="#f8fafc"/><path d="M66 124h20v12H66Zm48 0h20v12h-20Z" fill="#fbbf24"/>' },
+                 gorro:'<rect x="72" y="4" width="56" height="44" rx="5" fill="#1f2937"/><rect x="72" y="42" width="56" height="10" fill="#fbbf24"/><circle class="na-destello" cx="100" cy="20" r="8" fill="#fbbf24"/><path d="M100 0v8" stroke="#fbbf24" stroke-width="5"/>',
+                 cara:'<path d="M82 76q6-8 12 0M106 76q6-8 12 0" stroke="#3d2b25" stroke-width="4" fill="none" stroke-linecap="round"/><g class="na-dientes"><path d="M78 96h44v10H78Z" fill="#f8fafc"/><path d="M86 96v10M100 96v10M114 96v10" stroke="#cbd5e1" stroke-width="2"/></g>',
+                 pecho:'<rect x="94" y="118" width="12" height="60" fill="#fbbf24"/><circle class="na-boton" cx="100" cy="132" r="5" fill="#f8fafc"/><circle class="na-boton na-b2" cx="100" cy="152" r="5" fill="#f8fafc"/><path d="M66 124h20v12H66Zm48 0h20v12h-20Z" fill="#fbbf24"/>' },
   jengibre:    { cat:'navidad', emoji:'🍪', es:{f:'la galletita', m:'el galletito'}, en:'the gingerbread', color:'#b45309',
                  piel:'#d6a16a',
-                 cabeza:'<circle cx="100" cy="74" r="33" fill="#d6a16a" stroke="#92400e" stroke-width="3"/><circle cx="88" cy="70" r="5" fill="#3d2b25"/><circle cx="112" cy="70" r="5" fill="#3d2b25"/><path d="M86 90q14 12 28 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="76" cy="84" r="4" fill="#ef4444"/><circle cx="124" cy="84" r="4" fill="#ef4444"/>',
-                 pecho:'<circle cx="100" cy="130" r="5" fill="#f8fafc"/><circle cx="100" cy="150" r="5" fill="#f8fafc"/><path d="M78 168q22 12 44 0" stroke="#f8fafc" stroke-width="4" fill="none"/>' },
+                 cabeza:'<circle cx="100" cy="74" r="33" fill="#d6a16a" stroke="#92400e" stroke-width="3"/><circle cx="88" cy="70" r="5" fill="#3d2b25"/><circle cx="112" cy="70" r="5" fill="#3d2b25"/><path class="na-sonrisa" d="M86 90q14 12 28 0" stroke="#f8fafc" stroke-width="4" fill="none" stroke-linecap="round"/><circle class="na-cachete" cx="76" cy="84" r="4" fill="#ef4444"/><circle class="na-cachete na-b2" cx="124" cy="84" r="4" fill="#ef4444"/>',
+                 pecho:'<circle class="na-boton" cx="100" cy="130" r="5" fill="#f8fafc"/><circle class="na-boton na-b2" cx="100" cy="150" r="5" fill="#f8fafc"/><path class="na-glaseado" d="M78 168q22 12 44 0" stroke="#f8fafc" stroke-width="4" fill="none"/>' },
   pinguino:    { cat:'navidad', emoji:'🐧', es:{f:'la pingüina', m:'el pingüino'}, en:'the penguin', color:'#1f2937',
-                 cabeza:'<circle cx="100" cy="74" r="33" fill="#1f2937"/><ellipse cx="100" cy="84" rx="22" ry="20" fill="#f8fafc"/><circle cx="90" cy="70" r="5" fill="#f8fafc"/><circle cx="110" cy="70" r="5" fill="#f8fafc"/><circle cx="90" cy="70" r="2.5" fill="#1f2937"/><circle cx="110" cy="70" r="2.5" fill="#1f2937"/><path d="M100 80l12 8-12 8-12-8Z" fill="#f97316"/>',
-                 pecho:'<ellipse cx="100" cy="152" rx="26" ry="32" fill="#f8fafc"/>',
-                 gorro:'<path d="M66 44q14-16 34-16t34 16l4 10H62Z" fill="#dc2626"/><ellipse cx="100" cy="54" rx="42" ry="8" fill="#f8fafc"/>' },
+                 cabeza:'<circle cx="100" cy="74" r="33" fill="#1f2937"/><ellipse cx="100" cy="84" rx="22" ry="20" fill="#f8fafc"/><g class="na-ojo"><circle cx="90" cy="70" r="5" fill="#f8fafc"/><circle cx="90" cy="70" r="2.5" fill="#1f2937"/></g><g class="na-ojo na-b2"><circle cx="110" cy="70" r="5" fill="#f8fafc"/><circle cx="110" cy="70" r="2.5" fill="#1f2937"/></g><path class="na-pico" d="M100 80l12 8-12 8-12-8Z" fill="#f97316"/>',
+                 pecho:'<ellipse class="na-panza" cx="100" cy="152" rx="26" ry="32" fill="#f8fafc"/>',
+                 gorro:'<g class="na-sombrero"><path d="M66 44q14-16 34-16t34 16l4 10H62Z" fill="#dc2626"/><ellipse cx="100" cy="54" rx="42" ry="8" fill="#f8fafc"/></g>' },
   osopolar:    { cat:'navidad', emoji:'🐻‍❄️', es:{f:'la osita polar', m:'el osito polar'}, en:'the polar bear', color:'#e2e8f0',
-                 cabeza:'<circle cx="70" cy="46" r="14" fill="#f1f5f9"/><circle cx="130" cy="46" r="14" fill="#f1f5f9"/><circle cx="100" cy="74" r="34" fill="#f8fafc"/><ellipse cx="100" cy="88" rx="18" ry="14" fill="#e2e8f0"/><circle cx="88" cy="68" r="4.5" fill="#1f2937"/><circle cx="112" cy="68" r="4.5" fill="#1f2937"/><ellipse cx="100" cy="84" rx="7" ry="5" fill="#1f2937"/><path d="M92 94q8 8 16 0" stroke="#94a3b8" stroke-width="3" fill="none"/>',
-                 pecho:'<path d="M66 124q34 14 68 0l3 12q-37 16-74 0Z" fill="#dc2626"/>' },
+                 cabeza:'<circle class="na-oreja-l" cx="70" cy="46" r="14" fill="#f1f5f9"/><circle class="na-oreja-r" cx="130" cy="46" r="14" fill="#f1f5f9"/><circle cx="100" cy="74" r="34" fill="#f8fafc"/><ellipse cx="100" cy="88" rx="18" ry="14" fill="#e2e8f0"/><circle cx="88" cy="68" r="4.5" fill="#1f2937"/><circle cx="112" cy="68" r="4.5" fill="#1f2937"/><ellipse class="na-hocico" cx="100" cy="84" rx="7" ry="5" fill="#1f2937"/><path d="M92 94q8 8 16 0" stroke="#94a3b8" stroke-width="3" fill="none"/>',
+                 pecho:'<path class="na-bufanda" d="M66 124q34 14 68 0l3 12q-37 16-74 0Z" fill="#dc2626"/>' },
   estrellabelen:{cat:'navidad', emoji:'🌟', es:{f:'la estrella de Belén', m:'la estrella de Belén'}, en:'the Christmas star', color:'#fbbf24',
-                 cabeza:'<path d="m100 30 10 26 28 2-21 18 7 27-24-15-24 15 7-27-21-18 28-2z" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/><path d="M88 76q6-7 12 0M104 76q6-7 12 0" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M92 86q8 10 16 0Z" fill="#78350f"/>',
-                 pecho:'<circle cx="100" cy="134" r="7" fill="#fde68a"/><circle cx="84" cy="152" r="5" fill="#fde68a"/><circle cx="116" cy="152" r="5" fill="#fde68a"/>' },
+                 cabeza:'<path class="na-estrella" d="m100 30 10 26 28 2-21 18 7 27-24-15-24 15 7-27-21-18 28-2z" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/><path d="M88 76q6-7 12 0M104 76q6-7 12 0" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M92 86q8 10 16 0Z" fill="#78350f"/>',
+                 pecho:'<circle class="na-destello" cx="100" cy="134" r="7" fill="#fde68a"/><circle class="na-destello na-b2" cx="84" cy="152" r="5" fill="#fde68a"/><circle class="na-destello na-b3" cx="116" cy="152" r="5" fill="#fde68a"/>' },
   regalo:      { cat:'navidad', emoji:'🎁', es:{f:'el regalito', m:'el regalito'}, en:'the gift', color:'#dc2626',
-                 cuerpo:'<rect x="52" y="112" width="96" height="88" rx="8" fill="#dc2626"/><rect x="88" y="112" width="24" height="88" fill="#fbbf24"/><rect x="52" y="146" width="96" height="18" fill="#fbbf24"/>',
-                 gorro:'<path d="M100 40q-20-22-30-6t30 14q40 2 30-14t-30 6Z" fill="#16a34a"/>',
+                 cuerpo:'<g class="na-caja"><rect x="52" y="112" width="96" height="88" rx="8" fill="#dc2626"/><rect x="88" y="112" width="24" height="88" fill="#fbbf24"/><rect x="52" y="146" width="96" height="18" fill="#fbbf24"/></g>',
+                 gorro:'<path class="na-lazo" d="M100 40q-20-22-30-6t30 14q40 2 30-14t-30 6Z" fill="#16a34a"/>',
                  pecho:'' }
 ,
   rey:         { cat:'fantasia', emoji:'👑', es:{f:'la reina', m:'el rey'}, en:'the royal', color:'#7e22ce',
@@ -6158,7 +6327,9 @@ function celSvgPersona(s, opciones){
         ? '<g fill="#a855f7"><path d="M100 32 84 24v16z"/><path d="M100 32 116 24v16z"/><circle cx="100" cy="32" r="5.5"/></g>' : '');
     const cabezaEscala = edad==='joven'
         ? '<g transform="translate(100,80) scale(.9) translate(-100,-80)">' : '<g>';
-    return `<svg viewBox="0 0 200 270" aria-hidden="true">
+    // La etiqueta del disfraz deja que el CSS le de vida a cada pieza.
+    const marca = 'cel-fig' + (rol ? ' dis-'+(rol.id||'') : (nav ? ' dis-navidad' : (hw ? ' dis-hw' : '')));
+    return `<svg class="${marca}" viewBox="0 0 200 270" aria-hidden="true">
   <ellipse class="cel-sombra" cx="100" cy="254" rx="48" ry="9"/>
   <g class="cel-cuerpo">
     ${capaAtras}
